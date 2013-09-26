@@ -67,10 +67,10 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (string.IsNullOrEmpty(hatenaId))
         Usage("hatena-idを指定してください");
 
-      if (string.IsNullOrEmpty(hatenaId))
+      if (string.IsNullOrEmpty(blogId))
         Usage("blog-idを指定してください");
 
-      if (string.IsNullOrEmpty(hatenaId))
+      if (string.IsNullOrEmpty(apiKey))
         Usage("api-keyを指定してください");
 
       var atom = new Atom();
