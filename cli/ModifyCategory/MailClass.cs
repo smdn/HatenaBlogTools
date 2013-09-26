@@ -106,18 +106,6 @@ namespace Smdn.Applications.HatenaBlogTools {
           Console.WriteLine("[{0}] -> [{1}]", pair.Key, pair.Value);
       }
 
-      var at = new Atom();
-
-      at.Credential = new NetworkCredential(hatenaId, apiKey);
-
-#if false
-      HttpStatusCode st;
-      var ret=      at.Get(new Uri("http://blog.hatena.ne.jp/smdn/smdn.hatenablog.jp/atom/entry/11696248318758086243"), out st);
-
-      ret.Save(Console.OpenStandardOutput());
-      return;
-#endif
-
       Console.WriteLine();
       Console.WriteLine("エントリを取得中 ...");
 
