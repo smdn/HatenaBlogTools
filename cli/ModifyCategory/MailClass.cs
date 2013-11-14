@@ -38,6 +38,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       public string Author;
       public string Content;
       public string Published;
+      public string Updated;
       public HashSet<string> Categories = new HashSet<string>();
       public string Draft;
     }
@@ -226,6 +227,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         e.Author = entry.GetSingleNodeValueOf("atom:author/atom:name/text()", nsmgr);
         e.Content = entry.GetSingleNodeValueOf("atom:content/text()", nsmgr);
         e.Published = entry.GetSingleNodeValueOf("atom:published/text()", nsmgr);
+        e.Updated = entry.GetSingleNodeValueOf("atom:updated/text()", nsmgr);
 
         foreach (XmlElement category in entry.SelectNodes("./atom:category", nsmgr)) {
           e.Categories.Add(category.GetAttribute("term"));
@@ -252,6 +254,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       e.AppendElement("title", Namespaces.Atom).AppendText(entry.Title);
       e.AppendElement("author", Namespaces.Atom).AppendElement("name", Namespaces.Atom).AppendText(entry.Author);
+      e.AppendElement("updated", Namespaces.Atom).AppendText(entry.Updated);
 
       var c = e.AppendElement("content", Namespaces.Atom);
 
