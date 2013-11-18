@@ -97,8 +97,8 @@ namespace Smdn.Applications.HatenaBlogTools {
         // 次のatom:linkを取得する
         nextUri = collectionDocument.GetSingleNodeValueOf("/atom:feed/atom:link[@rel='next']/@href", nsmgr, s => s == null ? null : new Uri(s));
 
-        // atom:entryをコピーする
         if (outputDocument == null) {
+          // link[@rel=first/next]を削除してルート要素以下をコピーする
           collectionDocument.SelectSingleNode("/atom:feed/atom:link[@rel='first']", nsmgr).RemoveSelf();
           collectionDocument.SelectSingleNode("/atom:feed/atom:link[@rel='next']", nsmgr).RemoveSelf();
 
@@ -107,6 +107,7 @@ namespace Smdn.Applications.HatenaBlogTools {
           outputDocument.AppendChild(outputDocument.ImportNode(collectionDocument.DocumentElement, true));
         }
         else {
+          // atom:entryのみをコピーする
           foreach (XmlNode entry in collectionDocument.SelectNodes("/atom:feed/atom:entry", nsmgr)) {
             outputDocument.DocumentElement.AppendChild(outputDocument.ImportNode(entry, true));
           }
@@ -116,6 +117,7 @@ namespace Smdn.Applications.HatenaBlogTools {
           break;
       }
 
+      // 結果を保存
       using (var outputStream = outputFile == "-"
              ? Console.OpenStandardOutput()
              : new FileStream(outputFile, FileMode.Create, FileAccess.Write)) {
