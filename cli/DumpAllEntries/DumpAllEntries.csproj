@@ -54,5 +54,8 @@
     <Compile Include="..\..\core\Smdn.Xml\Smdn.Xml\XmlNodeExtensions.cs">
       <Link>XmlNodeExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\..\core\Smdn\Smdn\UnixTimeStamp.cs">
+      <Link>UnixTimeStamp.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>
