@@ -59,9 +59,19 @@ namespace Smdn.Applications.HatenaBlogTools {
       return GetResponse(req, out statusCode);
     }
 
+    public XmlDocument Post(Uri requestUri, XmlDocument document, out HttpStatusCode statusCode)
+    {
+      return PostPut(WebRequestMethods.Http.Post, requestUri, document, out statusCode);
+    }
+
     public XmlDocument Put(Uri requestUri, XmlDocument document, out HttpStatusCode statusCode)
     {
-      var req = CreateRequest(WebRequestMethods.Http.Put, requestUri);
+      return PostPut(WebRequestMethods.Http.Put, requestUri, document, out statusCode);
+    }
+
+    private XmlDocument PostPut(string method, Uri requestUri, XmlDocument document, out HttpStatusCode statusCode)
+    {
+      var req = CreateRequest(method, requestUri);
 
       req.ContentType = "application/atom+xml";
 
