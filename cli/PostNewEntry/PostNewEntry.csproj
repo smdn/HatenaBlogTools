@@ -53,6 +53,9 @@
     <Compile Include="..\..\core\Smdn.Xml\Smdn.Xml\XmlNodeExtensions.cs">
       <Link>XmlNodeExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

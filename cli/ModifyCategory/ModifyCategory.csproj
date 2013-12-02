@@ -57,5 +57,8 @@
     <Compile Include="..\Namespaces.cs">
       <Link>Namespaces.cs</Link>
     </Compile>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>

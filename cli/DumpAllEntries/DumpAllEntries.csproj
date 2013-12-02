@@ -57,5 +57,8 @@
     <Compile Include="..\..\core\Smdn\Smdn\UnixTimeStamp.cs">
       <Link>UnixTimeStamp.cs</Link>
     </Compile>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>
