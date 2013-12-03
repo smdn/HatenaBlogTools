@@ -33,13 +33,10 @@ namespace Smdn.Applications.HatenaBlogTools {
   class MainClass {
     public static void Main(string[] args)
     {
+      var entry = new Entry();
       string hatenaId = null;
       string blogId = null;
       string apiKey = null;
-      string title = null;
-      string content = null;
-      bool draft = false;
-      var categories = new HashSet<string>(StringComparer.Ordinal);
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
@@ -56,15 +53,15 @@ namespace Smdn.Applications.HatenaBlogTools {
             break;
 
           case "-title":
-            title = args[++i];
+            entry.Title = args[++i];
             break;
 
           case "-category":
-            categories.Add(args[++i]);
+            entry.Categories.Add(args[++i]);
             break;
 
           case "-draft":
-            draft = true;
+            entry.IsDraft = true;
             break;
 
           case "/help":
@@ -74,7 +71,7 @@ namespace Smdn.Applications.HatenaBlogTools {
             break;
 
           default:
-            content = args[i];
+            entry.Content = args[i];
             break;
         }
       }
@@ -88,7 +85,25 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (string.IsNullOrEmpty(apiKey))
         Usage("api-keyを指定してください");
 
-      PostEntry(hatenaId, blogId, apiKey, title, categories, draft, content);
+      var collectionUri = new Uri(string.Concat("http://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom/entry"));
+      var atom = new Atom();
+
+      atom.Credential = new NetworkCredential(hatenaId, apiKey);
+
+      HttpStatusCode statusCode;
+
+      var responseDocument = HatenaBlog.PostEntry(atom, collectionUri, entry, out statusCode);
+
+      if (statusCode == HttpStatusCode.Created) {
+        var nsmgr = new XmlNamespaceManager(responseDocument.NameTable);
+
+        nsmgr.AddNamespace("atom", Namespaces.Atom);
+
+        Console.WriteLine("投稿が完了しました: {0}", responseDocument.GetSingleNodeValueOf("atom:entry/atom:link[@rel='alternate']/@href", nsmgr));
+      }
+      else {
+        Console.Error.WriteLine("投稿に失敗しました: {0}", statusCode);
+      }
     }
 
     private static void Usage(string format, params string[] args)
@@ -105,54 +120,6 @@ namespace Smdn.Applications.HatenaBlogTools {
       Console.Error.WriteLine("  -draft : post entry as draft");
 
       Environment.Exit(-1);
-    }
-
-    private static void PostEntry(string hatenaId, string blogId, string apiKey,
-      string title, IEnumerable<string> categories, bool draft, string content)
-    {
-      var doc = new XmlDocument();
-
-      doc.AppendChild(doc.CreateXmlDeclaration("1.0", "utf-8", null));
-
-      var e = doc.AppendElement("entry", Namespaces.Atom);
-
-      e.SetAttribute("xmlns", Namespaces.Atom);
-      e.SetAttribute("xmlns:app", Namespaces.App);
-
-      e.AppendElement("title", Namespaces.Atom).AppendText(title);
-      //e.AppendElement("updated", Namespaces.Atom).AppendText(entry.Updated);
-
-      var c = e.AppendElement("content", Namespaces.Atom);
-
-      c.SetAttribute("type", "text/plain");
-      c.AppendText(content);
-
-      foreach (var category in categories) {
-        e.AppendElement("category", Namespaces.Atom).SetAttribute("term", category);
-      }
-
-      if (draft)
-        e.AppendElement("control", Namespaces.App).AppendElement("draft", Namespaces.App).AppendText("yes");
-
-      var atom = new Atom();
-      var collectionUri = new Uri(string.Concat("http://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom/entry"));
-
-      atom.Credential = new NetworkCredential(hatenaId, apiKey);
-
-      HttpStatusCode statusCode;
-
-      var response = atom.Post(collectionUri, doc, out statusCode);
-
-      if (statusCode == HttpStatusCode.Created) {
-        var nsmgr = new XmlNamespaceManager(response.NameTable);
-
-        nsmgr.AddNamespace("atom", Namespaces.Atom);
-
-        Console.WriteLine("投稿が完了しました: {0}", response.GetSingleNodeValueOf("atom:entry/atom:link[@rel='alternate']/@href", nsmgr));
-      }
-      else {
-        Console.Error.WriteLine("投稿に失敗しました: {0}", statusCode);
-      }
     }
   }
 }
