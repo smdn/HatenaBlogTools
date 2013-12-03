@@ -24,6 +24,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Xml;
 
@@ -37,6 +38,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       string hatenaId = null;
       string blogId = null;
       string apiKey = null;
+      string contentFile = null;
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
@@ -64,6 +66,10 @@ namespace Smdn.Applications.HatenaBlogTools {
             entry.IsDraft = true;
             break;
 
+          case "-fromfile":
+            contentFile = args[++i];
+            break;
+
           case "/help":
           case "-h":
           case "--help":
@@ -85,6 +91,22 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (string.IsNullOrEmpty(apiKey))
         Usage("api-keyを指定してください");
 
+      if (!string.IsNullOrEmpty(contentFile)) {
+        if (contentFile == "-") {
+          using (var reader = new StreamReader(Console.OpenStandardInput())) {
+            entry.Content = reader.ReadToEnd();
+          }
+        }
+        else if (File.Exists(contentFile)) {
+          entry.Content = File.ReadAllText(contentFile);
+        }
+        else {
+          Usage("ファイル '{0}' が見つかりません", contentFile);
+        }
+      }
+
+      Console.Write("投稿しています ... ");
+
       var collectionUri = new Uri(string.Concat("http://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom/entry"));
       var atom = new Atom();
 
@@ -99,10 +121,10 @@ namespace Smdn.Applications.HatenaBlogTools {
 
         nsmgr.AddNamespace("atom", Namespaces.Atom);
 
-        Console.WriteLine("投稿が完了しました: {0}", responseDocument.GetSingleNodeValueOf("atom:entry/atom:link[@rel='alternate']/@href", nsmgr));
+        Console.WriteLine("完了しました: {0}", responseDocument.GetSingleNodeValueOf("atom:entry/atom:link[@rel='alternate']/@href", nsmgr));
       }
       else {
-        Console.Error.WriteLine("投稿に失敗しました: {0}", statusCode);
+        Console.Error.WriteLine("失敗しました: {0}", statusCode);
       }
     }
 
@@ -118,6 +140,8 @@ namespace Smdn.Applications.HatenaBlogTools {
         System.IO.Path.GetFileName(System.Reflection.Assembly.GetEntryAssembly().Location));
       Console.Error.WriteLine("options:");
       Console.Error.WriteLine("  -draft : post entry as draft");
+      Console.Error.WriteLine("  -fromfile <file>: post content from <file>");
+      Console.Error.WriteLine("  -fromfile -: post content from stdin");
 
       Environment.Exit(-1);
     }
