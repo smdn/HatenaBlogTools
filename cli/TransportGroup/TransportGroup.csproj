@@ -59,6 +59,12 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\HatenaBlog.cs">
+      <Link>HatenaBlog.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\Smdn.Core.Miscellaneous\Smdn\ConsoleUtils.cs">
+      <Link>ConsoleUtils.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
