@@ -40,6 +40,13 @@ namespace Smdn.Applications.HatenaBlogTools {
       HatenaDiary,
     }
 
+    private class Comment {
+      public string Content;
+      public string Author;
+      public string Url;
+      public DateTime Date;
+    }
+
     public static void Main(string[] args)
     {
       string hatenaId = null;
@@ -270,6 +277,80 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
 
       outputDocument.Save(outputStream);
+    }
+
+    private static IEnumerable<Comment> RetrieveComments(Uri entryUrl)
+    {
+      var doc = new XmlDocument();
+
+      using (var sgmlReader = new Sgml.SgmlReader()) {
+        sgmlReader.Href = entryUrl.ToString();
+        sgmlReader.CaseFolding = Sgml.CaseFolding.ToLower;
+
+        doc.Load(sgmlReader);
+
+        // TODO: sleep
+      }
+
+      //var contentNode = doc.GetElementById("content");
+      var contentNode = doc.SelectSingleNode("//*[@id = 'content']");
+
+      foreach (XmlElement commentRootElement in contentNode.SelectNodes(".//*[contains(@class, 'entry-comment')]")) {
+        var comment = new Comment();
+
+        foreach (XmlNode commentChildNode in commentRootElement.ChildNodes) {
+          if (commentChildNode.NodeType != XmlNodeType.Element)
+            continue;
+
+          var commentChildElement = (XmlElement)commentChildNode;
+
+          switch (commentChildElement.GetAttribute("class")) {
+            case "comment-user-name":
+              /* 
+               * <!-- hatena user -->
+               * <e class="comment-user-name">
+               *   <a class="comment-user-id" href="http://blog.hatena.ne.jp/hatenaid/">
+               *     <span class="comment-nickname" data-user-name="hatenaid">
+               *       id:hatenaid
+               *     </span>
+               *   </a>
+               * </e>
+               * <!-- name with website -->
+               * <e class="comment-user-name">
+               *   name
+               *   <a class="icon-website" href="http://example.com/" />
+               * </e>
+               * <!-- name only -->
+               * <e class="comment-user-name">
+               *   name
+               * </e>
+               */
+              comment.Author = commentChildElement.InnerText.Trim();
+              comment.Url = commentChildElement.GetSingleNodeValueOf(".//@href");
+              break;
+
+            case "comment-content":
+              /* 
+               * <e class="comment-content">
+               *   <p>comment-html</p>
+               * </e>
+               */
+              comment.Content = commentChildElement.FirstChild.InnerXml;
+              break;
+
+            case "comment-metadata":
+              /* 
+               * <e class="comment-metadata">
+               *   <time data-epoch="1387283661000" />
+               * </e>
+               */
+              comment.Date = UnixTimeStamp.ToLocalDateTime(commentChildElement.GetSingleNodeValueOf("time/@data-epoch", long.Parse) / 1000);
+              break;
+          }
+        }
+
+        yield return comment;
+      }
     }
 
     private static void Usage(string format, params string[] args)
