@@ -11,12 +11,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostNewEntry", "cli\PostNew
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{88BC1CDA-25A5-47A5-8F8C-D188E82486F0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SgmlReaderDll8", "core\SgmlReader\sgmlreaderdll\SgmlReaderDll8.csproj", "{499527FF-AE52-450F-B3E3-4AD53E1712AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{499527FF-AE52-450F-B3E3-4AD53E1712AD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{499527FF-AE52-450F-B3E3-4AD53E1712AD}.Debug|x86.Build.0 = Debug|Any CPU
+		{499527FF-AE52-450F-B3E3-4AD53E1712AD}.Release|x86.ActiveCfg = Release|Any CPU
+		{499527FF-AE52-450F-B3E3-4AD53E1712AD}.Release|x86.Build.0 = Release|Any CPU
 		{69B775E5-8B31-48F3-A71B-94AA5EF33F15}.Debug|x86.ActiveCfg = Debug|x86
 		{69B775E5-8B31-48F3-A71B-94AA5EF33F15}.Debug|x86.Build.0 = Debug|x86
 		{69B775E5-8B31-48F3-A71B-94AA5EF33F15}.Release|x86.ActiveCfg = Release|x86
@@ -34,8 +40,9 @@ Global
 		{C75CA0A0-AA2A-4C28-A1FA-B0F51671F7DB} = {7448DB9E-F012-4EF2-BFAA-7A03F4861DD5}
 		{69B775E5-8B31-48F3-A71B-94AA5EF33F15} = {7448DB9E-F012-4EF2-BFAA-7A03F4861DD5}
 		{EB061C25-6DFF-47EA-BF8E-0C1F22D1BBE8} = {7448DB9E-F012-4EF2-BFAA-7A03F4861DD5}
+		{499527FF-AE52-450F-B3E3-4AD53E1712AD} = {88BC1CDA-25A5-47A5-8F8C-D188E82486F0}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = cli\PostNewEntry\PostNewEntry.csproj
+		StartupItem = cli\DumpAllEntries\DumpAllEntries.csproj
 	EndGlobalSection
 EndGlobal
