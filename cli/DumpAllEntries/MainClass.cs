@@ -42,12 +42,14 @@ namespace Smdn.Applications.HatenaBlogTools {
       HatenaDiary,
     }
 
+#if RETRIEVE_COMMENTS
     private class Comment {
       public string Content;
       public string Author;
       public string Url;
       public DateTime Date;
     }
+#endif
 
     public static void Main(string[] args)
     {
