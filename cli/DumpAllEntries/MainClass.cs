@@ -115,7 +115,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (string.IsNullOrEmpty(apiKey))
         Usage("api-keyを指定してください");
 
-      var outputDocument = DumpAllEntry(hatenaId, blogId, apiKey);
+      var outputDocument = DumpAllEntries(hatenaId, blogId, apiKey);
 
       if (outputDocument == null)
         return;
@@ -142,7 +142,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
     }
 
-    private static XmlDocument DumpAllEntry(string hatenaId, string blogId, string apiKey)
+    private static XmlDocument DumpAllEntries(string hatenaId, string blogId, string apiKey)
     {
       var atom = new Atom();
 
