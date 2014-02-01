@@ -60,5 +60,8 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\HatenaBlog.cs">
+      <Link>HatenaBlog.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>

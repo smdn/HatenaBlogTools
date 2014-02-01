@@ -31,18 +31,6 @@ using Smdn.Xml;
 
 namespace Smdn.Applications.HatenaBlogTools {
   class MainClass {
-    class Entry {
-      public bool Modified = false;
-      public Uri MemberUri;
-      public string Title;
-      public string Author;
-      public string Content;
-      public string Published;
-      public string Updated;
-      public HashSet<string> Categories = new HashSet<string>();
-      public string Draft;
-    }
-
     public static void Main(string[] args)
     {
       string hatenaId = null;
@@ -110,19 +98,27 @@ namespace Smdn.Applications.HatenaBlogTools {
       Console.WriteLine();
       Console.WriteLine("エントリを取得中 ...");
 
-      var entries = GetEntries(hatenaId, blogId, apiKey);
+      List<PostedEntry> entries = null;
 
-      if (entries == null)
+      try {
+        entries = HatenaBlog.GetEntries(hatenaId, blogId, apiKey);
+      }
+      catch (WebException ex) {
+        Console.Error.WriteLine(ex.Message);
         return;
+      }
 
       Console.WriteLine("以下のエントリのカテゴリが変更されます");
 
+      var modifiedEntries = new List<PostedEntry>(entries.Count);
+
       foreach (var entry in entries) {
         var currentJoinedCategories = string.Join("][", entry.Categories);
+        var modified = false;
 
         foreach (var pair in categoryMap) {
           if (entry.Categories.Contains(pair.Key)) {
-            entry.Modified = true;
+            modified = true;
 
             entry.Categories.Remove(pair.Key);
 
@@ -131,8 +127,10 @@ namespace Smdn.Applications.HatenaBlogTools {
           }
         }
 
-        if (!entry.Modified)
+        if (!modified)
           continue;
+
+        modifiedEntries.Add(entry);
 
         Console.WriteLine("{0} \"{1}\" [{2}] -> [{3}]",
                           entry.Published,
@@ -151,16 +149,19 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       Console.WriteLine();
 
-      foreach (var entry in entries) {
-        if (!entry.Modified)
-          continue;
+      var atom = new Atom();
 
+      atom.Credential = new NetworkCredential(hatenaId, apiKey);
+
+      foreach (var entry in modifiedEntries) {
         Console.Write("変更を更新中: {0} \"{1}\" [{2}] ... ",
                       entry.Published,
                       entry.Title,
                       string.Join("][", entry.Categories));
 
-        var status = PostEntry(hatenaId, apiKey, entry);
+        HttpStatusCode status;
+
+        HatenaBlog.UpdateEntry(atom, entry, out status);
 
         if (status == HttpStatusCode.OK)
           Console.WriteLine();
@@ -173,109 +174,6 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
 
       Console.WriteLine("変更が完了しました");
-    }
-
-    private static List<Entry> GetEntries(string hatenaId, string blogId, string apiKey)
-    {
-      var atom = new Atom();
-
-      atom.Credential = new NetworkCredential(hatenaId, apiKey);
-
-      var rootEndPoint = new Uri(string.Concat("http://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom/"));
-      var nextUri = new Uri(rootEndPoint, "./entry");
-      HttpStatusCode statusCode;
-
-      var entries = new List<Entry>();
-
-      for (;;) {
-        var collectionDocument = atom.Get(nextUri, out statusCode);
-
-        if (statusCode != HttpStatusCode.OK) {
-          Console.Error.WriteLine("エントリの取得に失敗したため中断しました ({0})", statusCode);
-          return null;
-        }
-
-        entries.AddRange(ReadEntries(collectionDocument));
-
-        // 次のatom:linkを取得する
-        var nsmgr = new XmlNamespaceManager(collectionDocument.NameTable);
-
-        nsmgr.AddNamespace("atom", Namespaces.Atom);
-
-        nextUri = collectionDocument.GetSingleNodeValueOf("/atom:feed/atom:link[@rel='next']/@href", nsmgr, s => s == null ? null : new Uri(s));
-
-        if (nextUri == null)
-          break;
-      }
-
-      return entries;
-    }
-
-    private static IEnumerable<Entry> ReadEntries(XmlDocument doc)
-    {
-      var nsmgr = new XmlNamespaceManager(doc.NameTable);
-
-      nsmgr.PushScope();
-      nsmgr.AddNamespace("atom", Namespaces.Atom);
-      nsmgr.AddNamespace("app", Namespaces.App);
-
-      foreach (XmlNode entry in doc.SelectNodes("/atom:feed/atom:entry", nsmgr)) {
-        var e = new Entry();
-
-        e.MemberUri = entry.GetSingleNodeValueOf("atom:link[@rel='edit']/@href", nsmgr, s => s == null ? null : new Uri(s));
-        e.Title = entry.GetSingleNodeValueOf("atom:title/text()", nsmgr);
-        e.Author = entry.GetSingleNodeValueOf("atom:author/atom:name/text()", nsmgr);
-        e.Content = entry.GetSingleNodeValueOf("atom:content/text()", nsmgr);
-        e.Published = entry.GetSingleNodeValueOf("atom:published/text()", nsmgr);
-        e.Updated = entry.GetSingleNodeValueOf("atom:updated/text()", nsmgr);
-
-        foreach (XmlElement category in entry.SelectNodes("./atom:category", nsmgr)) {
-          e.Categories.Add(category.GetAttribute("term"));
-        }
-
-        e.Draft = entry.GetSingleNodeValueOf("app:control/app:draft/text()", nsmgr);
-
-        yield return e;
-      }
-
-      nsmgr.PopScope();
-    }
-
-    private static HttpStatusCode PostEntry(string hatenaId, string apiKey, Entry entry)
-    {
-      var doc = new XmlDocument();
-
-      doc.AppendChild(doc.CreateXmlDeclaration("1.0", "utf-8", null));
-
-      var e = doc.AppendElement("entry", Namespaces.Atom);
-
-      e.SetAttribute("xmlns", Namespaces.Atom);
-      e.SetAttribute("xmlns:app", Namespaces.App);
-
-      e.AppendElement("title", Namespaces.Atom).AppendText(entry.Title);
-      e.AppendElement("author", Namespaces.Atom).AppendElement("name", Namespaces.Atom).AppendText(entry.Author);
-      e.AppendElement("updated", Namespaces.Atom).AppendText(entry.Updated);
-
-      var c = e.AppendElement("content", Namespaces.Atom);
-
-      c.SetAttribute("type", "text/plain");
-      c.AppendText(entry.Content);
-
-      foreach (var category in entry.Categories) {
-        e.AppendElement("category", Namespaces.Atom).SetAttribute("term", category);
-      }
-
-      e.AppendElement("control", Namespaces.App).AppendElement("draft", Namespaces.App).AppendText(entry.Draft);
-
-      var atom = new Atom();
-
-      atom.Credential = new NetworkCredential(hatenaId, apiKey);
-
-      HttpStatusCode statusCode;
-
-      atom.Put(entry.MemberUri, doc, out statusCode);
-
-      return statusCode;
     }
 
     private static void Usage(string format, params string[] args)
