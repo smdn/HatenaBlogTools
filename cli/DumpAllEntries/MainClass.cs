@@ -22,6 +22,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#undef RETRIEVE_COMMENTS
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -52,6 +54,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       string hatenaId = null;
       string blogId = null;
       string apiKey = null;
+      bool retrieveComments = false;
       OutputFormat outputFormat = OutputFormat.Default;
       string outputFile = "-";
 
@@ -85,6 +88,12 @@ namespace Smdn.Applications.HatenaBlogTools {
             }
             break;
 
+#if RETRIEVE_COMMENTS
+          case "-comment":
+            retrieveComments = true;
+            break;
+#endif
+
           case "/help":
           case "-h":
           case "--help":
@@ -106,6 +115,35 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (string.IsNullOrEmpty(apiKey))
         Usage("api-keyを指定してください");
 
+      var outputDocument = DumpAllEntry(hatenaId, blogId, apiKey);
+
+      if (outputDocument == null)
+        return;
+
+      // 結果を保存
+      using (var outputStream = outputFile == "-"
+             ? Console.OpenStandardOutput()
+             : new FileStream(outputFile, FileMode.Create, FileAccess.Write)) {
+
+        switch (outputFormat) {
+          case OutputFormat.HatenaDiary:
+            SaveAsHatenaDiary(outputDocument, outputStream, retrieveComments);
+            break;
+
+          case OutputFormat.MovableType:
+            SaveAsMovableType(outputDocument, outputStream, retrieveComments);
+            break;
+
+          case OutputFormat.Default:
+          default:
+            outputDocument.Save(outputStream);
+            break;
+        }
+      }
+    }
+
+    private static XmlDocument DumpAllEntry(string hatenaId, string blogId, string apiKey)
+    {
       var atom = new Atom();
 
       atom.Credential = new NetworkCredential(hatenaId, apiKey);
@@ -115,12 +153,17 @@ namespace Smdn.Applications.HatenaBlogTools {
       HttpStatusCode statusCode;
       XmlDocument outputDocument = null;
 
+      Console.Error.Write("エントリをダンプ中 ");
+
       for (;;) {
         var collectionDocument = atom.Get(nextUri, out statusCode);
 
-        if (statusCode != HttpStatusCode.OK) {
+        if (statusCode == HttpStatusCode.OK) {
+          Console.Error.Write(".");
+        }
+        else {
           Console.Error.WriteLine("中断しました ({0})", statusCode);
-          return;
+          return null;
         }
 
         var nsmgr = new XmlNamespaceManager(collectionDocument.NameTable);
@@ -150,29 +193,12 @@ namespace Smdn.Applications.HatenaBlogTools {
           break;
       }
 
-      // 結果を保存
-      using (var outputStream = outputFile == "-"
-             ? Console.OpenStandardOutput()
-             : new FileStream(outputFile, FileMode.Create, FileAccess.Write)) {
+      Console.Error.WriteLine("完了");
 
-        switch (outputFormat) {
-          case OutputFormat.HatenaDiary:
-            SaveAsHatenaDiary(outputDocument, outputStream);
-            break;
-
-          case OutputFormat.MovableType:
-            SaveAsMovableType(outputDocument, outputStream);
-            break;
-
-          case OutputFormat.Default:
-          default:
-            outputDocument.Save(outputStream);
-            break;
-        }
-      }
+      return outputDocument;
     }
 
-    private static void SaveAsMovableType(XmlDocument document, Stream outputStream)
+    private static void SaveAsMovableType(XmlDocument document, Stream outputStream, bool retrieveComments)
     {
       /*
        * http://www.movabletype.jp/documentation/appendices/import-export-format.html
@@ -197,7 +223,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
         var updatedDate = DateTimeOffset.Parse(entry.GetSingleNodeValueOf("atom:updated/text()", nsmgr));
 
-        writer.WriteLine(string.Concat("DATE: ", updatedDate.ToString("MM/dd/yyyy hh\\:mm\\:ss tt", System.Globalization.CultureInfo.InvariantCulture)));
+        writer.WriteLine(string.Concat("DATE: ", ToMovableTypeDateString(updatedDate.LocalDateTime)));
 
         var tags = entry.GetNodeValuesOf("atom:category/@term", nsmgr)
                         .Select(tag => tag.Contains(" ") ? string.Concat("\"", tag, "\"") : tag);
@@ -216,6 +242,22 @@ namespace Smdn.Applications.HatenaBlogTools {
         writer.WriteLine( entry.GetSingleNodeValueOf("hatena:formatted-content/text()", nsmgr));
         writer.WriteLine(multilineFieldDelimiter);
 
+#if RETRIEVE_COMMENTS
+        if (retrieveComments) {
+          var entryUrl = entry.GetSingleNodeValueOf("atom:link[@rel='alternate' and @type='text/html']/@href", nsmgr);
+
+          foreach (var comment in RetrieveComments(entryUrl)) {
+            writer.WriteLine("COMMENT:");
+            writer.WriteLine(string.Concat("AUTHOR: ", comment.Author));
+            writer.WriteLine(string.Concat("DATE: ", ToMovableTypeDateString(comment.Date)));
+            writer.WriteLine(string.Concat("URL: ", comment.Url));
+            writer.WriteLine(comment.Content);
+
+            writer.WriteLine(multilineFieldDelimiter);
+          }
+        }
+#endif
+
         // end of entry
         const string entryDelimiter = "--------";
 
@@ -225,7 +267,12 @@ namespace Smdn.Applications.HatenaBlogTools {
       writer.Flush();
     }
 
-    private static void SaveAsHatenaDiary(XmlDocument document, Stream outputStream)
+    private static string ToMovableTypeDateString(DateTime dateTime)
+    {
+      return dateTime.ToString("MM/dd/yyyy hh\\:mm\\:ss tt", System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    private static void SaveAsHatenaDiary(XmlDocument document, Stream outputStream, bool retrieveComments)
     {
       var nsmgr = new XmlNamespaceManager(document.NameTable);
 
@@ -249,12 +296,12 @@ namespace Smdn.Applications.HatenaBlogTools {
           bodyElement = (XmlElement)dayElement.FirstChild;
         }
         else {
-          dayElement = (XmlElement)diaryElement.AppendChild(outputDocument.CreateElement("day"));
+          dayElement = diaryElement.AppendElement("day");
 
           dayElement.SetAttribute("date", date);
           dayElement.SetAttribute("title", string.Empty);
 
-          bodyElement = (XmlElement)dayElement.AppendChild(outputDocument.CreateElement("body"));
+          bodyElement = dayElement.AppendElement("body");
 
           dayElements[date] = dayElement;
         }
@@ -274,22 +321,41 @@ namespace Smdn.Applications.HatenaBlogTools {
         body.AppendLine();
 
         bodyElement.AppendText(body.ToString());
+
+#if RETRIEVE_COMMENTS
+        if (retrieveComments) {
+          var entryUrl = entry.GetSingleNodeValueOf("atom:link[@rel='alternate' and @type='text/html']/@href", nsmgr);
+          var commentsElement = dayElement.AppendElement("comments");
+
+          foreach (var comment in RetrieveComments(entryUrl)) {
+            var commentElement = commentsElement.AppendElement("comment");
+
+            commentElement.AppendElement("username").AppendText(comment.Author);
+            commentElement.AppendElement("body").AppendText(comment.Content);
+            commentElement.AppendElement("timestamp").AppendText(XmlConvert.ToString(UnixTimeStamp.ToInt64(comment.Date)));
+          }
+        }
+#endif
       }
 
       outputDocument.Save(outputStream);
     }
 
-    private static IEnumerable<Comment> RetrieveComments(Uri entryUrl)
+#if RETRIEVE_COMMENTS
+    /// <remarks>コメントはJavaScriptによって動的に読み込まれているので、この方法では取得できない</remarks>
+    private static IEnumerable<Comment> RetrieveComments(string entryUrl)
     {
       var doc = new XmlDocument();
 
+      Console.Error.Write("{0} のコメントを取得中 ... ", entryUrl);
+
       using (var sgmlReader = new Sgml.SgmlReader()) {
-        sgmlReader.Href = entryUrl.ToString();
+        sgmlReader.Href = entryUrl;
         sgmlReader.CaseFolding = Sgml.CaseFolding.ToLower;
 
         doc.Load(sgmlReader);
 
-        // TODO: sleep
+        System.Threading.Thread.Sleep(500);
       }
 
       //var contentNode = doc.GetElementById("content");
@@ -351,7 +417,10 @@ namespace Smdn.Applications.HatenaBlogTools {
 
         yield return comment;
       }
+
+      Console.Error.WriteLine("完了");
     }
+#endif
 
     private static void Usage(string format, params string[] args)
     {
@@ -363,6 +432,11 @@ namespace Smdn.Applications.HatenaBlogTools {
       Console.Error.WriteLine("usage:");
       Console.Error.WriteLine("  {0} -id <hatena-id> -blogid <blog-id> -apikey <api-key> [-format (hatena|mt)] [outfile]",
                               System.IO.Path.GetFileName(System.Reflection.Assembly.GetEntryAssembly().Location));
+
+#if RETRIEVE_COMMENTS
+      Console.Error.WriteLine("options:");
+      Console.Error.WriteLine("  -comment : dump comments posted on entry");
+#endif
 
       Environment.Exit(-1);
     }
