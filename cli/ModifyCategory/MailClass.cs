@@ -191,7 +191,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         var collectionDocument = atom.Get(nextUri, out statusCode);
 
         if (statusCode != HttpStatusCode.OK) {
-          Console.Error.WriteLine("中断しました ({0})", statusCode);
+          Console.Error.WriteLine("エントリの取得に失敗したため中断しました ({0})", statusCode);
           return null;
         }
 
