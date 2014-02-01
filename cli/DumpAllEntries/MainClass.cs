@@ -162,7 +162,7 @@ namespace Smdn.Applications.HatenaBlogTools {
           Console.Error.Write(".");
         }
         else {
-          Console.Error.WriteLine("中断しました ({0})", statusCode);
+          Console.Error.WriteLine("エントリの取得に失敗したため中断しました ({0})", statusCode);
           return null;
         }
 
