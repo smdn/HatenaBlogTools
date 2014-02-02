@@ -100,11 +100,12 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (string.IsNullOrEmpty(replaceFromText))
         Usage("置換する文字列を指定してください");
 
+      if (replaceToText == null)
+        replaceToText = string.Empty; // delete
+
       ReplaceContentText(hatenaId, blogId, apiKey, verbose, dryrun, delegate(string input) {
         if (input == null)
           return null;
-        if (replaceToText == null)
-          return input;
 
         if (replaceAsRegex)
           return Regex.Replace(input, replaceFromText, replaceToText, RegexOptions.Multiline);
