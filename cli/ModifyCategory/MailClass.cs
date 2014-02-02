@@ -163,14 +163,14 @@ namespace Smdn.Applications.HatenaBlogTools {
 
         HatenaBlog.UpdateEntry(atom, entry, out status);
 
-        if (status == HttpStatusCode.OK)
+        if (status == HttpStatusCode.OK) {
+          HatenaBlog.WaitForCinnamon();
           Console.WriteLine();
+        }
         else {
           Console.WriteLine("失敗しました ({0})", status);
           return;
         }
-
-        System.Threading.Thread.Sleep(250);
       }
 
       Console.WriteLine("変更が完了しました");

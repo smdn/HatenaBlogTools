@@ -128,6 +128,7 @@ namespace Smdn.Applications.HatenaBlogTools {
           HatenaBlog.UpdateEntry(atom, entry, out statusCode);
 
           if (statusCode == HttpStatusCode.OK) {
+            HatenaBlog.WaitForCinnamon();
             Console.WriteLine("更新しました");
           }
           else {
