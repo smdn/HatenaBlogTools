@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 // Change them to the values specific to your project.
 
 [assembly: AssemblyCompany("smdn:総武ソフトウェア推進所")]
-[assembly: AssemblyCopyright("Copyright(c) 2013 smdn.")]
+[assembly: AssemblyCopyright("Copyright(c) 2013-2014 smdn.")]
 
 // The assembly version has the format "{Major}.{Minor}.{Build}.{Revision}".
 // The form "{Major}.{Minor}.*" will automatically update the build and revision,
