@@ -28,6 +28,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 using Smdn.Xml;
@@ -42,6 +43,8 @@ namespace Smdn.Applications.HatenaBlogTools {
       string replaceFromText = null;
       string replaceToText = null;
       bool replaceAsRegex = false;
+      bool verbose = false;
+      bool dryrun = false;
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
@@ -69,6 +72,14 @@ namespace Smdn.Applications.HatenaBlogTools {
             replaceAsRegex = true;
             break;
 
+          case "-v":
+            verbose = true;
+            break;
+
+          case "-n":
+            dryrun = true;
+            break;
+
           case "/help":
           case "-h":
           case "--help":
@@ -89,22 +100,21 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (string.IsNullOrEmpty(replaceFromText))
         Usage("置換する文字列を指定してください");
 
-      if (replaceAsRegex) {
-        throw new NotImplementedException();
-      }
-      else {
-        ReplaceContentText(hatenaId, blogId, apiKey, delegate(string input) {
-          if (input == null)
-            return null;
-          else if (replaceToText == null)
-            return input;
-          else
-            return input.Replace(replaceFromText, replaceToText);
-        });
-      }
+      ReplaceContentText(hatenaId, blogId, apiKey, verbose, dryrun, delegate(string input) {
+        if (input == null)
+          return null;
+        if (replaceToText == null)
+          return input;
+
+        if (replaceAsRegex)
+          return Regex.Replace(input, replaceFromText, replaceToText, RegexOptions.Multiline);
+        else
+          return input.Replace(replaceFromText, replaceToText);
+      });
     }
 
-    private static void ReplaceContentText(string hatenaId, string blogId, string apiKey, Func<string, string> replace)
+    private static void ReplaceContentText(string hatenaId, string blogId, string apiKey,
+                                             bool verbose, bool dryrun, Func<string, string> replace)
     {
       var atom = new Atom();
 
@@ -116,10 +126,22 @@ namespace Smdn.Applications.HatenaBlogTools {
         Console.Write("{0} \"{1}\" ", entry.MemberUri, entry.Title);
 
         if (string.Equals(entry.Content, newContent, StringComparison.Ordinal)) {
-          Console.WriteLine("(変更なし)");
+          Console.WriteLine("(該当個所なし)");
         }
         else {
-          Console.Write(" 更新中...");
+          if (verbose) {
+            Console.WriteLine("以下の内容に置換します");
+            Console.WriteLine("[  現在の本文  ]");
+            Console.WriteLine(entry.Content);
+            Console.WriteLine("[  置換後の本文  ]");
+            Console.WriteLine(newContent);
+            Console.WriteLine();
+          }
+
+          if (dryrun)
+            continue;
+
+          Console.Write("更新中...");
 
           HttpStatusCode statusCode;
 
@@ -151,6 +173,8 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       Console.Error.WriteLine("options:");
       Console.Error.WriteLine("  -regex : use 'oldtext' and 'newtext' as regular expressions");
+      Console.Error.WriteLine("  -v : display replacement result");
+      Console.Error.WriteLine("  -n : dry run");
 
       Environment.Exit(-1);
     }
