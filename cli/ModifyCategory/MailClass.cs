@@ -29,7 +29,34 @@ using System.Xml;
 
 using Smdn.Xml;
 
+using CategorySet = System.Collections.Generic.HashSet<string>;
+
 namespace Smdn.Applications.HatenaBlogTools {
+  class CategoryModification {
+    public CategorySet Old { get; private set; }
+    public CategorySet New { get; private set; }
+
+    public CategoryModification(CategorySet old, CategorySet @new)
+    {
+      this.Old = old;
+      this.New = @new;
+    }
+
+    public void Apply(CategorySet categories)
+    {
+      if (Old.Count == 0) {
+        if (categories.Count == 0)
+          // カテゴリが設定されていない場合、新規設定
+          categories.UnionWith(New);
+      }
+      else if (categories.IsSupersetOf(Old)) {
+        // カテゴリがすべて設定されている場合、置換または削除
+        categories.ExceptWith(Old);
+        categories.UnionWith(New);
+      }
+    }
+  }
+
   class MainClass {
     public static void Main(string[] args)
     {
@@ -37,7 +64,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       string blogId = null;
       string apiKey = null;
       bool dryrun = false;
-      var categoryMap = new Dictionary<string, string>();
+      var categoryModifications = new List<CategoryModification>();
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
@@ -66,8 +93,14 @@ namespace Smdn.Applications.HatenaBlogTools {
           default: {
             var pos = args[i].IndexOf(':');
 
-            if (1 <= pos) // 1文字以上
-              categoryMap[args[i].Substring(0, pos)] = args[i].Substring(pos + 1);
+            if (0 <= pos) {
+              var categoriesOld = args[i].Substring(0, pos).Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+              var categoriesNew = args[i].Substring(pos + 1).Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+
+              if (0 < categoriesOld.Length || 0 < categoriesNew.Length)
+                categoryModifications.Add(new CategoryModification(new CategorySet(categoriesOld, StringComparer.Ordinal),
+                                                                   new CategorySet(categoriesNew, StringComparer.Ordinal)));
+            }
 
             break;
           }
@@ -83,16 +116,18 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (string.IsNullOrEmpty(apiKey))
         Usage("api-keyを指定してください");
 
-      if (categoryMap.Count <= 0)
+      if (categoryModifications.Count <= 0)
         Usage("変更するカテゴリを指定してください");
 
       Console.WriteLine("以下のカテゴリを変更します");
 
-      foreach (var pair in categoryMap) {
-        if (string.IsNullOrEmpty(pair.Value))
-          Console.WriteLine("[{0}] -> (削除)", pair.Key);
+      foreach (var modification in categoryModifications) {
+        if (modification.Old.Count == 0)
+          Console.WriteLine("(新規設定) -> {0}", Join(modification.New));
+        else if (modification.New.Count == 0)
+          Console.WriteLine("{0} -> (削除)", Join(modification.Old));
         else
-          Console.WriteLine("[{0}] -> [{1}]", pair.Key, pair.Value);
+          Console.WriteLine("{0} -> {1}", Join(modification.Old), Join(modification.New));
       }
 
       Console.WriteLine();
@@ -113,30 +148,27 @@ namespace Smdn.Applications.HatenaBlogTools {
       var modifiedEntries = new List<PostedEntry>(entries.Count);
 
       foreach (var entry in entries) {
-        var currentJoinedCategories = string.Join("][", entry.Categories);
-        var modified = false;
+        var prevCategories = new CategorySet(entry.Categories, entry.Categories.Comparer);
 
-        foreach (var pair in categoryMap) {
-          if (entry.Categories.Contains(pair.Key)) {
-            modified = true;
-
-            entry.Categories.Remove(pair.Key);
-
-            if (!string.IsNullOrEmpty(pair.Value))
-              entry.Categories.Add(pair.Value); // replace
-          }
+        foreach (var modification in categoryModifications) {
+          modification.Apply(entry.Categories);
         }
 
-        if (!modified)
-          continue;
+        if (prevCategories.SetEquals(entry.Categories))
+          continue; // 変更なし
 
         modifiedEntries.Add(entry);
 
-        Console.WriteLine("{0} \"{1}\" [{2}] -> [{3}]",
+        Console.WriteLine("{0} \"{1}\" {2} -> {3}",
                           entry.Published,
                           entry.Title,
-                          currentJoinedCategories,
-                          string.Join("][", entry.Categories));
+                          Join(prevCategories),
+                          Join(entry.Categories));
+      }
+
+      if (modifiedEntries.Count == 0) {
+        Console.WriteLine("カテゴリが変更されるエントリはありません");
+        return;
       }
 
       if (dryrun)
@@ -176,6 +208,14 @@ namespace Smdn.Applications.HatenaBlogTools {
       Console.WriteLine("変更が完了しました");
     }
 
+    private static string Join(CategorySet categorySet)
+    {
+      if (categorySet.Count == 0)
+        return "(カテゴリなし)";
+      else
+        return "[" + string.Join("][", categorySet) + "]";
+    }
+
     private static void Usage(string format, params string[] args)
     {
       if (format != null) {
@@ -184,7 +224,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
 
       Console.Error.WriteLine("usage:");
-      Console.Error.WriteLine("  {0} -id <hatena-id> -blogid <blog-id> -apikey <api-key> new1:old1 new2:old2 ...",
+      Console.Error.WriteLine("  {0} -id <hatena-id> -blogid <blog-id> -apikey <api-key> old1:new1 old2:new2 ...",
                               System.IO.Path.GetFileName(System.Reflection.Assembly.GetEntryAssembly().Location));
       Console.Error.WriteLine("options:");
       Console.Error.WriteLine("  -n : dry run");
