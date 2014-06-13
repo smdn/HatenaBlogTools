@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Xml;
 
@@ -429,11 +430,16 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (format != null) {
         Console.Error.Write("error: ");
         Console.Error.WriteLine(format, args);
+        Console.Error.WriteLine();
       }
 
+      var assm = Assembly.GetEntryAssembly();
+      var version = (assm.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)[0] as AssemblyInformationalVersionAttribute).InformationalVersion;
+
+      Console.Error.WriteLine("{0} version {1}", assm.GetName().Name, version);
       Console.Error.WriteLine("usage:");
       Console.Error.WriteLine("  {0} -id <hatena-id> -blogid <blog-id> -apikey <api-key> [-format (hatena|mt)] [outfile]",
-                              System.IO.Path.GetFileName(System.Reflection.Assembly.GetEntryAssembly().Location));
+                              System.IO.Path.GetFileName(assm.Location));
 
 #if RETRIEVE_COMMENTS
       Console.Error.WriteLine("options:");

@@ -25,6 +25,7 @@
 using System;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 using Smdn.Xml;
@@ -162,11 +163,16 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (format != null) {
         Console.Error.Write("error: ");
         Console.Error.WriteLine(format, args);
+        Console.Error.WriteLine();
       }
 
+      var assm = Assembly.GetEntryAssembly();
+      var version = (assm.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)[0] as AssemblyInformationalVersionAttribute).InformationalVersion;
+
+      Console.Error.WriteLine("{0} version {1}", assm.GetName().Name, version);
       Console.Error.WriteLine("usage:");
       Console.Error.WriteLine("  {0} -id <hatena-id> -blogid <blog-id> -apikey <api-key> -from 'oldtext' [-to 'newtext']",
-                              System.IO.Path.GetFileName(System.Reflection.Assembly.GetEntryAssembly().Location));
+                              System.IO.Path.GetFileName(assm.Location));
 
       Console.Error.WriteLine("options:");
       Console.Error.WriteLine("  -regex : use 'oldtext' and 'newtext' as regular expressions");
