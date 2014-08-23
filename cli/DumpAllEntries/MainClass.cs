@@ -134,7 +134,7 @@ namespace Smdn.Applications.HatenaBlogTools {
             break;
 
           case OutputFormat.MovableType:
-            SaveAsMovableType(outputDocument, outputStream, retrieveComments);
+            SaveAsMovableType(outputDocument, outputStream, blogId, retrieveComments);
             break;
 
           case OutputFormat.Default:
@@ -201,7 +201,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       return outputDocument;
     }
 
-    private static void SaveAsMovableType(XmlDocument document, Stream outputStream, bool retrieveComments)
+    private static void SaveAsMovableType(XmlDocument document, Stream outputStream, string blogId, bool retrieveComments)
     {
       /*
        * http://www.movabletype.jp/documentation/appendices/import-export-format.html
@@ -216,13 +216,22 @@ namespace Smdn.Applications.HatenaBlogTools {
       nsmgr.AddNamespace("app", Namespaces.App);
       nsmgr.AddNamespace("hatena", Namespaces.Hatena);
 
+      var entryRootLocation = string.Concat("http://", blogId, "/entry/");
+
       foreach (XmlNode entry in document.SelectNodes("/atom:feed/atom:entry", nsmgr)) {
         /*
          * metadata seciton
          */
         writer.WriteLine(string.Concat("AUTHOR: ", entry.GetSingleNodeValueOf("atom:author/atom:name/text()", nsmgr)));
         writer.WriteLine(string.Concat("TITLE: ", entry.GetSingleNodeValueOf("atom:title/text()", nsmgr)));
+
+        var entryLocation = entry.GetSingleNodeValueOf("atom:link[@rel='alternate' and @type='text/html']/@href", nsmgr);
+
+        if (entryLocation.StartsWith(entryRootLocation, StringComparison.Ordinal))
+          writer.WriteLine(string.Concat("BASENAME: ", entryLocation.Substring(entryRootLocation.Length)));
+
         writer.WriteLine(string.Concat("STATUS: ", entry.GetSingleNodeValueOf("app:control/app:draft/text()", nsmgr) == "yes" ? "Draft" : "Publish"));
+        writer.WriteLine("CONVERT BREAKS: 0");
 
         var updatedDate = DateTimeOffset.Parse(entry.GetSingleNodeValueOf("atom:updated/text()", nsmgr));
 
