@@ -103,8 +103,20 @@ namespace Smdn.Applications.HatenaBlogTools {
         e.Title = entry.GetSingleNodeValueOf("atom:title/text()", nsmgr);
         e.Author = entry.GetSingleNodeValueOf("atom:author/atom:name/text()", nsmgr);
         e.Content = entry.GetSingleNodeValueOf("atom:content/text()", nsmgr);
-        e.Published = entry.GetSingleNodeValueOf<DateTimeOffset>("atom:published/text()", nsmgr, DateTimeOffset.Parse); // XXX
-        e.Updated = entry.GetSingleNodeValueOf<DateTimeOffset>("atom:updated/text()", nsmgr, DateTimeOffset.Parse); // XXX
+
+        try {
+          e.Published = entry.GetSingleNodeValueOf<DateTimeOffset>("atom:published/text()", nsmgr, DateTimeOffset.Parse); // XXX
+        }
+        catch (FormatException) {
+          // ignore exception
+        }
+
+        try {
+          e.Updated = entry.GetSingleNodeValueOf<DateTimeOffset>("atom:updated/text()", nsmgr, DateTimeOffset.Parse); // XXX
+        }
+        catch (FormatException) {
+          // ignore exception
+        }
 
         foreach (XmlElement category in entry.SelectNodes("./atom:category", nsmgr)) {
           e.Categories.Add(category.GetAttribute("term"));
