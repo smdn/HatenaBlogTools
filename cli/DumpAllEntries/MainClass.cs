@@ -131,14 +131,10 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (0 < categoriesToExclude.Count && 0 < categoriesToInclude.Count)
         Usage("-excatと-incatを同時に指定することはできません");
 
-#if false
       var outputDocument = DumpAllEntries(hatenaId, blogId, apiKey);
 
       if (outputDocument == null)
         return;
-#endif
-      var outputDocument = new XmlDocument();
-      outputDocument.Load("/home/smdn/dummy.xml");
 
       if (0 < categoriesToExclude.Count) {
         Console.Error.WriteLine("次のカテゴリの記事を除外しています: {0}", string.Join(", ", categoriesToExclude));
