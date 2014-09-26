@@ -58,6 +58,8 @@ namespace Smdn.Applications.HatenaBlogTools {
       string blogId = null;
       string apiKey = null;
       bool retrieveComments = false;
+      var categoriesToExclude = new HashSet<string>(StringComparer.Ordinal);
+      var categoriesToInclude = new HashSet<string>(StringComparer.Ordinal);
       OutputFormat outputFormat = OutputFormat.Default;
       string outputFile = "-";
 
@@ -91,6 +93,14 @@ namespace Smdn.Applications.HatenaBlogTools {
             }
             break;
 
+          case "-excat":
+            categoriesToExclude.Add(args[++i]);
+            break;
+
+          case "-incat":
+            categoriesToInclude.Add(args[++i]);
+            break;
+
 #if RETRIEVE_COMMENTS
           case "-comment":
             retrieveComments = true;
@@ -118,12 +128,32 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (string.IsNullOrEmpty(apiKey))
         Usage("api-keyを指定してください");
 
+      if (0 < categoriesToExclude.Count && 0 < categoriesToInclude.Count)
+        Usage("-excatと-incatを同時に指定することはできません");
+
+#if false
       var outputDocument = DumpAllEntries(hatenaId, blogId, apiKey);
 
       if (outputDocument == null)
         return;
+#endif
+      var outputDocument = new XmlDocument();
+      outputDocument.Load("/home/smdn/dummy.xml");
+
+      if (0 < categoriesToExclude.Count) {
+        Console.Error.WriteLine("次のカテゴリの記事を除外しています: {0}", string.Join(", ", categoriesToExclude));
+
+        FilterEntries(outputDocument, categoriesToExclude, true); // exclude specified categories
+      }
+      else if (0 < categoriesToInclude.Count) {
+        Console.Error.WriteLine("次のカテゴリの記事を抽出しています: {0}", string.Join(", ", categoriesToInclude));
+
+        FilterEntries(outputDocument, categoriesToInclude, false); // include specified categories
+      }
 
       // 結果を保存
+      Console.Error.WriteLine("結果を保存しています");
+
       using (var outputStream = outputFile == "-"
              ? Console.OpenStandardOutput()
              : new FileStream(outputFile, FileMode.Create, FileAccess.Write)) {
@@ -143,6 +173,8 @@ namespace Smdn.Applications.HatenaBlogTools {
             break;
         }
       }
+
+      Console.Error.WriteLine("完了");
     }
 
     private static XmlDocument DumpAllEntries(string hatenaId, string blogId, string apiKey)
@@ -196,9 +228,24 @@ namespace Smdn.Applications.HatenaBlogTools {
           break;
       }
 
-      Console.Error.WriteLine("完了");
-
       return outputDocument;
+    }
+
+    private static void FilterEntries(XmlDocument document, HashSet<string> categoriesToFilter, bool exclude)
+    {
+      var include = !exclude;
+      var nsmgr = new XmlNamespaceManager(document.NameTable);
+
+      nsmgr.AddNamespace("atom", Namespaces.Atom);
+
+      foreach (var entry in document.SelectNodes("/atom:feed/atom:entry", nsmgr).Cast<XmlElement>().ToList()) {
+        var categories = new HashSet<string>(entry.GetNodeValuesOf("atom:category/@term", nsmgr), StringComparer.Ordinal);
+
+        if (exclude && categories.Overlaps(categoriesToFilter))
+          entry.RemoveSelf();
+        else if (include && !categories.Overlaps(categoriesToFilter))
+          entry.RemoveSelf();
+      }
     }
 
     private static void SaveAsMovableType(XmlDocument document, Stream outputStream, string blogId, bool retrieveComments)
@@ -450,10 +497,12 @@ namespace Smdn.Applications.HatenaBlogTools {
       Console.Error.WriteLine("  {0} -id <hatena-id> -blogid <blog-id> -apikey <api-key> [-format (hatena|mt)] [outfile]",
                               System.IO.Path.GetFileName(assm.Location));
 
-#if RETRIEVE_COMMENTS
       Console.Error.WriteLine("options:");
+#if RETRIEVE_COMMENTS
       Console.Error.WriteLine("  -comment : dump comments posted on entry");
 #endif
+      Console.Error.WriteLine("  -excat <category> : category to be excluded");
+      Console.Error.WriteLine("  -incat <category> : category to be included");
 
       Environment.Exit(-1);
     }
