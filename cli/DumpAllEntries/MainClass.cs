@@ -274,15 +274,20 @@ namespace Smdn.Applications.HatenaBlogTools {
 
         var entryLocation = entry.GetSingleNodeValueOf("atom:link[@rel='alternate' and @type='text/html']/@href", nsmgr);
 
-        if (entryLocation.StartsWith(entryRootLocation, StringComparison.Ordinal))
+        if (entryLocation != null && entryLocation.StartsWith(entryRootLocation, StringComparison.Ordinal))
           writer.WriteLine(string.Concat("BASENAME: ", entryLocation.Substring(entryRootLocation.Length)));
 
         writer.WriteLine(string.Concat("STATUS: ", entry.GetSingleNodeValueOf("app:control/app:draft/text()", nsmgr) == "yes" ? "Draft" : "Publish"));
         writer.WriteLine("CONVERT BREAKS: 0");
 
-        var updatedDate = DateTimeOffset.Parse(entry.GetSingleNodeValueOf("atom:updated/text()", nsmgr));
+        try {
+          var updatedDate = DateTimeOffset.Parse(entry.GetSingleNodeValueOf("atom:updated/text()", nsmgr) ?? string.Empty);
 
-        writer.WriteLine(string.Concat("DATE: ", ToMovableTypeDateString(updatedDate.LocalDateTime)));
+          writer.WriteLine(string.Concat("DATE: ", ToMovableTypeDateString(updatedDate.LocalDateTime)));
+        }
+        catch (FormatException) {
+          // ignore exception
+        }
 
         var tags = entry.GetNodeValuesOf("atom:category/@term", nsmgr)
                         .Select(tag => tag.Contains(" ") ? string.Concat("\"", tag, "\"") : tag);
@@ -298,7 +303,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
         writer.WriteLine("BODY:");
         //writer.WriteLine(entry.GetSingleNodeValueOf("atom:content/text()", nsmgr));
-        writer.WriteLine( entry.GetSingleNodeValueOf("hatena:formatted-content/text()", nsmgr));
+        writer.WriteLine(entry.GetSingleNodeValueOf("hatena:formatted-content/text()", nsmgr));
         writer.WriteLine(multilineFieldDelimiter);
 
 #if RETRIEVE_COMMENTS
@@ -347,8 +352,17 @@ namespace Smdn.Applications.HatenaBlogTools {
       var dayElements = new Dictionary<string, XmlElement>();
 
       foreach (XmlNode entry in document.SelectNodes("/atom:feed/atom:entry", nsmgr)) {
-        var updatedDate = DateTimeOffset.Parse(entry.GetSingleNodeValueOf("atom:updated/text()", nsmgr));
+        var updatedDate = (DateTimeOffset)UnixTimeStamp.Epoch;
+
+        try {
+          updatedDate = DateTimeOffset.Parse(entry.GetSingleNodeValueOf("atom:updated/text()", nsmgr) ?? string.Empty);
+        }
+        catch (FormatException) {
+          // ignore exceptions
+        }
+
         var date = updatedDate.ToLocalTime().DateTime.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+
         XmlElement dayElement, bodyElement;
 
         if (dayElements.TryGetValue(date, out dayElement)) {
