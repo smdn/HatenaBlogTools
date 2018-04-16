@@ -30,10 +30,9 @@ using System.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
   partial class MainClass {
-    private static bool ParseCommonCommandLineArgs(string[] args, out HatenaBlogAtomPub hatenaBlog, out string[] extraArgs)
+    private static bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPub hatenaBlog)
     {
       hatenaBlog = null;
-      extraArgs = Array.Empty<string>();
 
       string hatenaId = null;
       string blogId = null;
@@ -82,7 +81,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
 
       hatenaBlog = new HatenaBlogAtomPub(hatenaId, blogId, apiKey);
-      extraArgs = unparsedArgs.ToArray();
+      args = unparsedArgs.ToArray();
 
       return true;
     }

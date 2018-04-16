@@ -40,13 +40,13 @@ namespace Smdn.Applications.HatenaBlogTools {
     {
       HatenaBlogAtomPub.InitializeHttpsServicePoint();
 
-      if (!ParseCommonCommandLineArgs(args, out HatenaBlogAtomPub hatenaBlog, out string[] extraArgs))
+      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPub hatenaBlog))
         return;
 
       bool verbose = false;
 
-      for (var i = 0; i < extraArgs.Length; i++) {
-        switch (extraArgs[i]) {
+      for (var i = 0; i < args.Length; i++) {
+        switch (args[i]) {
           case "-v":
             verbose = true;
             break;

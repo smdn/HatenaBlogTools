@@ -50,20 +50,20 @@ namespace Smdn.Applications.HatenaBlogTools {
     {
       HatenaBlogAtomPub.InitializeHttpsServicePoint();
 
-      if (!ParseCommonCommandLineArgs(args, out HatenaBlogAtomPub hatenaBlog, out string[] extraArgs))
+      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPub hatenaBlog))
         return;
 
       var entry = new Entry();
       string contentFile = null;
 
-      for (var i = 0; i < extraArgs.Length; i++) {
-        switch (extraArgs[i]) {
+      for (var i = 0; i < args.Length; i++) {
+        switch (args[i]) {
           case "-title":
-            entry.Title = extraArgs[++i];
+            entry.Title = args[++i];
             break;
 
           case "-category":
-            entry.Categories.Add(extraArgs[++i]);
+            entry.Categories.Add(args[++i]);
             break;
 
           case "-draft":
@@ -71,11 +71,11 @@ namespace Smdn.Applications.HatenaBlogTools {
             break;
 
           case "-fromfile":
-            contentFile = extraArgs[++i];
+            contentFile = args[++i];
             break;
 
           default:
-            entry.Content = extraArgs[i];
+            entry.Content = args[i];
             break;
         }
       }
