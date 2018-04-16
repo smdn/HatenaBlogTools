@@ -51,6 +51,17 @@ namespace Smdn.Applications.HatenaBlogTools {
       System.Threading.Thread.Sleep(250);
     }
 
+    public static XmlDocument GetServiceDocuments(string hatenaId, string blogId, string apiKey, out HttpStatusCode statusCode)
+    {
+      var atom = new Atom();
+
+      atom.Credential = new NetworkCredential(hatenaId, apiKey);
+
+      var rootEndPoint = new Uri(string.Concat("http://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom"));
+
+      return atom.Get(rootEndPoint, out statusCode);
+    }
+
     public static List<PostedEntry> GetEntries(string hatenaId, string blogId, string apiKey)
     {
       return new List<PostedEntry>(EnumerateEntries(hatenaId, blogId, apiKey));
