@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumpAllEntries", "cli\DumpA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModifyCategory", "cli\ModifyCategory\ModifyCategory.csproj", "{69B775E5-8B31-48F3-A71B-94AA5EF33F15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostNewEntry", "cli\PostNewEntry\PostNewEntry.csproj", "{EB061C25-6DFF-47EA-BF8E-0C1F22D1BBE8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Login", "cli\Login\Login.csproj", "{EB061C25-6DFF-47EA-BF8E-0C1F22D1BBE8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReplaceContentText", "cli\ReplaceContentText\ReplaceContentText.csproj", "{FC279681-6215-4880-93E6-65A9F7638F9B}"
 EndProject
