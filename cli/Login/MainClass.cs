@@ -23,57 +23,40 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 using System.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  class MainClass {
+  partial class MainClass {
+    private static string GetUsageExtraMandatoryOptions()
+    {
+      return string.Empty;
+    }
+
+    private static IEnumerable<string> GetUsageExtraOptionDescriptions()
+    {
+      yield return "-v : display response document";
+    }
+
     public static void Main(string[] args)
     {
-      string hatenaId = null;
-      string blogId = null;
-      string apiKey = null;
+      HatenaBlogAtomPub.InitializeHttpsServicePoint();
+
+      if (!ParseCommonCommandLineArgs(args, out HatenaBlogAtomPub hatenaBlog, out string[] extraArgs))
+        return;
+
       bool verbose = false;
 
-      for (var i = 0; i < args.Length; i++) {
-        switch (args[i]) {
-          case "-id":
-            hatenaId = args[++i];
-            break;
-
-          case "-blogid":
-            blogId = args[++i];
-            break;
-
-          case "-apikey":
-            apiKey = args[++i];
-            break;
-
+      for (var i = 0; i < extraArgs.Length; i++) {
+        switch (extraArgs[i]) {
           case "-v":
             verbose = true;
-            break;
-
-          case "/help":
-          case "-h":
-          case "--help":
-            Usage(null);
             break;
         }
       }
 
-      if (string.IsNullOrEmpty(hatenaId))
-        Usage("hatena-idを指定してください");
-
-      if (string.IsNullOrEmpty(blogId))
-        Usage("blog-idを指定してください");
-
-      if (string.IsNullOrEmpty(apiKey))
-        Usage("api-keyを指定してください");
-
-      HatenaBlogAtomPub.InitializeHttpsServicePoint();
-
-      var hatenaBlog = new HatenaBlogAtomPub(hatenaId, blogId, apiKey);
       var statusCode = hatenaBlog.Login(out XDocument serviceDocument);
 
       if (statusCode == HttpStatusCode.OK) {
@@ -97,27 +80,6 @@ namespace Smdn.Applications.HatenaBlogTools {
         Console.WriteLine(serviceDocument);
         Console.WriteLine();
       }
-    }
-
-    private static void Usage(string format, params string[] args)
-    {
-      if (format != null) {
-        Console.Error.Write("error: ");
-        Console.Error.WriteLine(format, args);
-        Console.Error.WriteLine();
-      }
-
-      var assm = Assembly.GetEntryAssembly();
-      var version = (assm.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)[0] as AssemblyInformationalVersionAttribute).InformationalVersion;
-
-      Console.Error.WriteLine("{0} version {1}", assm.GetName().Name, version);
-      Console.Error.WriteLine("usage:");
-      Console.Error.WriteLine("  {0} -id <hatena-id> -blogid <blog-id> -apikey <api-key>",
-                              System.IO.Path.GetFileName(assm.Location));
-      Console.Error.WriteLine("options:");
-      Console.Error.WriteLine("  -v : display response document");
-
-      Environment.Exit(-1);
     }
   }
 }

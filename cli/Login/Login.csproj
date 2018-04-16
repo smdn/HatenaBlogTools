@@ -43,5 +43,8 @@
     <Compile Include="..\..\core\Smdn\Smdn.Xml.Xhtml\src\Smdn.Xml.Linq\Extensions.cs">
       <Link>Extensions.cs</Link>
     </Compile>
+    <Compile Include="..\CommonCli.cs">
+      <Link>CommonCli.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>
