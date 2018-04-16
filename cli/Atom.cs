@@ -53,11 +53,13 @@ namespace Smdn.Applications.HatenaBlogTools {
     private int timeout = DefaultTimeoutMilliseconds;
     private NetworkCredential credential;
 
-    public XDocument Get(Uri requestUri, out HttpStatusCode statusCode)
+    public HttpStatusCode Get(Uri requestUri, out XDocument responseDocument)
     {
       var req = CreateRequest(WebRequestMethods.Http.Get, requestUri);
 
-      return GetResponse(req, out statusCode);
+      responseDocument = GetResponse(req, out HttpStatusCode statusCode);
+
+      return statusCode;
     }
 
     [Obsolete("use Post(XDocument)")]

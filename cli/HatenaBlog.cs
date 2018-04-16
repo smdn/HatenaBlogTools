@@ -110,6 +110,11 @@ namespace Smdn.Applications.HatenaBlogTools {
       this.RootEndPoint = GetRootEndPont(hatenaId, blogId, apiKey);
     }
 
+    public void WaitForCinnamon()
+    {
+      System.Threading.Thread.Sleep(250);
+    }
+
     private Atom EnsureInitAtomClient()
     {
       if (atom != null)
@@ -128,7 +133,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     private HttpStatusCode GetServiceDocuments(out XDocument serviceDocument)
     {
-      serviceDocument = EnsureInitAtomClient().Get(RootEndPoint, out HttpStatusCode statusCode);
+      var statusCode = EnsureInitAtomClient().Get(RootEndPoint, out serviceDocument);
 
       if (statusCode != HttpStatusCode.OK)
         return statusCode;
@@ -148,6 +153,93 @@ namespace Smdn.Applications.HatenaBlogTools {
                                      ?.GetAttributeValue("href", StringConversion.ToUri);
 
       return statusCode;
+    }
+
+    public List<PostedEntry> GetEntries()
+    {
+      return EnumerateEntries().ToList();
+    }
+
+    public IEnumerable<PostedEntry> EnumerateEntries()
+    {
+      if (atom == null)
+        throw new InvalidOperationException("not logged in");
+
+      var nextUri = CollectionUri;
+
+      for (;;) {
+        var statusCode = atom.Get(nextUri, out XDocument collectionDocument);
+
+        if (statusCode != HttpStatusCode.OK)
+          throw new WebException(string.Format("エントリの取得に失敗したため中断しました ({0})", statusCode), WebExceptionStatus.ProtocolError);
+
+        foreach (var entry in ReadEntries(collectionDocument)) {
+          yield return entry;
+        }
+
+        // 次のatom:linkを取得する
+        nextUri = collectionDocument.Element(AtomPub.Namespaces.Atom + "feed")
+                                    ?.Elements(AtomPub.Namespaces.Atom + "link")
+                                    ?.FirstOrDefault(e => e.HasAttributeWithValue("rel", "next"))
+                                    ?.GetAttributeValue("href", StringConversion.ToUriNullable);
+
+        if (nextUri == null)
+          break;
+      }
+    }
+
+    private static IEnumerable<PostedEntry> ReadEntries(XDocument doc)
+    {
+      return doc.Element(AtomPub.Namespaces.Atom + "feed")
+                ?.Elements(AtomPub.Namespaces.Atom + "entry")
+                ?.Select(entry => ConvertEntry(entry)) ?? Enumerable.Empty<PostedEntry>();
+
+      PostedEntry ConvertEntry(XElement entry)
+      {
+        var e = new PostedEntry();
+
+        e.MemberUri = entry
+          .Elements(AtomPub.Namespaces.Atom + "link")
+          .FirstOrDefault(link => link.HasAttributeWithValue("rel", "edit"))
+          ?.GetAttributeValue("href", StringConversion.ToUriNullable);
+
+        e.Title = entry.Element(AtomPub.Namespaces.Atom + "title")?.Value;
+        e.Author = entry.Element(AtomPub.Namespaces.Atom + "author")?.Element(AtomPub.Namespaces.Atom + "name")?.Value;
+        e.Content = entry.Element(AtomPub.Namespaces.Atom + "content")?.Value;
+
+        try {
+          e.Published = DateTimeOffset.Parse(entry.Element(AtomPub.Namespaces.Atom + "published")?.Value);
+        }
+        catch (ArgumentNullException) {
+          // ignore exception
+        }
+        catch (FormatException) {
+          // ignore exception
+        }
+
+        try {
+          e.Updated = DateTimeOffset.Parse(entry.Element(AtomPub.Namespaces.Atom + "updated")?.Value);
+        }
+        catch (ArgumentNullException) {
+          // ignore exception
+        }
+        catch (FormatException) {
+          // ignore exception
+        }
+
+        foreach (var category in entry.Elements(AtomPub.Namespaces.Atom + "category").Select(c => c.GetAttributeValue("term"))) {
+          e.Categories.Add(category);
+        }
+
+        e.IsDraft = IsYes(entry.Element(AtomPub.Namespaces.App + "control")?.Element(AtomPub.Namespaces.App + "draft")?.Value);
+
+        return e;
+      }
+
+      bool IsYes(string str)
+      {
+        return string.Equals(str, "yes", StringComparison.OrdinalIgnoreCase);
+      }
     }
 
     public HttpStatusCode UpdateEntry(PostedEntry updatingEntry, out XDocument responseDocument)
@@ -253,7 +345,9 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       var rootEndPoint = new Uri(string.Concat("https://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom"));
 
-      return atom.Get(rootEndPoint, out statusCode).ToXmlDocument();
+      statusCode = atom.Get(rootEndPoint, out XDocument responseDocument);
+
+      return responseDocument.ToXmlDocument();
     }
 
     public static List<PostedEntry> GetEntries(string hatenaId, string blogId, string apiKey)
@@ -269,10 +363,10 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       var rootEndPoint = new Uri(string.Concat("http://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom/"));
       var nextUri = new Uri(rootEndPoint, "./entry");
-      HttpStatusCode statusCode;
 
       for (;;) {
-        var collectionDocument = atom.Get(nextUri, out statusCode).ToXmlDocument();
+        var statusCode = atom.Get(nextUri, out XDocument responseDocument);
+        var collectionDocument = responseDocument.ToXmlDocument();
 
         if (statusCode != HttpStatusCode.OK)
           throw new WebException(string.Format("エントリの取得に失敗したため中断しました ({0})", statusCode), WebExceptionStatus.ProtocolError);

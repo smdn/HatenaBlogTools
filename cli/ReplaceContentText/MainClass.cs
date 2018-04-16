@@ -23,6 +23,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -31,12 +32,25 @@ using System.Text.RegularExpressions;
 using Smdn.Xml;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  class MainClass {
+  partial class MainClass {
+    private static string GetUsageExtraMandatoryOptions() => "-from 'oldtext' [-to 'newtext']";
+
+    private static IEnumerable<string> GetUsageExtraOptionDescriptions()
+    {
+      yield return "-from <oldtext> : text to be replaced";
+      yield return "-to <newtext>   : text to replace <oldtext>";
+      yield return "-regex          : treat <oldtext> and <newtext> as regular expressions";
+      yield return "-v              : display replacement result";
+      yield return "-n              : dry run";
+    }
+
     public static void Main(string[] args)
     {
-      string hatenaId = null;
-      string blogId = null;
-      string apiKey = null;
+      HatenaBlogAtomPub.InitializeHttpsServicePoint();
+
+      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPub hatenaBlog))
+        return;
+
       string replaceFromText = null;
       string replaceToText = null;
       bool replaceAsRegex = false;
@@ -45,18 +59,6 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
-          case "-id":
-            hatenaId = args[++i];
-            break;
-
-          case "-blogid":
-            blogId = args[++i];
-            break;
-
-          case "-apikey":
-            apiKey = args[++i];
-            break;
-
           case "-from":
             replaceFromText = args[++i];
             break;
@@ -76,23 +78,8 @@ namespace Smdn.Applications.HatenaBlogTools {
           case "-n":
             dryrun = true;
             break;
-
-          case "/help":
-          case "-h":
-          case "--help":
-            Usage(null);
-            break;
         }
       }
-
-      if (string.IsNullOrEmpty(hatenaId))
-        Usage("hatena-idを指定してください");
-
-      if (string.IsNullOrEmpty(blogId))
-        Usage("blog-idを指定してください");
-
-      if (string.IsNullOrEmpty(apiKey))
-        Usage("api-keyを指定してください");
 
       if (string.IsNullOrEmpty(replaceFromText))
         Usage("置換する文字列を指定してください");
@@ -100,25 +87,29 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (replaceToText == null)
         replaceToText = string.Empty; // delete
 
-      ReplaceContentText(hatenaId, blogId, apiKey, verbose, dryrun, delegate(string input) {
+      var regex = replaceAsRegex ? new Regex(replaceFromText, RegexOptions.Multiline) : null;
+      var replace = new Func<string, string>(input => {
         if (input == null)
           return null;
 
-        if (replaceAsRegex)
-          return Regex.Replace(input, replaceFromText, replaceToText, RegexOptions.Multiline);
-        else
+        if (regex == null)
           return input.Replace(replaceFromText, replaceToText);
+        else
+          return regex.Replace(input, replaceToText);
       });
+
+      if (!Login(hatenaBlog))
+        return;
+
+      ReplaceContentText(hatenaBlog, verbose, dryrun, replace);
     }
 
-    private static void ReplaceContentText(string hatenaId, string blogId, string apiKey,
-                                             bool verbose, bool dryrun, Func<string, string> replace)
+    private static void ReplaceContentText(HatenaBlogAtomPub hatenaBlog,
+                                           bool verbose,
+                                           bool dryrun,
+                                           Func<string, string> replace)
     {
-      var atom = new Atom();
-
-      atom.Credential = new NetworkCredential(hatenaId, apiKey);
-
-      foreach (var entry in HatenaBlog.EnumerateEntries(hatenaId, blogId, apiKey)) {
+      foreach (var entry in hatenaBlog.EnumerateEntries()) {
         var newContent = replace(entry.Content);
 
         Console.Write("{0} \"{1}\" ", entry.MemberUri, entry.Title);
@@ -141,45 +132,19 @@ namespace Smdn.Applications.HatenaBlogTools {
 
           Console.Write("更新中...");
 
-          HttpStatusCode statusCode;
-
           entry.Content = newContent;
 
-          HatenaBlog.UpdateEntry(atom, entry, out statusCode);
+          var statusCode = hatenaBlog.UpdateEntry(entry, out _);
 
           if (statusCode == HttpStatusCode.OK) {
-            HatenaBlog.WaitForCinnamon();
+            hatenaBlog.WaitForCinnamon();
             Console.WriteLine("更新しました");
           }
           else {
-            Console.Error.WriteLine("失敗しました: {0}", statusCode);
+            Console.Error.WriteLine("更新に失敗しました: {0}", statusCode);
           }
         }
       }
-    }
-
-    private static void Usage(string format, params string[] args)
-    {
-      if (format != null) {
-        Console.Error.Write("error: ");
-        Console.Error.WriteLine(format, args);
-        Console.Error.WriteLine();
-      }
-
-      var assm = Assembly.GetEntryAssembly();
-      var version = (assm.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)[0] as AssemblyInformationalVersionAttribute).InformationalVersion;
-
-      Console.Error.WriteLine("{0} version {1}", assm.GetName().Name, version);
-      Console.Error.WriteLine("usage:");
-      Console.Error.WriteLine("  {0} -id <hatena-id> -blogid <blog-id> -apikey <api-key> -from 'oldtext' [-to 'newtext']",
-                              System.IO.Path.GetFileName(assm.Location));
-
-      Console.Error.WriteLine("options:");
-      Console.Error.WriteLine("  -regex : use 'oldtext' and 'newtext' as regular expressions");
-      Console.Error.WriteLine("  -v : display replacement result");
-      Console.Error.WriteLine("  -n : dry run");
-
-      Environment.Exit(-1);
     }
   }
 }
