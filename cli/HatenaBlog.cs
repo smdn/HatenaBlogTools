@@ -176,7 +176,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     {
       if (atom == null)
         throw new InvalidOperationException("not logged in");
-      
+
       return atom.Post(CollectionUri, CreatePostDocument(entry), out responseDocument);
     }
 
