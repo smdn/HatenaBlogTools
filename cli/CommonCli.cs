@@ -88,6 +88,8 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     private static bool Login(HatenaBlogAtomPub hatenaBlog)
     {
+      Console.Write("ログインしています ... ");
+
       var statusCode = hatenaBlog.Login(out _);
 
       if (statusCode == HttpStatusCode.OK) {
