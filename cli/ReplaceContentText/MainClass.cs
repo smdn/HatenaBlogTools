@@ -112,7 +112,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       foreach (var entry in hatenaBlog.EnumerateEntries()) {
         var newContent = replace(entry.Content);
 
-        Console.Write("{0} \"{1}\" ", entry.MemberUri, entry.Title);
+        Console.Write("{0} \"{1}\" ", entry.EntryUri, entry.Title);
 
         if (string.Equals(entry.Content, newContent, StringComparison.Ordinal)) {
           Console.WriteLine("(該当個所なし)");
@@ -130,7 +130,7 @@ namespace Smdn.Applications.HatenaBlogTools {
           if (dryrun)
             continue;
 
-          Console.Write("更新中...");
+          Console.Write("{0} \"{1}\" を更新中 ... ", entry.EntryUri, entry.Title);
 
           entry.Content = newContent;
 
@@ -138,10 +138,15 @@ namespace Smdn.Applications.HatenaBlogTools {
 
           if (statusCode == HttpStatusCode.OK) {
             hatenaBlog.WaitForCinnamon();
+
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("更新しました");
+            Console.ResetColor();
           }
           else {
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.Error.WriteLine("更新に失敗しました: {0}", statusCode);
+            Console.ResetColor();
           }
         }
       }

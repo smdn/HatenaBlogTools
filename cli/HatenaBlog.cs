@@ -46,6 +46,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
   public class PostedEntry : Entry {
     public Uri MemberUri;
+    public Uri EntryUri;
     public string Author;
     public DateTimeOffset Published;
   }
@@ -201,6 +202,11 @@ namespace Smdn.Applications.HatenaBlogTools {
         e.MemberUri = entry
           .Elements(AtomPub.Namespaces.Atom + "link")
           .FirstOrDefault(link => link.HasAttributeWithValue("rel", "edit"))
+          ?.GetAttributeValue("href", StringConversion.ToUriNullable);
+
+        e.EntryUri = entry
+          .Elements(AtomPub.Namespaces.Atom + "link")
+          .FirstOrDefault(link => link.HasAttributeWithValue("rel", "alternate") && link.HasAttributeWithValue("type", "text/html"))
           ?.GetAttributeValue("href", StringConversion.ToUriNullable);
 
         e.Title = entry.Element(AtomPub.Namespaces.Atom + "title")?.Value;
