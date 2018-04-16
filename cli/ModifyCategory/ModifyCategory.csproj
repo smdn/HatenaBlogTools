@@ -1,50 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{69B775E5-8B31-48F3-A71B-94AA5EF33F15}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>ModifyCategory</RootNamespace>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>ModifyCategory</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <RootNamespace>Smdn.Applications.HatenaBlogTools</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\build\bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Externalconsole>true</Externalconsole>
-    <PlatformTarget>x86</PlatformTarget>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\..\build\bin\Debug\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\build\bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Externalconsole>true</Externalconsole>
-    <PlatformTarget>x86</PlatformTarget>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType></DebugType>
+    <OutputPath>..\..\build\bin\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="MailClass.cs" />
     <Compile Include="..\Atom.cs">
       <Link>Atom.cs</Link>
     </Compile>
-    <Compile Include="..\..\core\Smdn\Smdn.Core.Miscellaneous\src\Smdn.Net\WsseClient.cs">
-      <Link>WsseClient.cs</Link>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\HatenaBlog.cs">
+      <Link>HatenaBlog.cs</Link>
+    </Compile>
+    <Compile Include="..\Namespaces.cs">
+      <Link>Namespaces.cs</Link>
     </Compile>
     <Compile Include="..\..\core\Smdn\Smdn\src\Smdn\MathUtils.cs">
       <Link>MathUtils.cs</Link>
@@ -52,17 +34,20 @@
     <Compile Include="..\..\core\Smdn\Smdn.Xml\src\Smdn.Xml\XmlNodeExtensions.cs">
       <Link>XmlNodeExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\..\core\Smdn\Smdn.Core.Miscellaneous\src\Smdn.Net\WsseClient.cs">
+      <Link>WsseClient.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\Smdn\Smdn\src\Smdn.Text\StringConversion.cs">
+      <Link>StringConversion.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\Smdn\Smdn.Xml.Xhtml\src\Smdn.Xml.Linq\Extensions.cs">
+      <Link>Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\CommonCli.cs">
+      <Link>CommonCli.cs</Link>
+    </Compile>
     <Compile Include="..\..\core\Smdn\Smdn.Core.Miscellaneous\src\Smdn\ConsoleUtils.cs">
       <Link>ConsoleUtils.cs</Link>
-    </Compile>
-    <Compile Include="..\Namespaces.cs">
-      <Link>Namespaces.cs</Link>
-    </Compile>
-    <Compile Include="..\CommonAssemblyInfo.cs">
-      <Link>CommonAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\HatenaBlog.cs">
-      <Link>HatenaBlog.cs</Link>
     </Compile>
   </ItemGroup>
 </Project>

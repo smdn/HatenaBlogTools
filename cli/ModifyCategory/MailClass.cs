@@ -58,37 +58,38 @@ namespace Smdn.Applications.HatenaBlogTools {
     }
   }
 
-  class MainClass {
+  partial class MainClass {
+    private static string GetUsageExtraMandatoryOptions() => "old1:new1 old2:new2 ...";
+
+    private static void Hoge()
+    {
+      Console.Error.WriteLine("options:");
+      Console.Error.WriteLine("  -n : dry run");
+    }
+
+    private static IEnumerable<string> GetUsageExtraOptionDescriptions()
+    {
+      yield return "<old>:<new>          : replace category <old> to <new>";
+      yield return "<old>:               : delete category <old>";
+      yield return ":<new>               : add category <new> to uncategorized entries";
+      yield return "<old>:<old>;<new>    : add category <new> to entries of category <old>";
+      yield return "-n                   : dry run";
+    }
+
     public static void Main(string[] args)
     {
-      string hatenaId = null;
-      string blogId = null;
-      string apiKey = null;
+      HatenaBlogAtomPub.InitializeHttpsServicePoint();
+
+      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPub hatenaBlog))
+        return;
+
       bool dryrun = false;
       var categoryModifications = new List<CategoryModification>();
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
-          case "-id":
-            hatenaId = args[++i];
-            break;
-
-          case "-blogid":
-            blogId = args[++i];
-            break;
-
-          case "-apikey":
-            apiKey = args[++i];
-            break;
-
           case "-n":
             dryrun = true;
-            break;
-
-          case "/help":
-          case "-h":
-          case "--help":
-            Usage(null);
             break;
 
           default: {
@@ -108,15 +109,6 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
-      if (string.IsNullOrEmpty(hatenaId))
-        Usage("hatena-idを指定してください");
-
-      if (string.IsNullOrEmpty(blogId))
-        Usage("blog-idを指定してください");
-
-      if (string.IsNullOrEmpty(apiKey))
-        Usage("api-keyを指定してください");
-
       if (categoryModifications.Count <= 0)
         Usage("変更するカテゴリを指定してください");
 
@@ -132,12 +124,16 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
 
       Console.WriteLine();
+
+      if (!Login(hatenaBlog))
+        return;
+
       Console.WriteLine("エントリを取得中 ...");
 
       List<PostedEntry> entries = null;
 
       try {
-        entries = HatenaBlog.GetEntries(hatenaId, blogId, apiKey);
+        entries = hatenaBlog.GetEntries();
       }
       catch (WebException ex) {
         Console.Error.WriteLine(ex.Message);
@@ -161,7 +157,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         modifiedEntries.Add(entry);
 
         Console.WriteLine("{0} \"{1}\" {2} -> {3}",
-                          entry.Published,
+                          entry.EntryUri,
                           entry.Title,
                           Join(prevCategories),
                           Join(entry.Categories));
@@ -182,26 +178,25 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       Console.WriteLine();
 
-      var atom = new Atom();
-
-      atom.Credential = new NetworkCredential(hatenaId, apiKey);
-
       foreach (var entry in modifiedEntries) {
         Console.Write("変更を更新中: {0} \"{1}\" [{2}] ... ",
                       entry.Published,
                       entry.Title,
                       string.Join("][", entry.Categories));
 
-        HttpStatusCode status;
+        var statusCode = hatenaBlog.UpdateEntry(entry, out _);
 
-        HatenaBlog.UpdateEntry(atom, entry, out status);
+        if (statusCode == HttpStatusCode.OK) {
+          hatenaBlog.WaitForCinnamon();
 
-        if (status == HttpStatusCode.OK) {
-          HatenaBlog.WaitForCinnamon();
-          Console.WriteLine();
+          Console.ForegroundColor = ConsoleColor.Green;
+          Console.WriteLine("更新しました");
+          Console.ResetColor();
         }
         else {
-          Console.WriteLine("失敗しました ({0})", status);
+          Console.ForegroundColor = ConsoleColor.Red;
+          Console.WriteLine("失敗しました ({0})", statusCode);
+          Console.ResetColor();
           return;
         }
       }
@@ -215,27 +210,6 @@ namespace Smdn.Applications.HatenaBlogTools {
         return "(カテゴリなし)";
       else
         return "[" + string.Join("][", categorySet) + "]";
-    }
-
-    private static void Usage(string format, params string[] args)
-    {
-      if (format != null) {
-        Console.Error.Write("error: ");
-        Console.Error.WriteLine(format, args);
-        Console.Error.WriteLine();
-      }
-
-      var assm = Assembly.GetEntryAssembly();
-      var version = (assm.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)[0] as AssemblyInformationalVersionAttribute).InformationalVersion;
-
-      Console.Error.WriteLine("{0} version {1}", assm.GetName().Name, version);
-      Console.Error.WriteLine("usage:");
-      Console.Error.WriteLine("  {0} -id <hatena-id> -blogid <blog-id> -apikey <api-key> old1:new1 old2:new2 ...",
-                              System.IO.Path.GetFileName(assm.Location));
-      Console.Error.WriteLine("options:");
-      Console.Error.WriteLine("  -n : dry run");
-
-      Environment.Exit(-1);
     }
   }
 }
