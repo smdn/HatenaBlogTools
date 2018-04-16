@@ -25,6 +25,8 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Xml;
 
 using Smdn;
@@ -57,7 +59,19 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       atom.Credential = new NetworkCredential(hatenaId, apiKey);
 
-      var rootEndPoint = new Uri(string.Concat("http://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom"));
+      ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+      ServicePointManager.ServerCertificateValidationCallback = (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => {
+#if DEBUG
+        Console.Error.WriteLine(sslPolicyErrors);
+#endif
+
+        if (sslPolicyErrors == SslPolicyErrors.None)
+          return true;
+        else
+          return false;
+      };
+
+      var rootEndPoint = new Uri(string.Concat("https://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom"));
 
       return atom.Get(rootEndPoint, out statusCode);
     }
