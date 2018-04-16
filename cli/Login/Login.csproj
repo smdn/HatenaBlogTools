@@ -37,5 +37,11 @@
     <Compile Include="..\..\core\Smdn\Smdn.Core.Miscellaneous\src\Smdn.Net\WsseClient.cs">
       <Link>WsseClient.cs</Link>
     </Compile>
+    <Compile Include="..\..\core\Smdn\Smdn\src\Smdn.Text\StringConversion.cs">
+      <Link>StringConversion.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\Smdn\Smdn.Xml.Xhtml\src\Smdn.Xml.Linq\Extensions.cs">
+      <Link>Extensions.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>

@@ -23,13 +23,9 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Reflection;
-using System.Xml;
-
-using Smdn.Xml;
+using System.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
   class MainClass {
@@ -75,21 +71,20 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (string.IsNullOrEmpty(apiKey))
         Usage("api-keyを指定してください");
 
-      var responseDocument = HatenaBlog.GetServiceDocuments(hatenaId, blogId, apiKey, out HttpStatusCode statusCode);
+      HatenaBlogAtomPub.InitializeHttpsServicePoint();
+
+      var hatenaBlog = new HatenaBlogAtomPub(hatenaId, blogId, apiKey);
+      var statusCode = hatenaBlog.Login(out XDocument serviceDocument);
 
       if (statusCode == HttpStatusCode.OK) {
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("ログインに成功しました。");
         Console.ResetColor();
 
-        var nsmgr = new XmlNamespaceManager(responseDocument.NameTable);
-
-        nsmgr.AddNamespace("app", Namespaces.App);
-        nsmgr.AddNamespace("atom", Namespaces.Atom);
-
-        Console.WriteLine("はてなID: {0}", hatenaId);
-        Console.WriteLine("ブログID: {0}", blogId);
-        Console.WriteLine("ブログタイトル: {0}", responseDocument.GetSingleNodeValueOf("/app:service/app:workspace/atom:title/text()", nsmgr));
+        Console.WriteLine("はてなID: {0}", hatenaBlog.HatenaId);
+        Console.WriteLine("ブログID: {0}", hatenaBlog.BlogId);
+        Console.WriteLine("ブログタイトル: {0}", hatenaBlog.BlogTitle);
+        Console.WriteLine("コレクションURI: {0}", hatenaBlog.CollectionUri);
       }
       else {
         Console.ForegroundColor = ConsoleColor.Red;
@@ -97,21 +92,9 @@ namespace Smdn.Applications.HatenaBlogTools {
         Console.ResetColor();
       }
 
-      if (verbose) {
+      if (verbose && serviceDocument != null) {
         Console.WriteLine();
-
-        using (var stdout = Console.OpenStandardOutput()) {
-          var settings = new XmlWriterSettings();
-
-          settings.NewLineChars = Environment.NewLine;
-          settings.Indent = true;
-          settings.IndentChars = " ";
-
-          using (var writer = XmlWriter.Create(stdout, settings)) {
-            responseDocument.Save(writer);
-          }
-        }
-
+        Console.WriteLine(serviceDocument);
         Console.WriteLine();
       }
     }

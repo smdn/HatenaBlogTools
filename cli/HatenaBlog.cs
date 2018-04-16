@@ -24,13 +24,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml;
+using System.Xml.Linq;
 
-using Smdn;
+using Smdn.Text;
 using Smdn.Xml;
+using Smdn.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
   public class Entry {
@@ -47,7 +50,115 @@ namespace Smdn.Applications.HatenaBlogTools {
     public DateTimeOffset Published;
   }
 
+  public class HatenaBlogAtomPub {
+    public static void InitializeHttpsServicePoint()
+    {
+      ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+      ServicePointManager.ServerCertificateValidationCallback = (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => {
+        if (sslPolicyErrors == SslPolicyErrors.None) {
+          return true;
+        }
+        else {
+          Console.Error.WriteLine(sslPolicyErrors);
+
+          return false;
+        }
+      };
+    }
+
+    public string HatenaId {
+      get; private set;
+    }
+
+    public string BlogId {
+      get; private set;
+    }
+
+    private readonly string apiKey;
+
+    public Uri RootEndPoint {
+      get; private set;
+    }
+
+    public string BlogTitle {
+      get; private set;
+    }
+
+    public Uri CollectionUri {
+      get; private set;
+    }
+
+    private Atom atom = null;
+
+    private static Uri GetRootEndPont(string hatenaId, string blogId, string apiKey)
+    {
+      return new Uri(string.Concat("https://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom"));
+    }
+
+    public HatenaBlogAtomPub(string hatenaId, string blogId, string apiKey)
+    {
+      if (string.IsNullOrEmpty(hatenaId))
+        throw new ArgumentException("must be non empty value", nameof(hatenaId));
+      if (string.IsNullOrEmpty(blogId))
+        throw new ArgumentException("must be non empty value", nameof(blogId));
+      if (string.IsNullOrEmpty(apiKey))
+        throw new ArgumentException("must be non empty value", nameof(apiKey));
+
+      this.HatenaId = hatenaId;
+      this.BlogId = blogId;
+      this.apiKey = apiKey;
+      this.RootEndPoint = GetRootEndPont(hatenaId, blogId, apiKey);
+    }
+
+    private Atom EnsureInitAtomClient()
+    {
+      if (atom != null)
+        return atom;
+
+      atom = new Atom();
+      atom.Credential = new NetworkCredential(HatenaId, apiKey);
+
+      return atom;
+    }
+
+    public HttpStatusCode Login(out XDocument serviceDocument)
+    {
+      return GetServiceDocuments(out serviceDocument);
+    }
+
+    private HttpStatusCode GetServiceDocuments(out XDocument serviceDocument)
+    {
+      serviceDocument = EnsureInitAtomClient().Get(RootEndPoint, out HttpStatusCode statusCode);
+
+      if (serviceDocument.Root.Name != AtomPub.ElementNames.AppService)
+        throw new NotSupportedException($"unexpected document type: {serviceDocument.Root.Name}");
+
+      BlogTitle = serviceDocument.Root
+                                 .Element(AtomPub.ElementNames.AppWorkspace)
+                                 ?.Element(AtomPub.ElementNames.AtomTitle)
+                                 ?.Value;
+
+      CollectionUri = serviceDocument.Root
+                                     .Element(AtomPub.ElementNames.AppWorkspace)
+                                     ?.Elements(AtomPub.ElementNames.AppCollection)
+                                     ?.FirstOrDefault(e => e.Element(AtomPub.ElementNames.AppAccept).Value.Contains("type=entry"))
+                                     ?.GetAttributeValue("href", StringConversion.ToUri);
+
+      return statusCode;
+    }
+  }
+
+  [Obsolete]
   public static class HatenaBlog {
+    private static XmlDocument ToXmlDocument(this XDocument document)
+    {
+      var ret = new XmlDocument();
+
+      ret.LoadXml(document.ToString());
+
+      return ret;
+    }
+
     public static void WaitForCinnamon()
     {
       System.Threading.Thread.Sleep(250);
@@ -73,7 +184,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       var rootEndPoint = new Uri(string.Concat("https://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom"));
 
-      return atom.Get(rootEndPoint, out statusCode);
+      return atom.Get(rootEndPoint, out statusCode).ToXmlDocument();
     }
 
     public static List<PostedEntry> GetEntries(string hatenaId, string blogId, string apiKey)
@@ -92,7 +203,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       HttpStatusCode statusCode;
 
       for (;;) {
-        var collectionDocument = atom.Get(nextUri, out statusCode);
+        var collectionDocument = atom.Get(nextUri, out statusCode).ToXmlDocument();
 
         if (statusCode != HttpStatusCode.OK)
           throw new WebException(string.Format("エントリの取得に失敗したため中断しました ({0})", statusCode), WebExceptionStatus.ProtocolError);
@@ -169,7 +280,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (updatingEntry.Author != null)
         putDocument.DocumentElement.AppendElement("author", Namespaces.Atom).AppendElement("name", Namespaces.Atom).AppendText(updatingEntry.Author);
 
-      return atom.Put(updatingEntry.MemberUri, putDocument, out statusCode);
+      return atom.Put(updatingEntry.MemberUri, putDocument, out statusCode).ToXmlDocument();
     }
 
     public static XmlDocument PostEntry(Atom atom, Uri collectionUri, Entry entry, out HttpStatusCode statusCode)
@@ -178,7 +289,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       var postDocument = CreatePostDocument(entry);
 
-      return atom.Post(collectionUri, postDocument, out statusCode);
+      return atom.Post(collectionUri, postDocument, out statusCode).ToXmlDocument();
     }
 
     private static XmlDocument CreatePostDocument(Entry entry)

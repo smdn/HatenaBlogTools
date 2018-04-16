@@ -27,6 +27,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Xml;
+using System.Xml.Linq;
 
 using Smdn.Net;
 
@@ -52,24 +53,24 @@ namespace Smdn.Applications.HatenaBlogTools {
     private int timeout = DefaultTimeoutMilliseconds;
     private NetworkCredential credential;
 
-    public XmlDocument Get(Uri requestUri, out HttpStatusCode statusCode)
+    public XDocument Get(Uri requestUri, out HttpStatusCode statusCode)
     {
       var req = CreateRequest(WebRequestMethods.Http.Get, requestUri);
 
       return GetResponse(req, out statusCode);
     }
 
-    public XmlDocument Post(Uri requestUri, XmlDocument document, out HttpStatusCode statusCode)
+    public XDocument Post(Uri requestUri, XmlDocument document, out HttpStatusCode statusCode)
     {
       return PostPut(WebRequestMethods.Http.Post, requestUri, document, out statusCode);
     }
 
-    public XmlDocument Put(Uri requestUri, XmlDocument document, out HttpStatusCode statusCode)
+    public XDocument Put(Uri requestUri, XmlDocument document, out HttpStatusCode statusCode)
     {
       return PostPut(WebRequestMethods.Http.Put, requestUri, document, out statusCode);
     }
 
-    private XmlDocument PostPut(string method, Uri requestUri, XmlDocument document, out HttpStatusCode statusCode)
+    private XDocument PostPut(string method, Uri requestUri, XmlDocument document, out HttpStatusCode statusCode)
     {
       var req = CreateRequest(method, requestUri);
 
@@ -95,7 +96,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       return req;
     }
 
-    private static XmlDocument GetResponse(HttpWebRequest req, out HttpStatusCode statusCode)
+    private static XDocument GetResponse(HttpWebRequest req, out HttpStatusCode statusCode)
     {
       statusCode = (HttpStatusCode)0;
 
@@ -104,11 +105,7 @@ namespace Smdn.Applications.HatenaBlogTools {
           statusCode = resp.StatusCode;
 
           using (var respStream = resp.GetResponseStream()) {
-            var doc = new XmlDocument();
-
-            doc.Load(respStream);
-
-            return doc;
+            return XDocument.Load(respStream);
           }
         }
       }
