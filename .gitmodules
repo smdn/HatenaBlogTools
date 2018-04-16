@@ -1,0 +1,3 @@
+[submodule "core/Smdn"]
+	path = core/Smdn
+	url = git://repos.local.smdn.jp/libs/Smdn/
