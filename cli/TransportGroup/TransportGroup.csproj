@@ -38,10 +38,10 @@
   <ItemGroup>
     <Compile Include="MainClass.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="..\..\core\Smdn.Xml\Smdn.Xml\XmlNodeExtensions.cs">
+    <Compile Include="..\..\core\Smdn\Smdn.Xml\src\Smdn.Xml\XmlNodeExtensions.cs">
       <Link>XmlNodeExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\..\core\Smdn.Core.Miscellaneous\Smdn.Net\WsseClient.cs">
+    <Compile Include="..\..\core\Smdn\Smdn.Core.Miscellaneous\src\Smdn.Net\WsseClient.cs">
       <Link>WsseClient.cs</Link>
     </Compile>
     <Compile Include="..\Atom.cs">
@@ -50,10 +50,10 @@
     <Compile Include="..\Namespaces.cs">
       <Link>Namespaces.cs</Link>
     </Compile>
-    <Compile Include="..\..\core\Smdn\Smdn\MathUtils.cs">
+    <Compile Include="..\..\core\Smdn\Smdn\src\Smdn\MathUtils.cs">
       <Link>MathUtils.cs</Link>
     </Compile>
-    <Compile Include="..\..\core\Smdn\Smdn\UnixTimeStamp.cs">
+    <Compile Include="..\..\core\Smdn\Smdn\src\Smdn\UnixTimeStamp.cs">
       <Link>UnixTimeStamp.cs</Link>
     </Compile>
     <Compile Include="..\CommonAssemblyInfo.cs">
@@ -62,7 +62,7 @@
     <Compile Include="..\HatenaBlog.cs">
       <Link>HatenaBlog.cs</Link>
     </Compile>
-    <Compile Include="..\..\core\Smdn.Core.Miscellaneous\Smdn\ConsoleUtils.cs">
+    <Compile Include="..\..\core\Smdn\Smdn.Core.Miscellaneous\src\Smdn\ConsoleUtils.cs">
       <Link>ConsoleUtils.cs</Link>
     </Compile>
   </ItemGroup>

@@ -348,7 +348,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       var dayElements = new Dictionary<string, XmlElement>();
 
       foreach (XmlNode entry in document.SelectNodes("/atom:feed/atom:entry", nsmgr)) {
-        var updatedDate = (DateTimeOffset)UnixTimeStamp.Epoch;
+        var updatedDate = DateTimeOffset.FromUnixTimeSeconds(0L);
 
         try {
           updatedDate = DateTimeOffset.Parse(entry.GetSingleNodeValueOf("atom:updated/text()", nsmgr) ?? string.Empty);
@@ -377,7 +377,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
         var body = new StringBuilder();
 
-        body.AppendFormat("*{0}*", UnixTimeStamp.ToInt64(updatedDate));
+        body.AppendFormat("*{0}*", updatedDate.ToUnixTimeSeconds());
 
         var joinedCategory = string.Join("][", entry.GetNodeValuesOf("atom:category/@term", nsmgr));
 
@@ -401,7 +401,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
             commentElement.AppendElement("username").AppendText(comment.Author);
             commentElement.AppendElement("body").AppendText(comment.Content);
-            commentElement.AppendElement("timestamp").AppendText(XmlConvert.ToString(UnixTimeStamp.ToInt64(comment.Date)));
+            commentElement.AppendElement("timestamp").AppendText(XmlConvert.ToString(comment.Date.ToUnixTimeSeconds()));
           }
         }
 #endif
@@ -479,7 +479,7 @@ namespace Smdn.Applications.HatenaBlogTools {
                *   <time data-epoch="1387283661000" />
                * </e>
                */
-              comment.Date = UnixTimeStamp.ToLocalDateTime(commentChildElement.GetSingleNodeValueOf("time/@data-epoch", long.Parse) / 1000);
+              comment.Date = DateTimeOffset.FromUnixTime(commentChildElement.GetSingleNodeValueOf("time/@data-epoch", long.Parse) / 1000).ToLocalTime();
               break;
           }
         }

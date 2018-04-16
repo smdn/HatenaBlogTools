@@ -9,6 +9,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>ModifyCategory</RootNamespace>
     <AssemblyName>ModifyCategory</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,16 +43,16 @@
     <Compile Include="..\Atom.cs">
       <Link>Atom.cs</Link>
     </Compile>
-    <Compile Include="..\..\core\Smdn.Core.Miscellaneous\Smdn.Net\WsseClient.cs">
+    <Compile Include="..\..\core\Smdn\Smdn.Core.Miscellaneous\src\Smdn.Net\WsseClient.cs">
       <Link>WsseClient.cs</Link>
     </Compile>
-    <Compile Include="..\..\core\Smdn\Smdn\MathUtils.cs">
+    <Compile Include="..\..\core\Smdn\Smdn\src\Smdn\MathUtils.cs">
       <Link>MathUtils.cs</Link>
     </Compile>
-    <Compile Include="..\..\core\Smdn.Xml\Smdn.Xml\XmlNodeExtensions.cs">
+    <Compile Include="..\..\core\Smdn\Smdn.Xml\src\Smdn.Xml\XmlNodeExtensions.cs">
       <Link>XmlNodeExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\..\core\Smdn.Core.Miscellaneous\Smdn\ConsoleUtils.cs">
+    <Compile Include="..\..\core\Smdn\Smdn.Core.Miscellaneous\src\Smdn\ConsoleUtils.cs">
       <Link>ConsoleUtils.cs</Link>
     </Compile>
     <Compile Include="..\Namespaces.cs">
