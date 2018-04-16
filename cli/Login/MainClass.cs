@@ -29,10 +29,7 @@ using System.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
   partial class MainClass {
-    private static string GetUsageExtraMandatoryOptions()
-    {
-      return string.Empty;
-    }
+    private static string GetUsageExtraMandatoryOptions() => string.Empty;
 
     private static IEnumerable<string> GetUsageExtraOptionDescriptions()
     {
