@@ -60,16 +60,19 @@ namespace Smdn.Applications.HatenaBlogTools {
       return GetResponse(req, out statusCode);
     }
 
+    [Obsolete("use Post(XDocument)")]
     public XDocument Post(Uri requestUri, XmlDocument document, out HttpStatusCode statusCode)
     {
       return PostPut(WebRequestMethods.Http.Post, requestUri, document, out statusCode);
     }
 
+    [Obsolete("use Put(XDocument)")]
     public XDocument Put(Uri requestUri, XmlDocument document, out HttpStatusCode statusCode)
     {
       return PostPut(WebRequestMethods.Http.Put, requestUri, document, out statusCode);
     }
 
+    [Obsolete("use PostPut(XDocument)")]
     private XDocument PostPut(string method, Uri requestUri, XmlDocument document, out HttpStatusCode statusCode)
     {
       var req = CreateRequest(method, requestUri);
@@ -81,6 +84,31 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
 
       return GetResponse(req, out statusCode);
+    }
+
+    public HttpStatusCode Post(Uri requestUri, XDocument requestDocument, out XDocument responseDocument)
+    {
+      return PostPut(WebRequestMethods.Http.Post, requestUri, requestDocument, out responseDocument);
+    }
+
+    public HttpStatusCode Put(Uri requestUri, XDocument requestDocument, out XDocument responseDocument)
+    {
+      return PostPut(WebRequestMethods.Http.Put, requestUri, requestDocument, out responseDocument);
+    }
+
+    private HttpStatusCode PostPut(string method, Uri requestUri, XDocument requestDocument, out XDocument responseDocument)
+    {
+      var req = CreateRequest(method, requestUri);
+
+      req.ContentType = "application/atom+xml";
+
+      using (var reqStream = req.GetRequestStream()) {
+        requestDocument.Save(reqStream);
+      }
+
+      responseDocument = GetResponse(req, out HttpStatusCode statusCode);
+
+      return statusCode;
     }
 
     private HttpWebRequest CreateRequest(string method, Uri requestUri)

@@ -87,6 +87,26 @@ namespace Smdn.Applications.HatenaBlogTools {
       return true;
     }
 
+    private static bool Login(HatenaBlogAtomPub hatenaBlog)
+    {
+      var statusCode = hatenaBlog.Login(out _);
+
+      if (statusCode == HttpStatusCode.OK) {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("ログインに成功しました。");
+        Console.ResetColor();
+
+        return true;
+      }
+      else {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.Error.WriteLine("ログインに失敗しました。　({0:D} {0})", statusCode);
+        Console.ResetColor();
+
+        return false;
+      }
+    }
+
     private static void Usage(string format, params string[] args)
     {
       if (format != null) {

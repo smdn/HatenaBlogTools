@@ -130,6 +130,9 @@ namespace Smdn.Applications.HatenaBlogTools {
     {
       serviceDocument = EnsureInitAtomClient().Get(RootEndPoint, out HttpStatusCode statusCode);
 
+      if (statusCode != HttpStatusCode.OK)
+        return statusCode;
+
       if (serviceDocument.Root.Name != AtomPub.ElementNames.AppService)
         throw new NotSupportedException($"unexpected document type: {serviceDocument.Root.Name}");
 
@@ -145,6 +148,72 @@ namespace Smdn.Applications.HatenaBlogTools {
                                      ?.GetAttributeValue("href", StringConversion.ToUri);
 
       return statusCode;
+    }
+
+    public HttpStatusCode UpdateEntry(PostedEntry updatingEntry, out XDocument responseDocument)
+    {
+      if (atom == null)
+        throw new InvalidOperationException("not logged in");
+
+      responseDocument = null;
+
+      var putDocument = CreatePostDocument(updatingEntry);
+
+      if (updatingEntry.Author != null) {
+        putDocument.Root.Add(new XElement(
+          AtomPub.Namespaces.Atom + "author",
+          new XElement(
+            AtomPub.Namespaces.Atom + "name",
+            new XText(updatingEntry.Author)
+          )
+        ));
+      }
+
+      return atom.Put(updatingEntry.MemberUri, putDocument, out responseDocument);
+    }
+
+    public HttpStatusCode PostEntry(Entry entry, out XDocument responseDocument)
+    {
+      if (atom == null)
+        throw new InvalidOperationException("not logged in");
+      
+      return atom.Post(CollectionUri, CreatePostDocument(entry), out responseDocument);
+    }
+
+    private static XDocument CreatePostDocument(Entry postEntry)
+    {
+      var entry = new XElement(
+        AtomPub.Namespaces.Atom + "entry",
+        new XElement(
+          AtomPub.Namespaces.Atom + "title",
+          new XText(postEntry.Title)
+        ),
+        postEntry.Updated.HasValue
+          ? new XElement(
+            AtomPub.Namespaces.Atom + "updated",
+            new XText(XmlConvert.ToString(postEntry.Updated.Value))
+          )
+          : null,
+        new XElement(
+          AtomPub.Namespaces.Atom + "content",
+          new XAttribute("type", "text/plain"),
+          new XText(postEntry.Content)
+        ),
+        postEntry.Categories.Select(c => new XElement(
+          AtomPub.Namespaces.Atom + "category",
+          new XAttribute("term", c)
+        )),
+        new XElement(
+          AtomPub.Namespaces.App + "control",
+          new XElement(
+            AtomPub.Namespaces.App + "draft",
+            new XText(postEntry.IsDraft ? "yes" : "no")
+          )
+        )
+      );
+
+      return new XDocument(new XDeclaration("1.0", "utf-8", null),
+                           entry);
     }
   }
 

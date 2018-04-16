@@ -25,42 +25,45 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
-using System.Reflection;
-using System.Xml;
+using System.Xml.Linq;
 
-using Smdn.Xml;
+using Smdn.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  class MainClass {
+  partial class MainClass {
+    private static string GetUsageExtraMandatoryOptions() => "-title <title> -category <category> <content>";
+
+    private static IEnumerable<string> GetUsageExtraOptionDescriptions()
+    {
+      yield return "<content>            : content of new entry";
+      yield return "-title <title>       : title of new entry";
+      yield return "-category <category> : category of new entry";
+      yield return "                       (ex: -category diary -category tech)";
+      yield return "-draft               : post entry as draft";
+      yield return "-fromfile <file>     : post entry content from <file>";
+      yield return "-fromfile -          : post entry content from stdin";
+    }
+
     public static void Main(string[] args)
     {
+      HatenaBlogAtomPub.InitializeHttpsServicePoint();
+
+      if (!ParseCommonCommandLineArgs(args, out HatenaBlogAtomPub hatenaBlog, out string[] extraArgs))
+        return;
+
       var entry = new Entry();
-      string hatenaId = null;
-      string blogId = null;
-      string apiKey = null;
       string contentFile = null;
 
-      for (var i = 0; i < args.Length; i++) {
-        switch (args[i]) {
-          case "-id":
-            hatenaId = args[++i];
-            break;
-
-          case "-blogid":
-            blogId = args[++i];
-            break;
-
-          case "-apikey":
-            apiKey = args[++i];
-            break;
-
+      for (var i = 0; i < extraArgs.Length; i++) {
+        switch (extraArgs[i]) {
           case "-title":
-            entry.Title = args[++i];
+            entry.Title = extraArgs[++i];
             break;
 
           case "-category":
-            entry.Categories.Add(args[++i]);
+            entry.Categories.Add(extraArgs[++i]);
             break;
 
           case "-draft":
@@ -68,29 +71,14 @@ namespace Smdn.Applications.HatenaBlogTools {
             break;
 
           case "-fromfile":
-            contentFile = args[++i];
-            break;
-
-          case "/help":
-          case "-h":
-          case "--help":
-            Usage(null);
+            contentFile = extraArgs[++i];
             break;
 
           default:
-            entry.Content = args[i];
+            entry.Content = extraArgs[i];
             break;
         }
       }
-
-      if (string.IsNullOrEmpty(hatenaId))
-        Usage("hatena-idを指定してください");
-
-      if (string.IsNullOrEmpty(blogId))
-        Usage("blog-idを指定してください");
-
-      if (string.IsNullOrEmpty(apiKey))
-        Usage("api-keyを指定してください");
 
       if (!string.IsNullOrEmpty(contentFile)) {
         if (contentFile == "-") {
@@ -106,50 +94,28 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
+      if (!Login(hatenaBlog))
+        return;
+
       Console.Write("投稿しています ... ");
 
-      var collectionUri = new Uri(string.Concat("http://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom/entry"));
-      var atom = new Atom();
-
-      atom.Credential = new NetworkCredential(hatenaId, apiKey);
-
-      HttpStatusCode statusCode;
-
-      var responseDocument = HatenaBlog.PostEntry(atom, collectionUri, entry, out statusCode);
+      var statusCode = hatenaBlog.PostEntry(entry, out XDocument responseDocument);
 
       if (statusCode == HttpStatusCode.Created) {
-        var nsmgr = new XmlNamespaceManager(responseDocument.NameTable);
+        var createdUri = responseDocument.Element(AtomPub.Namespaces.Atom + "entry")
+                                         ?.Elements(AtomPub.Namespaces.Atom + "link")
+                                         ?.FirstOrDefault(e => e.HasAttributeWithValue("rel", "alternate"))
+                                         ?.GetAttributeValue("href");
 
-        nsmgr.AddNamespace("atom", Namespaces.Atom);
-
-        Console.WriteLine("完了しました: {0}", responseDocument.GetSingleNodeValueOf("atom:entry/atom:link[@rel='alternate']/@href", nsmgr));
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("完了しました: {0}", createdUri);
+        Console.ResetColor();
       }
       else {
+        Console.ForegroundColor = ConsoleColor.Red;
         Console.Error.WriteLine("失敗しました: {0}", statusCode);
+        Console.ResetColor();
       }
-    }
-
-    private static void Usage(string format, params string[] args)
-    {
-      if (format != null) {
-        Console.Error.Write("error: ");
-        Console.Error.WriteLine(format, args);
-        Console.Error.WriteLine();
-      }
-
-      var assm = Assembly.GetEntryAssembly();
-      var version = (assm.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)[0] as AssemblyInformationalVersionAttribute).InformationalVersion;
-
-      Console.Error.WriteLine("{0} version {1}", assm.GetName().Name, version);
-      Console.Error.WriteLine("usage:");
-      Console.Error.WriteLine("  {0} -id <hatena-id> -blogid <blog-id> -apikey <api-key> -title <title> -category <category> <content>",
-                              System.IO.Path.GetFileName(assm.Location));
-      Console.Error.WriteLine("options:");
-      Console.Error.WriteLine("  -draft : post entry as draft");
-      Console.Error.WriteLine("  -fromfile <file>: post content from <file>");
-      Console.Error.WriteLine("  -fromfile -: post content from stdin");
-
-      Environment.Exit(-1);
     }
   }
 }
