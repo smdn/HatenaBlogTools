@@ -28,8 +28,6 @@ using System.Net;
 using System.Reflection;
 using System.Xml;
 
-using Smdn.Xml;
-
 using CategorySet = System.Collections.Generic.HashSet<string>;
 
 namespace Smdn.Applications.HatenaBlogTools {
