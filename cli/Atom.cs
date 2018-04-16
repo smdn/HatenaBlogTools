@@ -84,7 +84,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     private HttpWebRequest CreateRequest(string method, Uri requestUri)
     {
-      var req = WebRequest.Create(requestUri) as HttpWebRequest;
+      var req = WebRequest.CreateHttp(requestUri);
 
       req.Method = method;
       req.SetWsseHeader(credential);
@@ -124,10 +124,30 @@ namespace Smdn.Applications.HatenaBlogTools {
                                   req.Method,
                                   resp.ResponseUri);
 
-          using (var respStream = resp.GetResponseStream()) {
-            var reader = new StreamReader(respStream, Encoding.UTF8);
+#if false
+          foreach (string h in resp.Headers.Keys) {
+            Console.Error.WriteLine("{0}: {1}", h, resp.Headers[h]);
+          }
+#endif
 
-            Console.Error.WriteLine(reader.ReadToEnd());
+          // try read response body
+          // XXX: cannot read chunked response with GetResponseStream() (?)
+          // XXX: or cannot read empty response (?)
+          try {
+            using (var memoryStream = new MemoryStream()) {
+              using (var respStream = resp.GetResponseStream()) {
+                respStream.CopyTo(memoryStream);
+              }
+
+              memoryStream.Position = 0L;
+
+              using (var reader = new StreamReader(memoryStream, Encoding.UTF8)) {
+                Console.Error.WriteLine(reader.ReadToEnd());
+              }
+            }
+          }
+          catch {
+            // ignore exceptions
           }
 
           return null;
