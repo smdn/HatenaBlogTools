@@ -24,9 +24,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
-using System.Reflection;
-using System.Xml;
 
 using CategorySet = System.Collections.Generic.HashSet<string>;
 
@@ -131,7 +130,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       List<PostedEntry> entries = null;
 
       try {
-        entries = hatenaBlog.GetEntries();
+        entries = hatenaBlog.EnumerateEntries().ToList();
       }
       catch (WebException ex) {
         Console.Error.WriteLine(ex.Message);

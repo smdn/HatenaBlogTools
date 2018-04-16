@@ -156,11 +156,6 @@ namespace Smdn.Applications.HatenaBlogTools {
       return statusCode;
     }
 
-    public List<PostedEntry> GetEntries()
-    {
-      return EnumerateEntries().ToList();
-    }
-
     public IEnumerable<PostedEntry> EnumerateEntries()
     {
       if (atom == null)
