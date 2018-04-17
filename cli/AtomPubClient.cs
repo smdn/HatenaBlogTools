@@ -35,6 +35,8 @@ namespace Smdn.Applications.HatenaBlogTools {
   public class AtomPubClient {
     public static readonly int DefaultTimeoutMilliseconds = 60 * 1000;
 
+    private int timeout = DefaultTimeoutMilliseconds;
+
     public int Timeout {
       get { return timeout; }
       set {
@@ -46,16 +48,12 @@ namespace Smdn.Applications.HatenaBlogTools {
     }
 
     public NetworkCredential Credential {
-      get { return credential; }
-      set { credential = value; }
+      get; set;
     }
 
     public string UserAgent {
       get; set;
     }
-
-    private int timeout = DefaultTimeoutMilliseconds;
-    private NetworkCredential credential;
 
     public HttpStatusCode Get(Uri requestUri, out XDocument responseDocument)
     {
@@ -92,7 +90,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       var req = WebRequest.CreateHttp(requestUri);
 
       req.Method = method;
-      req.SetWsseHeader(credential);
+      req.SetWsseHeader(Credential);
       req.Accept = "application/x.atom+xml, application/atom+xml, application/atomsvc+xml, application/xml, text/xml, */*";
       req.Timeout = timeout;
       req.ReadWriteTimeout = timeout;
