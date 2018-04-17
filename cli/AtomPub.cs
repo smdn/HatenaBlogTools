@@ -25,12 +25,6 @@ using System;
 using System.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  public static class Namespaces {
-    public static readonly string Atom = "http://www.w3.org/2005/Atom";
-    public static readonly string App = "http://www.w3.org/2007/app";
-    public static readonly string Hatena = "http://www.hatena.ne.jp/info/xmlns#";
-  }
-
   public static class AtomPub {
     public static class Namespaces {
       public static readonly XNamespace Atom = (XNamespace)"http://www.w3.org/2005/Atom";
