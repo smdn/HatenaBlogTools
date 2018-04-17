@@ -57,9 +57,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     {
       var req = CreateRequest(WebRequestMethods.Http.Get, requestUri);
 
-      responseDocument = GetResponse(req, out HttpStatusCode statusCode);
-
-      return statusCode;
+      return GetResponse(req, out responseDocument);
     }
 
     public HttpStatusCode Post(Uri requestUri, XDocument requestDocument, out XDocument responseDocument)
@@ -82,9 +80,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         requestDocument.Save(reqStream);
       }
 
-      responseDocument = GetResponse(req, out HttpStatusCode statusCode);
-
-      return statusCode;
+      return GetResponse(req, out responseDocument);
     }
 
     private HttpWebRequest CreateRequest(string method, Uri requestUri)
@@ -100,24 +96,22 @@ namespace Smdn.Applications.HatenaBlogTools {
       return req;
     }
 
-    private static XDocument GetResponse(HttpWebRequest req, out HttpStatusCode statusCode)
+    private static HttpStatusCode GetResponse(HttpWebRequest req, out XDocument responseDocument)
     {
-      statusCode = (HttpStatusCode)0;
+      responseDocument = null;
 
       try {
         using (var resp = req.GetResponse() as HttpWebResponse) {
-          statusCode = resp.StatusCode;
-
           using (var respStream = resp.GetResponseStream()) {
-            return XDocument.Load(respStream);
+            responseDocument = XDocument.Load(respStream);
+
+            return resp.StatusCode;
           }
         }
       }
       catch (WebException ex) {
         if (ex.Status == WebExceptionStatus.ProtocolError) {
           var resp = ex.Response as HttpWebResponse;
-
-          statusCode = resp.StatusCode;
 
           Console.Error.WriteLine("{0} {1} ({2} {3})",
                                   (int)resp.StatusCode,
@@ -151,7 +145,7 @@ namespace Smdn.Applications.HatenaBlogTools {
             // ignore exceptions
           }
 
-          return null;
+          return resp.StatusCode;
         }
         else {
           throw;
