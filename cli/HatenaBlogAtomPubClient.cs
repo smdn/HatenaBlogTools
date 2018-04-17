@@ -52,7 +52,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     public string FormattedContent;
   }
 
-  public class HatenaBlogAtomPub {
+  public class HatenaBlogAtomPubClient {
     public static void InitializeHttpsServicePoint()
     {
       ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
@@ -90,14 +90,14 @@ namespace Smdn.Applications.HatenaBlogTools {
       get; private set;
     }
 
-    private Atom atom = null;
+    private AtomPubClient atom = null;
 
     private static Uri GetRootEndPont(string hatenaId, string blogId, string apiKey)
     {
       return new Uri(string.Concat("https://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom"));
     }
 
-    public HatenaBlogAtomPub(string hatenaId, string blogId, string apiKey)
+    public HatenaBlogAtomPubClient(string hatenaId, string blogId, string apiKey)
     {
       if (string.IsNullOrEmpty(hatenaId))
         throw new ArgumentException("must be non empty value", nameof(hatenaId));
@@ -117,12 +117,12 @@ namespace Smdn.Applications.HatenaBlogTools {
       System.Threading.Thread.Sleep(250);
     }
 
-    private Atom EnsureInitAtomClient()
+    private AtomPubClient EnsureInitAtomClient()
     {
       if (atom != null)
         return atom;
 
-      atom = new Atom();
+      atom = new AtomPubClient();
       atom.Credential = new NetworkCredential(HatenaId, apiKey);
 
       return atom;

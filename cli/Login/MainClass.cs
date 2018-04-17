@@ -38,9 +38,9 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public static void Main(string[] args)
     {
-      HatenaBlogAtomPub.InitializeHttpsServicePoint();
+      HatenaBlogAtomPubClient.InitializeHttpsServicePoint();
 
-      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPub hatenaBlog))
+      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubClient hatenaBlog))
         return;
 
       bool verbose = false;

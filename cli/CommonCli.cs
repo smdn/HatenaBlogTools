@@ -29,7 +29,7 @@ using System.Reflection;
 
 namespace Smdn.Applications.HatenaBlogTools {
   partial class MainClass {
-    private static bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPub hatenaBlog)
+    private static bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPubClient hatenaBlog)
     {
       hatenaBlog = null;
 
@@ -79,13 +79,13 @@ namespace Smdn.Applications.HatenaBlogTools {
         return false;
       }
 
-      hatenaBlog = new HatenaBlogAtomPub(hatenaId, blogId, apiKey);
+      hatenaBlog = new HatenaBlogAtomPubClient(hatenaId, blogId, apiKey);
       args = unparsedArgs.ToArray();
 
       return true;
     }
 
-    private static bool Login(HatenaBlogAtomPub hatenaBlog)
+    private static bool Login(HatenaBlogAtomPubClient hatenaBlog)
     {
       Console.Write("ログインしています ... ");
 

@@ -32,7 +32,7 @@ using System.Xml.Linq;
 using Smdn.Net;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  public class Atom {
+  public class AtomPubClient {
     public static readonly int DefaultTimeoutMilliseconds = 60 * 1000;
 
     public int Timeout {

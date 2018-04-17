@@ -76,9 +76,9 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public static void Main(string[] args)
     {
-      HatenaBlogAtomPub.InitializeHttpsServicePoint();
+      HatenaBlogAtomPubClient.InitializeHttpsServicePoint();
 
-      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPub hatenaBlog))
+      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubClient hatenaBlog))
         return;
 
       bool retrieveComments = false;
@@ -190,7 +190,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       Console.Error.WriteLine("完了");
     }
 
-    private static XDocument DumpAllEntries(HatenaBlogAtomPub hatenaBlog, CategoryFilterMode filterMode, HashSet<string> categoriesToFilter, out List<PostedEntry> entries)
+    private static XDocument DumpAllEntries(HatenaBlogAtomPubClient hatenaBlog, CategoryFilterMode filterMode, HashSet<string> categoriesToFilter, out List<PostedEntry> entries)
     {
       var filteredEntries = new List<PostedEntry>();
 

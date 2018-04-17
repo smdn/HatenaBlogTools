@@ -51,9 +51,9 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public static void Main(string[] args)
     {
-      HatenaBlogAtomPub.InitializeHttpsServicePoint();
+      HatenaBlogAtomPubClient.InitializeHttpsServicePoint();
 
-      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPub hatenaBlog))
+      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubClient hatenaBlog))
         return;
 
       string replaceFromText = null;
@@ -126,7 +126,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       ReplaceContentText(hatenaBlog, verbose, dryrun, replace, showDiff);
     }
 
-    private static void ReplaceContentText(HatenaBlogAtomPub hatenaBlog,
+    private static void ReplaceContentText(HatenaBlogAtomPubClient hatenaBlog,
                                            bool verbose,
                                            bool dryrun,
                                            Func<string, string> replace,
