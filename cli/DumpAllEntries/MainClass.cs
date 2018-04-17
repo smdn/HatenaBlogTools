@@ -28,19 +28,25 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Reflection;
 using System.Text;
-using System.Xml;
+using System.Xml.Linq;
 
-using Smdn.Xml;
+using Smdn.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  class MainClass {
+  partial class MainClass {
     private enum OutputFormat {
-      Default,
+      Atom,
       MovableType,
       HatenaDiary,
+
+      Default = Atom,
+    }
+
+    private enum CategoryFilterMode {
+      None,
+      Exclude,
+      Include,
     }
 
 #if RETRIEVE_COMMENTS
@@ -52,11 +58,29 @@ namespace Smdn.Applications.HatenaBlogTools {
     }
 #endif
 
+    private static string GetUsageExtraMandatoryOptions() => "[-format <hatena|mt|atom>] [outfile|-]";
+
+    private static IEnumerable<string> GetUsageExtraOptionDescriptions()
+    {
+#if RETRIEVE_COMMENTS
+      yield return "-comment : dump comments posted on entry"
+#endif
+      yield return "-format <hatena|mt|atom> : specify output format";
+      yield return "                             hatena : Hatena Diary";
+      yield return "                             mt     : Movable Type";
+      yield return "                             atom   : Atom feed (default)";
+      yield return "-excat <category>        : category to be excluded";
+      yield return "-incat <category>        : category to be included";
+      yield return "[outfile|-]              : save to <outfile> or stdout (-)";
+    }
+
     public static void Main(string[] args)
     {
-      string hatenaId = null;
-      string blogId = null;
-      string apiKey = null;
+      HatenaBlogAtomPub.InitializeHttpsServicePoint();
+
+      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPub hatenaBlog))
+        return;
+
       bool retrieveComments = false;
       var categoriesToExclude = new HashSet<string>(StringComparer.Ordinal);
       var categoriesToInclude = new HashSet<string>(StringComparer.Ordinal);
@@ -65,18 +89,6 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
-          case "-id":
-            hatenaId = args[++i];
-            break;
-
-          case "-blogid":
-            blogId = args[++i];
-            break;
-
-          case "-apikey":
-            apiKey = args[++i];
-            break;
-
           case "-format":
             var format = args[++i];
 
@@ -84,9 +96,15 @@ namespace Smdn.Applications.HatenaBlogTools {
               case "hatena":
                 outputFormat = OutputFormat.HatenaDiary;
                 break;
+
               case "mt":
                 outputFormat = OutputFormat.MovableType;
                 break;
+
+              case "atom":
+                outputFormat = OutputFormat.Atom;
+                break;
+
               default:
                 Usage("unsupported format: {0}", format);
                 break;
@@ -119,33 +137,31 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
-      if (string.IsNullOrEmpty(hatenaId))
-        Usage("hatena-idを指定してください");
+      var filterMode = CategoryFilterMode.None;
+      HashSet<string> categoriesToFilter = null;
 
-      if (string.IsNullOrEmpty(blogId))
-        Usage("blog-idを指定してください");
-
-      if (string.IsNullOrEmpty(apiKey))
-        Usage("api-keyを指定してください");
-
-      if (0 < categoriesToExclude.Count && 0 < categoriesToInclude.Count)
+      if (0 < categoriesToExclude.Count && 0 < categoriesToInclude.Count) {
         Usage("-excatと-incatを同時に指定することはできません");
+        return;
+      }
+      else {
+        if (0 < categoriesToExclude.Count) {
+          filterMode = CategoryFilterMode.Exclude;
+          categoriesToFilter = categoriesToExclude;
+        }
+        else if (0 < categoriesToInclude.Count) {
+          filterMode = CategoryFilterMode.Include;
+          categoriesToFilter = categoriesToInclude;
+        }
+      }
 
-      var outputDocument = DumpAllEntries(hatenaId, blogId, apiKey);
+      if (!Login(hatenaBlog))
+        return;
+
+      var outputDocument = DumpAllEntries(hatenaBlog, filterMode, categoriesToFilter, out List<PostedEntry> entries);
 
       if (outputDocument == null)
         return;
-
-      if (0 < categoriesToExclude.Count) {
-        Console.Error.WriteLine("次のカテゴリの記事を除外しています: {0}", string.Join(", ", categoriesToExclude));
-
-        FilterEntries(outputDocument, categoriesToExclude, true); // exclude specified categories
-      }
-      else if (0 < categoriesToInclude.Count) {
-        Console.Error.WriteLine("次のカテゴリの記事を抽出しています: {0}", string.Join(", ", categoriesToInclude));
-
-        FilterEntries(outputDocument, categoriesToInclude, false); // include specified categories
-      }
 
       // 結果を保存
       Console.Error.WriteLine("結果を保存しています");
@@ -153,139 +169,120 @@ namespace Smdn.Applications.HatenaBlogTools {
       using (var outputStream = outputFile == "-"
              ? Console.OpenStandardOutput()
              : new FileStream(outputFile, FileMode.Create, FileAccess.Write)) {
-
         switch (outputFormat) {
           case OutputFormat.HatenaDiary:
-            SaveAsHatenaDiary(outputDocument, outputStream, retrieveComments);
+            SaveAsHatenaDiary(entries, outputStream, retrieveComments);
             break;
 
           case OutputFormat.MovableType:
-            SaveAsMovableType(outputDocument, outputStream, blogId, retrieveComments);
+            SaveAsMovableType(entries, outputStream, hatenaBlog.BlogId, retrieveComments);
             break;
 
-          case OutputFormat.Default:
-          default:
+          case OutputFormat.Atom:
             outputDocument.Save(outputStream);
             break;
+
+          default:
+            throw new NotSupportedException($"unsupported format: {outputFormat}");
         }
       }
 
       Console.Error.WriteLine("完了");
     }
 
-    private static XmlDocument DumpAllEntries(string hatenaId, string blogId, string apiKey)
+    private static XDocument DumpAllEntries(HatenaBlogAtomPub hatenaBlog, CategoryFilterMode filterMode, HashSet<string> categoriesToFilter, out List<PostedEntry> entries)
     {
-      var atom = new Atom();
+      var filteredEntries = new List<PostedEntry>();
 
-      atom.Credential = new NetworkCredential(hatenaId, apiKey);
+      XDocument outputDocument = null;
 
-      var rootEndPoint = new Uri(string.Concat("http://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom/"));
-      var nextUri = new Uri(rootEndPoint, "./entry");
-      HttpStatusCode statusCode;
-      XmlDocument outputDocument = null;
+      Console.Error.WriteLine("エントリをダンプ中 ...");
 
-      Console.Error.Write("エントリをダンプ中 ");
-
-      for (;;) {
-        var collectionDocument = atom.Get(nextUri, out statusCode);
-
-        if (statusCode == HttpStatusCode.OK) {
-          Console.Error.Write(".");
-        }
-        else {
-          Console.Error.WriteLine("エントリの取得に失敗したため中断しました ({0})", statusCode);
-          return null;
-        }
-
-        var nsmgr = new XmlNamespaceManager(collectionDocument.NameTable);
-
-        nsmgr.AddNamespace("atom", Namespaces.Atom);
-
-        // 次のatom:linkを取得する
-        nextUri = collectionDocument.GetSingleNodeValueOf("/atom:feed/atom:link[@rel='next']/@href", nsmgr, s => s == null ? null : new Uri(s));
-
+      hatenaBlog.EnumerateEntries((postedEntry, entryElement) => {
         if (outputDocument == null) {
-          // link[@rel=first/next]を削除してルート要素以下をコピーする
-          collectionDocument.SelectSingleNode("/atom:feed/atom:link[@rel='first']", nsmgr).RemoveSelf();
-          collectionDocument.SelectSingleNode("/atom:feed/atom:link[@rel='next']", nsmgr).RemoveSelf();
+          // オリジナルのレスポンス文書からlink[@rel=first/next], entry以外の要素をコピーしてヘッダ部を構築する
+          outputDocument = new XDocument(entryElement.Document);
 
-          outputDocument = new XmlDocument();
+          outputDocument.Root
+                        .Elements(AtomPub.Namespaces.Atom + "entry")
+                        .Remove();
 
-          outputDocument.AppendChild(outputDocument.ImportNode(collectionDocument.DocumentElement, true));
-        }
-        else {
-          // atom:entryのみをコピーする
-          foreach (XmlNode entry in collectionDocument.SelectNodes("/atom:feed/atom:entry", nsmgr)) {
-            outputDocument.DocumentElement.AppendChild(outputDocument.ImportNode(entry, true));
-          }
+          outputDocument.Root
+                        .Elements(AtomPub.Namespaces.Atom + "link")
+                        .Where(e => e.HasAttributeWithValue("rel", "first") || e.HasAttributeWithValue("rel", "next"))
+                        .Remove();
         }
 
-        if (nextUri == null)
-          break;
-      }
+        Console.Error.Write("{0} \"{1}\" : ",
+                            postedEntry.EntryUri,
+                            postedEntry.Title);
+
+        switch (filterMode) {
+          case CategoryFilterMode.Include:
+            if (!postedEntry.Categories.Overlaps(categoriesToFilter)) {
+              Console.Error.WriteLine("対象カテゴリを含まないため除外します ({0})", string.Join(", ", postedEntry.Categories));
+              return; // continue
+            }
+            break;
+
+          case CategoryFilterMode.Exclude:
+            if (postedEntry.Categories.Overlaps(categoriesToFilter)) {
+              Console.Error.WriteLine("対象カテゴリを含むため除外します: ({0})", string.Join(", ", postedEntry.Categories));
+              return; // continue
+            }
+            break;
+
+          default:
+            break; // do nothing
+        }
+
+        outputDocument.Root.Add(new XElement(entryElement));
+
+        filteredEntries.Add(postedEntry);
+
+        Console.Error.WriteLine("ダンプしました");
+      });
+
+      entries = filteredEntries;
 
       return outputDocument;
     }
 
-    private static void FilterEntries(XmlDocument document, HashSet<string> categoriesToFilter, bool exclude)
-    {
-      var include = !exclude;
-      var nsmgr = new XmlNamespaceManager(document.NameTable);
-
-      nsmgr.AddNamespace("atom", Namespaces.Atom);
-
-      foreach (var entry in document.SelectNodes("/atom:feed/atom:entry", nsmgr).Cast<XmlElement>().ToList()) {
-        var categories = new HashSet<string>(entry.GetNodeValuesOf("atom:category/@term", nsmgr), StringComparer.Ordinal);
-
-        if (exclude && categories.Overlaps(categoriesToFilter))
-          entry.RemoveSelf();
-        else if (include && !categories.Overlaps(categoriesToFilter))
-          entry.RemoveSelf();
-      }
-    }
-
-    private static void SaveAsMovableType(XmlDocument document, Stream outputStream, string blogId, bool retrieveComments)
+    private static void SaveAsMovableType(IEnumerable<PostedEntry> entries, Stream outputStream, string blogId, bool retrieveComments)
     {
       /*
        * http://www.movabletype.jp/documentation/appendices/import-export-format.html
        */
+      string ToMovableTypeDateString(DateTime dateTime)
+      {
+        return dateTime.ToString("MM/dd/yyyy hh\\:mm\\:ss tt", System.Globalization.CultureInfo.InvariantCulture);
+      }
+
       var writer = new StreamWriter(outputStream, Encoding.UTF8);
 
       writer.NewLine = "\n"; // ???
 
-      var nsmgr = new XmlNamespaceManager(document.NameTable);
+      var entryRootLocation = string.Concat("http://", blogId, "/entry/"); // TODO: HTTP/HTTPS
 
-      nsmgr.AddNamespace("atom", Namespaces.Atom);
-      nsmgr.AddNamespace("app", Namespaces.App);
-      nsmgr.AddNamespace("hatena", Namespaces.Hatena);
-
-      var entryRootLocation = string.Concat("http://", blogId, "/entry/");
-
-      foreach (XmlNode entry in document.SelectNodes("/atom:feed/atom:entry", nsmgr)) {
+      foreach (var entry in entries) {
         /*
          * metadata seciton
          */
-        writer.WriteLine(string.Concat("AUTHOR: ", entry.GetSingleNodeValueOf("atom:author/atom:name/text()", nsmgr)));
-        writer.WriteLine(string.Concat("TITLE: ", entry.GetSingleNodeValueOf("atom:title/text()", nsmgr)));
+        writer.WriteLine(string.Concat("AUTHOR: ", entry.Author));
+        writer.WriteLine(string.Concat("TITLE: ", entry.Title));
 
-        var entryLocation = entry.GetSingleNodeValueOf("atom:link[@rel='alternate' and @type='text/html']/@href", nsmgr);
+        var entryLocation = entry.EntryUri.ToString();
 
         if (entryLocation != null && entryLocation.StartsWith(entryRootLocation, StringComparison.Ordinal))
           writer.WriteLine(string.Concat("BASENAME: ", entryLocation.Substring(entryRootLocation.Length)));
 
-        writer.WriteLine(string.Concat("STATUS: ", entry.GetSingleNodeValueOf("app:control/app:draft/text()", nsmgr) == "yes" ? "Draft" : "Publish"));
+        writer.WriteLine(string.Concat("STATUS: ", entry.IsDraft ? "Draft" : "Publish"));
         writer.WriteLine("CONVERT BREAKS: 0");
 
-        try {
-          var updatedDate = DateTimeOffset.Parse(entry.GetSingleNodeValueOf("atom:updated/text()", nsmgr) ?? string.Empty);
+        if (entry.Updated.HasValue)
+          writer.WriteLine(string.Concat("DATE: ", ToMovableTypeDateString(entry.Updated.Value.LocalDateTime)));
 
-          writer.WriteLine(string.Concat("DATE: ", ToMovableTypeDateString(updatedDate.LocalDateTime)));
-        }
-        catch (FormatException) {
-          // ignore exception
-        }
-
-        var tags = entry.GetNodeValuesOf("atom:category/@term", nsmgr)
+        var tags = entry.Categories
                         .Select(tag => tag.Contains(" ") ? string.Concat("\"", tag, "\"") : tag);
 
         writer.WriteLine(string.Concat("TAGS: ", string.Join(",", tags)));
@@ -298,8 +295,8 @@ namespace Smdn.Applications.HatenaBlogTools {
         writer.WriteLine(multilineFieldDelimiter);
 
         writer.WriteLine("BODY:");
-        //writer.WriteLine(entry.GetSingleNodeValueOf("atom:content/text()", nsmgr));
-        writer.WriteLine(entry.GetSingleNodeValueOf("hatena:formatted-content/text()", nsmgr));
+        //writer.WriteLine(entry.Content);
+        writer.WriteLine(entry.FormattedContent);
         writer.WriteLine(multilineFieldDelimiter);
 
 #if RETRIEVE_COMMENTS
@@ -327,50 +324,34 @@ namespace Smdn.Applications.HatenaBlogTools {
       writer.Flush();
     }
 
-    private static string ToMovableTypeDateString(DateTime dateTime)
+    private static void SaveAsHatenaDiary(IEnumerable<PostedEntry> entries, Stream outputStream, bool retrieveComments)
     {
-      return dateTime.ToString("MM/dd/yyyy hh\\:mm\\:ss tt", System.Globalization.CultureInfo.InvariantCulture);
-    }
+      var diaryElement = new XElement("diary");
+      var dayElements = new Dictionary<string, XElement>();
+      var defaultUpdatedDate = DateTimeOffset.FromUnixTimeSeconds(0L);
 
-    private static void SaveAsHatenaDiary(XmlDocument document, Stream outputStream, bool retrieveComments)
-    {
-      var nsmgr = new XmlNamespaceManager(document.NameTable);
+      foreach (var entry in entries) {
+        var updatedDate = entry.Updated ?? defaultUpdatedDate;
+        var date = updatedDate.ToLocalTime()
+                              .DateTime
+                              .ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
 
-      nsmgr.AddNamespace("atom", Namespaces.Atom);
-      nsmgr.AddNamespace("app", Namespaces.App);
-      nsmgr.AddNamespace("hatena", Namespaces.Hatena);
-
-      var outputDocument = new XmlDocument();
-
-      outputDocument.AppendChild(outputDocument.CreateXmlDeclaration("1.0", "UTF-8", null));
-
-      var diaryElement = outputDocument.AppendChild(outputDocument.CreateElement("diary"));
-      var dayElements = new Dictionary<string, XmlElement>();
-
-      foreach (XmlNode entry in document.SelectNodes("/atom:feed/atom:entry", nsmgr)) {
-        var updatedDate = DateTimeOffset.FromUnixTimeSeconds(0L);
-
-        try {
-          updatedDate = DateTimeOffset.Parse(entry.GetSingleNodeValueOf("atom:updated/text()", nsmgr) ?? string.Empty);
-        }
-        catch (FormatException) {
-          // ignore exceptions
-        }
-
-        var date = updatedDate.ToLocalTime().DateTime.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
-
-        XmlElement dayElement, bodyElement;
+        XElement dayElement, bodyElement;
 
         if (dayElements.TryGetValue(date, out dayElement)) {
-          bodyElement = (XmlElement)dayElement.FirstChild;
+          bodyElement = dayElement.Element("body");
         }
         else {
-          dayElement = diaryElement.AppendElement("day");
+          bodyElement = new XElement("body");
 
-          dayElement.SetAttribute("date", date);
-          dayElement.SetAttribute("title", string.Empty);
+          dayElement = new XElement(
+            "day",
+            new XAttribute("date", date),
+            new XAttribute("title", string.Empty),
+            bodyElement
+          );
 
-          bodyElement = dayElement.AppendElement("body");
+          diaryElement.Add(dayElement);
 
           dayElements[date] = dayElement;
         }
@@ -379,17 +360,17 @@ namespace Smdn.Applications.HatenaBlogTools {
 
         body.AppendFormat("*{0}*", updatedDate.ToUnixTimeSeconds());
 
-        var joinedCategory = string.Join("][", entry.GetNodeValuesOf("atom:category/@term", nsmgr));
+        var joinedCategory = string.Join("][", entry.Categories);
 
         if (0 < joinedCategory.Length)
           body.AppendFormat("[{0}]", joinedCategory);
 
-        body.AppendLine(entry.GetSingleNodeValueOf("atom:title/text()", nsmgr));
+        body.AppendLine(entry.Title);
 
-        body.AppendLine(entry.GetSingleNodeValueOf("atom:content/text()", nsmgr));
+        body.AppendLine(entry.Content);
         body.AppendLine();
 
-        bodyElement.AppendText(body.ToString());
+        bodyElement.Add(new XText(body.ToString()));
 
 #if RETRIEVE_COMMENTS
         if (retrieveComments) {
@@ -406,6 +387,9 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
 #endif
       }
+
+      var outputDocument = new XDocument(new XDeclaration("1.0", "utf-8", null),
+                                         diaryElement);
 
       outputDocument.Save(outputStream);
     }
@@ -490,31 +474,5 @@ namespace Smdn.Applications.HatenaBlogTools {
       Console.Error.WriteLine("完了");
     }
 #endif
-
-    private static void Usage(string format, params string[] args)
-    {
-      if (format != null) {
-        Console.Error.Write("error: ");
-        Console.Error.WriteLine(format, args);
-        Console.Error.WriteLine();
-      }
-
-      var assm = Assembly.GetEntryAssembly();
-      var version = (assm.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)[0] as AssemblyInformationalVersionAttribute).InformationalVersion;
-
-      Console.Error.WriteLine("{0} version {1}", assm.GetName().Name, version);
-      Console.Error.WriteLine("usage:");
-      Console.Error.WriteLine("  {0} -id <hatena-id> -blogid <blog-id> -apikey <api-key> [-format (hatena|mt)] [outfile]",
-                              System.IO.Path.GetFileName(assm.Location));
-
-      Console.Error.WriteLine("options:");
-#if RETRIEVE_COMMENTS
-      Console.Error.WriteLine("  -comment : dump comments posted on entry");
-#endif
-      Console.Error.WriteLine("  -excat <category> : category to be excluded");
-      Console.Error.WriteLine("  -incat <category> : category to be included");
-
-      Environment.Exit(-1);
-    }
   }
 }

@@ -49,6 +49,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     public Uri EntryUri;
     public string Author;
     public DateTimeOffset Published;
+    public string FormattedContent;
   }
 
   public class HatenaBlogAtomPub {
@@ -158,6 +159,23 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public IEnumerable<PostedEntry> EnumerateEntries()
     {
+      foreach (var pair in EnumerateAllEntries()) {
+        yield return pair.Item1;
+      }
+    }
+
+    public void EnumerateEntries(Action<PostedEntry, XElement> actionForEachEntry)
+    {
+      if (actionForEachEntry == null)
+        throw new ArgumentNullException(nameof(actionForEachEntry));
+
+      foreach (var pair in EnumerateAllEntries()) {
+        actionForEachEntry(pair.Item1, pair.Item2);
+      }
+    }
+
+    private IEnumerable<Tuple<PostedEntry, XElement>> EnumerateAllEntries()
+    {
       if (atom == null)
         throw new InvalidOperationException("not logged in");
 
@@ -184,11 +202,11 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
     }
 
-    private static IEnumerable<PostedEntry> ReadEntries(XDocument doc)
+    private static IEnumerable<Tuple<PostedEntry, XElement>> ReadEntries(XDocument doc)
     {
       return doc.Element(AtomPub.Namespaces.Atom + "feed")
                 ?.Elements(AtomPub.Namespaces.Atom + "entry")
-                ?.Select(entry => ConvertEntry(entry)) ?? Enumerable.Empty<PostedEntry>();
+                ?.Select(entry => Tuple.Create(ConvertEntry(entry), entry)) ?? Enumerable.Empty<Tuple<PostedEntry, XElement>>();
 
       PostedEntry ConvertEntry(XElement entry)
       {
@@ -207,6 +225,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         e.Title = entry.Element(AtomPub.Namespaces.Atom + "title")?.Value;
         e.Author = entry.Element(AtomPub.Namespaces.Atom + "author")?.Element(AtomPub.Namespaces.Atom + "name")?.Value;
         e.Content = entry.Element(AtomPub.Namespaces.Atom + "content")?.Value;
+        e.FormattedContent = entry.Element(AtomPub.Namespaces.Hatena + "formatted-content")?.Value;
 
         try {
           e.Published = DateTimeOffset.Parse(entry.Element(AtomPub.Namespaces.Atom + "published")?.Value);
