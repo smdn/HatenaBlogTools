@@ -31,9 +31,6 @@
     <Compile Include="..\..\core\Smdn\Smdn\src\Smdn\MathUtils.cs">
       <Link>MathUtils.cs</Link>
     </Compile>
-    <Compile Include="..\..\core\Smdn\Smdn.Xml\src\Smdn.Xml\XmlNodeExtensions.cs">
-      <Link>XmlNodeExtensions.cs</Link>
-    </Compile>
     <Compile Include="..\..\core\Smdn\Smdn.Core.Miscellaneous\src\Smdn.Net\WsseClient.cs">
       <Link>WsseClient.cs</Link>
     </Compile>
