@@ -90,6 +90,18 @@ namespace Smdn.Applications.HatenaBlogTools {
       get; private set;
     }
 
+    private string userAgent;
+
+    public string UserAgent {
+      get { return atom?.UserAgent ?? userAgent; }
+      set {
+        userAgent = value;
+
+        if (atom != null)
+          atom.UserAgent = value;
+      }
+    }
+
     private AtomPubClient atom = null;
 
     private static Uri GetRootEndPont(string hatenaId, string blogId, string apiKey)
@@ -124,6 +136,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       atom = new AtomPubClient();
       atom.Credential = new NetworkCredential(HatenaId, apiKey);
+      atom.UserAgent = userAgent;
 
       return atom;
     }

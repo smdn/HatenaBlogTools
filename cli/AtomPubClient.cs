@@ -50,6 +50,10 @@ namespace Smdn.Applications.HatenaBlogTools {
       set { credential = value; }
     }
 
+    public string UserAgent {
+      get; set;
+    }
+
     private int timeout = DefaultTimeoutMilliseconds;
     private NetworkCredential credential;
 
@@ -92,6 +96,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       req.Accept = "application/x.atom+xml, application/atom+xml, application/atomsvc+xml, application/xml, text/xml, */*";
       req.Timeout = timeout;
       req.ReadWriteTimeout = timeout;
+      req.UserAgent = UserAgent;
 
       return req;
     }

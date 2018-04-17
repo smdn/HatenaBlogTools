@@ -80,6 +80,8 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
 
       hatenaBlog = new HatenaBlogAtomPubClient(hatenaId, blogId, apiKey);
+      hatenaBlog.UserAgent = $"{AssemblyInfo.Name}/{AssemblyInfo.Version} ({AssemblyInfo.TargetFramework}; {Environment.OSVersion.VersionString})";
+
       args = unparsedArgs.ToArray();
 
       return true;
