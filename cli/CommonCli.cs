@@ -110,8 +110,11 @@ namespace Smdn.Applications.HatenaBlogTools {
     private static void Usage(string format, params string[] args)
     {
       if (format != null) {
+        Console.ForegroundColor = ConsoleColor.Red;
         Console.Error.Write("error: ");
         Console.Error.WriteLine(format, args);
+        Console.ResetColor();
+
         Console.Error.WriteLine();
       }
 
