@@ -125,12 +125,6 @@ namespace Smdn.Applications.HatenaBlogTools {
             break;
 #endif
 
-          case "/help":
-          case "-h":
-          case "--help":
-            Usage(null);
-            break;
-
           default:
             outputFile = args[i];
             break;
