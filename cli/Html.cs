@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Smdn.Applications.HatenaBlogTools {
@@ -31,22 +32,24 @@ namespace Smdn.Applications.HatenaBlogTools {
     public string LocalName { get; private set; }
     public IReadOnlyList<HtmlAttribute> Attributes { get; private set; }
 
-    public HtmlElement(Match match, string localName, IReadOnlyList<HtmlAttribute> attributes)
+    internal HtmlElement(Match match, string localName, List<KeyValuePair<Capture, Capture>> attributes)
     {
       this.Match = match;
       this.LocalName = localName;
-      this.Attributes = attributes;
+      this.Attributes = attributes.ConvertAll(pair => new HtmlAttribute(this, pair.Key, pair.Value));
     }
   }
 
   public class HtmlAttribute {
+    public HtmlElement Parent { get; private set; }
     public Capture CaptureName { get; private set; }
     public Capture CaptureValue { get; private set; }
     public string Name => CaptureName?.Value;
     public string Value => CaptureValue?.Value;
 
-    public HtmlAttribute(Capture captureName, Capture captureValue)
+    internal HtmlAttribute(HtmlElement parent, Capture captureName, Capture captureValue)
     {
+      this.Parent = parent;
       this.CaptureName = captureName;
       this.CaptureValue = captureValue;
     }
@@ -84,7 +87,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       var match = regexElementStart.Match(input);
 
       while (match.Success) {
-        var attributes = new List<HtmlAttribute>(match.Groups["attr"].Captures.Count);
+        var attributes = new List<KeyValuePair<Capture, Capture>>(match.Groups["attr"].Captures.Count);
 
         var attributeNameGroup = match.Groups["attrname"];
         var attributeValueGroup = match.Groups["attrvalue"];
@@ -105,7 +108,7 @@ namespace Smdn.Applications.HatenaBlogTools {
             }
           }
 
-          attributes.Add(new HtmlAttribute(attributeNameCapture, attributeValueCapture));
+          attributes.Add(KeyValuePair.Create(attributeNameCapture, attributeValueCapture));
         }
 
         yield return new HtmlElement(match,
