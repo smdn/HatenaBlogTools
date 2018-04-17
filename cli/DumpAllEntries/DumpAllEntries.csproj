@@ -16,17 +16,17 @@
     <OutputPath>..\..\build\bin\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\Atom.cs">
-      <Link>Atom.cs</Link>
+    <Compile Include="..\AtomPubClient.cs">
+      <Link>AtomPubClient.cs</Link>
     </Compile>
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\HatenaBlog.cs">
-      <Link>HatenaBlog.cs</Link>
+    <Compile Include="..\HatenaBlogAtomPubClient.cs">
+      <Link>HatenaBlogAtomPubClient.cs</Link>
     </Compile>
-    <Compile Include="..\Namespaces.cs">
-      <Link>Namespaces.cs</Link>
+    <Compile Include="..\AtomPub.cs">
+      <Link>AtomPub.cs</Link>
     </Compile>
     <Compile Include="..\..\core\Smdn\Smdn\src\Smdn\MathUtils.cs">
       <Link>MathUtils.cs</Link>
