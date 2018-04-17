@@ -1,15 +1,44 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-// Information about this assembly is defined by the following attributes.
-// Change them to the values specific to your project.
-
 [assembly: AssemblyCompany("smdn:総武ソフトウェア推進所")]
-[assembly: AssemblyCopyright("Copyright(c) 2013-2014 smdn.")]
+[assembly: AssemblyCopyright(AssemblyInfo.Copyright)]
+[assembly: AssemblyTitle(AssemblyInfo.SubName)]
+[assembly: AssemblyProduct(AssemblyInfo.Name + "-" + AssemblyInfo.Version + " (" + AssemblyInfo.TargetFramework + ")")]
+[assembly: AssemblyVersion(AssemblyInfo.Version)]
+[assembly: AssemblyInformationalVersion(AssemblyInfo.Version + AssemblyInfo.VersionSuffix)]
+[assembly: AssemblyConfiguration(AssemblyInfo.TargetFramework + AssemblyInfo.Configuration)]
 
-// The assembly version has the format "{Major}.{Minor}.{Build}.{Revision}".
-// The form "{Major}.{Minor}.*" will automatically update the build and revision,
-// and "{Major}.{Minor}.{Build}.*" will update just the revision.
+internal static partial class AssemblyInfo {
+  internal const string Name = "HatenaBlogTools";
+  internal const string Version = "1.06";
+  internal const string Copyright = "Copyright (C) 2013-2014 smdn";
 
-[assembly: AssemblyVersion("1.06")]
-[assembly: AssemblyInformationalVersionAttribute("1.06")]
+  internal const string TargetFramework =
+#if NET46
+    ".NET Framework 4.6"
+    #elif NETCOREAPP2_0
+    ".NET Core 2.0"
+#else
+    ""
+#endif
+    ;
+
+  internal const string TargetFrameworkSuffix =
+#if NET46
+    "net4.6"
+#elif NETCOREAPP2_0
+    "netcoreapp2.0"
+#else
+    ""
+#endif
+    ;
+
+  internal const string Configuration =
+#if DEBUG
+    " Debug"
+#else
+    ""
+#endif
+    ;
+}

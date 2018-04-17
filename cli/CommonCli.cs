@@ -119,11 +119,12 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
 
       var assm = Assembly.GetEntryAssembly();
-      var version = (assm.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)[0] as AssemblyInformationalVersionAttribute).InformationalVersion;
+      var informationalVersion = (assm.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)[0] as AssemblyInformationalVersionAttribute).InformationalVersion;
 
       var commandLine = $"dotnet {System.IO.Path.GetFileName(assm.Location)} --"; // TODO: on .NET Framework, etc.
 
-      Console.Error.WriteLine($"{assm.GetName().Name} version {version}");
+      Console.Error.WriteLine($"{AssemblyInfo.Name} {AssemblyInfo.SubName} version {informationalVersion} (for {AssemblyInfo.TargetFramework})");
+      Console.Error.WriteLine();
       Console.Error.WriteLine("usage:");
       Console.Error.WriteLine($"  {commandLine} -id <hatena-id> -blogid <blog-id> -apikey <api-key> " + GetUsageExtraMandatoryOptions());
       Console.Error.WriteLine();
