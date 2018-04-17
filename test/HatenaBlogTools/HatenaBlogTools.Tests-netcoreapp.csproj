@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <AssemblyName>Smdn.Applications.HatenaBlogTools.Tests</AssemblyName>
+    <RootNamespace>Smdn.Applications.HatenaBlogTools</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="3.10.1" />
+    <PackageReference Include="NUnitLite" Version="3.10.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\core\Smdn\NUnitLiteTestRunner.cs" />
+    <Compile Include="..\..\core\Smdn\NUnitTestUtils.cs" Link="NUnitTestUtils.cs" />
+    <Compile Include="..\..\cli\Html.cs">
+      <Link>Html.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>
