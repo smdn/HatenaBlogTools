@@ -144,5 +144,47 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       Assert.AreEqual(input, doc.ToString(), "reconstructed document");
     }
+
+    [TestCase("<e attr='val'>", "<e attr='al'>")]
+    [TestCase("<e attr='val'/>", "<e attr='al'/>")]
+    [TestCase("<e attr='val' />", "<e attr='al' />")]
+    [TestCase("<e attr= 'val' />", "<e attr= 'al' />")]
+    [TestCase("<e attr=\"val\">", "<e attr=\"al\">")]
+    [TestCase("text<e attr='val'>text", "text<e attr='al'>text")]
+    [TestCase("text<e attr='val'>text<e attr='val'>", "text<e attr='al'>text<e attr='al'>")]
+    [TestCase("text<e attr='val'>text<e attr='val'>text", "text<e attr='al'>text<e attr='al'>text")]
+    public void TestToString_ModifyAttributeValue_LengthInflating(string input, string expectedResult)
+    {
+      var doc = new HtmlDocument(input);
+
+      foreach (var e in doc.Elements) {
+        foreach (var a in e.Attributes) {
+          a.Value = a.Value.Substring(1);
+        }
+      }
+
+      Assert.AreEqual(expectedResult, doc.ToString(), "reconstructed document");
+    }
+
+    [TestCase("<e attr='val'>", "<e attr=' val'>")]
+    [TestCase("<e attr='val'/>", "<e attr=' val'/>")]
+    [TestCase("<e attr='val' />", "<e attr=' val' />")]
+    [TestCase("<e attr= 'val' />", "<e attr= ' val' />")]
+    [TestCase("<e attr=\"val\">", "<e attr=\" val\">")]
+    [TestCase("text<e attr='val'>text", "text<e attr=' val'>text")]
+    [TestCase("text<e attr='val'>text<e attr='val'>", "text<e attr=' val'>text<e attr=' val'>")]
+    [TestCase("text<e attr='val'>text<e attr='val'>text", "text<e attr=' val'>text<e attr=' val'>text")]
+    public void TestToString_ModifyAttributeValue_LengthDeflating(string input, string expectedResult)
+    {
+      var doc = new HtmlDocument(input);
+
+      foreach (var e in doc.Elements) {
+        foreach (var a in e.Attributes) {
+          a.Value = " " + a.Value;
+        }
+      }
+
+      Assert.AreEqual(expectedResult, doc.ToString(), "reconstructed document");
+    }
   }
 }
