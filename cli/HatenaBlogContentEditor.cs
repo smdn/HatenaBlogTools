@@ -33,26 +33,32 @@ namespace Smdn.Applications.HatenaBlogTools {
     {
     }
 
-    private static readonly Regex regexReplaceToHttps = new Regex(@"(?:\s*)(?<scheme>http)(?:\://[^/]+/)", RegexOptions.Singleline | RegexOptions.CultureInvariant);
+    private static readonly Regex regexReplaceAttributeReferenceToHttps = new Regex(@"(?:\s*)(?<scheme>http)(?:\://[^/]+/)", RegexOptions.Singleline | RegexOptions.CultureInvariant);
 
-    private static void ReplaceReferenceToHttps(HtmlAttribute attr)
+    private static string ReplaceSchemeToHttps(string input, Regex regex, ref bool modified)
     {
       for (;;) {
-        var match = regexReplaceToHttps.Match(attr.Value);
+        var match = regex.Match(input);
 
         if (!match.Success)
           break;
 
         var groupScheme = match.Groups["scheme"];
 
-        attr.Value = string.Concat(attr.Value.Substring(0, groupScheme.Index),
-                                   "https",
-                                   attr.Value.Substring(groupScheme.Index + groupScheme.Length));
+        input = string.Concat(input.Substring(0, groupScheme.Index),
+                              "https",
+                              input.Substring(groupScheme.Index + groupScheme.Length));
+
+        modified |= true;
       }
+
+      return input;
     }
 
     public void FixMixedContentReferences()
     {
+      var modified = false;
+
       foreach (var element in Elements) {
         IEnumerable<HtmlAttribute> targets = null;
 
@@ -110,9 +116,31 @@ namespace Smdn.Applications.HatenaBlogTools {
           continue;
 
         foreach (var target in targets) {
-          ReplaceReferenceToHttps(target);
+          target.Value = ReplaceSchemeToHttps(target.Value, regexReplaceAttributeReferenceToHttps, ref modified);
         }
       } // for each element
     } // end of method
+
+    /// <summary>
+    /// replaces the blog url in plain text content and html a@href to https
+    /// </summary>
+    public void ReplaceBlogUrlToHttps(IEnumerable<string> hostNames)
+    {
+      var modified = false;
+
+      foreach (var hostName in hostNames) {
+        var regexReplaceBlogUrlToHttps = new Regex(@"(?<scheme>http)\://" + Regex.Escape(hostName) + "/", RegexOptions.Singleline | RegexOptions.CultureInvariant);
+
+        foreach (var text in Texts) {
+          text.Text = ReplaceSchemeToHttps(text.Text, regexReplaceBlogUrlToHttps, ref modified);
+        }
+
+        foreach (var anchor in Elements.Where(e => string.Equals(e.LocalName, "a", StringComparison.OrdinalIgnoreCase))) {
+          foreach (var href in anchor.Attributes.Where(a => a.IsNameEqualsTo("href"))) {
+            href.Value = ReplaceSchemeToHttps(href.Value, regexReplaceBlogUrlToHttps, ref modified);
+          }
+        }
+      }
+    }
   }
 }

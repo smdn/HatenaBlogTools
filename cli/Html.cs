@@ -34,6 +34,9 @@ namespace Smdn.Applications.HatenaBlogTools {
     private readonly List<HtmlElement> elements;
     public IReadOnlyList<HtmlElement> Elements => elements;
 
+    private readonly List<HtmlText> texts;
+    public IReadOnlyList<HtmlText> Texts => texts;
+
     public HtmlDocument(string input)
     {
       this.nodes = new List<HtmlNode>();
@@ -49,6 +52,8 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
 
       this.nodes.Add(new HtmlText(input.Substring(endIndexOfLastElementStart)));
+
+      this.texts = this.nodes.OfType<HtmlText>().ToList();
     }
 
     public override string ToString()
@@ -68,7 +73,7 @@ namespace Smdn.Applications.HatenaBlogTools {
   }
 
   public class HtmlText : HtmlNode {
-    public string Text { get; private set; }
+    public string Text { get; set; }
 
     public HtmlText(string text)
     {

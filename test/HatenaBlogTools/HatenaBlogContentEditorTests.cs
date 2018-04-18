@@ -173,5 +173,41 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
     }
+
+
+
+    [TestCase("http://example.com/",
+              "https://example.com/")]
+    [TestCase("http://example.net/",
+              "https://example.net/")]
+    [TestCase("http://example.com/ http://example.net/",
+              "https://example.com/ https://example.net/")]
+    [TestCase("http://example.com/test.dat",
+              "https://example.com/test.dat")]
+    [TestCase("<p>welcome to http://example.com/<p>",
+              "<p>welcome to https://example.com/<p>")]
+    [TestCase("welcome to <a href=\"http://example.com/\">http://example.com/</a>",
+              "welcome to <a href=\"https://example.com/\">https://example.com/</a>")]
+    [TestCase("welcome to [http://example.com/:title=my blog]",
+              "welcome to [https://example.com/:title=my blog]")]
+    public void TestReplaceBlogUrlToHttps(string input, string expectedResult)
+    {
+      var editor = new HatenaBlogContentEditor(input);
+
+      editor.ReplaceBlogUrlToHttps(new[] {"example.com", "example.net"});
+
+      Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
+    }
+
+    [TestCase("http://example.net/")]
+    [TestCase("<a href=\"http://example.net/\">http://example.net/</a>")]
+    public void TestReplaceBlogUrlToHttps_NonBlogUrl(string input)
+    {
+      var editor = new HatenaBlogContentEditor(input);
+
+      editor.ReplaceBlogUrlToHttps(new[] { "example.com" });
+
+      Assert.AreEqual(input, editor.ToString(), "modified content");
+    }
   }
 }
