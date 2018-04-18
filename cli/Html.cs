@@ -24,34 +24,129 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  public class HtmlElement {
-    public Match Match { get; private set; }
+  public class HtmlDocument {
+    private readonly List<HtmlNode> nodes;
+
+    private readonly List<HtmlElement> elements;
+    public IReadOnlyList<HtmlElement> Elements => elements;
+
+    public HtmlDocument(string input)
+    {
+      this.nodes = new List<HtmlNode>();
+      this.elements = Html.EnumerateHtmlElementStart(input).ToList();
+
+      var endIndexOfLastElementStart = 0;
+
+      foreach (var element in elements) {
+        this.nodes.Add(new HtmlText(input.Substring(endIndexOfLastElementStart, element.Match.Index - endIndexOfLastElementStart)));
+        this.nodes.Add(element);
+
+        endIndexOfLastElementStart = element.Match.Index + element.Match.Length;
+      }
+
+      this.nodes.Add(new HtmlText(input.Substring(endIndexOfLastElementStart)));
+    }
+
+    public override string ToString()
+    {
+      var sb = new StringBuilder(10240);
+
+      foreach (var node in nodes) {
+        sb.Append(node.ConstructHtml());
+      }
+
+      return sb.ToString();
+    }
+  }
+
+  public abstract class HtmlNode {
+    public abstract string ConstructHtml();
+  }
+
+  public class HtmlText : HtmlNode {
+    public string Text { get; private set; }
+
+    public HtmlText(string text)
+    {
+      this.Text = text;
+    }
+
+    public override string ConstructHtml() => Text;
+  }
+
+  public class HtmlElement : HtmlNode {
     public string LocalName { get; private set; }
     public IReadOnlyList<HtmlAttribute> Attributes { get; private set; }
 
-    internal HtmlElement(Match match, string localName, List<KeyValuePair<Capture, Capture>> attributes)
+    internal Match Match { get; private set; }
+    internal string ElementClose { get; private set; }
+
+    internal HtmlElement(string localName, Match match, List<HtmlAttribute> attributes, string elementClose)
     {
-      this.Match = match;
       this.LocalName = localName;
-      this.Attributes = attributes.ConvertAll(pair => new HtmlAttribute(this, pair.Key, pair.Value));
+      this.Match = match;
+      this.Attributes = attributes;
+      this.ElementClose = elementClose;
+    }
+
+    public override string ConstructHtml()
+    {
+      if (Attributes.Count == 0)
+        return Match.Value;
+
+      var sb = new StringBuilder(1024);
+
+      sb.Append("<");
+      sb.Append(LocalName);
+
+      foreach (var attr in Attributes) {
+        sb.Append(attr.ConstructHtml());
+      }
+
+      sb.Append(ElementClose);
+
+      return sb.ToString();
     }
   }
 
   public class HtmlAttribute {
-    public HtmlElement Parent { get; private set; }
-    public Capture CaptureName { get; private set; }
-    public Capture CaptureValue { get; private set; }
-    public string Name => CaptureName?.Value;
-    public string Value => CaptureValue?.Value;
+    // <element ___attr1_=_'value'____attr2=...
+    //          >  >    >   >    >>   
+    //          |  |    |   |    ||
+    //          |  |    |   |    |next preamble
+    //          |  |    |   |    postamble
+    //          |  |    |   capture 'attrvalue' -> CaptureValue/Value
+    //          |  |    delimiter
+    //          |  capture 'attrname' -> CaptureName/Name
+    //          preamble
 
-    internal HtmlAttribute(HtmlElement parent, Capture captureName, Capture captureValue)
+    internal string Preamble { get; private set; }
+    internal Capture CaptureName { get; private set; }
+    internal string Delimiter { get; private set; }
+    internal Capture CaptureValue { get; private set; }
+    internal string Postamble { get; private set; }
+
+    public string Name => CaptureName?.Value;
+    public string Value { get; set; }
+
+    internal HtmlAttribute(string preamble, Capture captureName, string delimiter, Capture captureValue, string postabmle)
     {
-      this.Parent = parent;
+      this.Preamble = preamble;
       this.CaptureName = captureName;
+      this.Delimiter = delimiter;
       this.CaptureValue = captureValue;
+      this.Postamble = postabmle;
+
+      this.Value = captureValue?.Value;
+    }
+
+    internal string ConstructHtml()
+    {
+      return string.Concat(Preamble, Name, Delimiter, Value, Postamble);
     }
   }
 
@@ -75,7 +170,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       var elementLocalName = "[a-zA-z]+";
 
-      return new Regex($"\\<(?<localname>{elementLocalName}){attributeList}{whitespaceZeroOrMore}/?\\>",
+      return new Regex($"\\<(?<localname>{elementLocalName}){attributeList}(?<elementclose>{whitespaceZeroOrMore}/?\\>)",
                        RegexOptions.Multiline | RegexOptions.Compiled);
     }
 
@@ -87,33 +182,41 @@ namespace Smdn.Applications.HatenaBlogTools {
       var match = regexElementStart.Match(input);
 
       while (match.Success) {
-        var attributes = new List<KeyValuePair<Capture, Capture>>(match.Groups["attr"].Captures.Count);
+        var groupAttribute = match.Groups["attr"];
+        var groupAttributeName = match.Groups["attrname"];
+        var groupAttributeValue = match.Groups["attrvalue"];
 
-        var attributeNameGroup = match.Groups["attrname"];
-        var attributeValueGroup = match.Groups["attrvalue"];
+        var attributes = new List<HtmlAttribute>(groupAttribute.Captures.Count);
 
-        for (var attributeIndex = 0; attributeIndex < attributeNameGroup.Captures.Count; attributeIndex++) {
-          var attributeNameCapture = attributeNameGroup.Captures[attributeIndex];
-          var indexOfNextAtttributeStart = attributeIndex < attributeNameGroup.Captures.Count - 1 ? attributeNameGroup.Captures[attributeIndex + 1].Index : match.Index + match.Length;
+        for (var attributeIndex = 0; attributeIndex < groupAttribute.Captures.Count; attributeIndex++) {
+          var captureAttributeName = groupAttributeName.Captures[attributeIndex];
+          var indexOfNextAtttributeStart = attributeIndex < groupAttributeName.Captures.Count - 1 ? groupAttributeName.Captures[attributeIndex + 1].Index : match.Index + match.Length;
 
-          Capture attributeValueCapture = null;
+          Capture captureAttributeValue = null;
 
-          for (var captureIndex = 0; captureIndex < attributeValueGroup.Captures.Count; captureIndex++) {
-            var capture = attributeValueGroup.Captures[captureIndex];
+          for (var captureIndex = 0; captureIndex < groupAttributeValue.Captures.Count; captureIndex++) {
+            var capture = groupAttributeValue.Captures[captureIndex];
 
-            if (attributeNameCapture.Index + attributeNameCapture.Length < capture.Index &&
+            if (captureAttributeName.Index + captureAttributeName.Length < capture.Index &&
                 capture.Index + capture.Length < indexOfNextAtttributeStart) {
-              attributeValueCapture = capture;
+              captureAttributeValue = capture;
               break;
             }
           }
 
-          attributes.Add(KeyValuePair.Create(attributeNameCapture, attributeValueCapture));
+          var captureAttribute = groupAttribute.Captures[attributeIndex];
+
+          attributes.Add(new HtmlAttribute(preamble: input.Substring(captureAttribute.Index, captureAttributeName.Index - captureAttribute.Index),
+                                           captureName: captureAttributeName,
+                                           delimiter: (captureAttributeValue == null) ? null : input.Substring(captureAttributeName.Index + captureAttributeName.Length, captureAttributeValue.Index - (captureAttributeName.Index + captureAttributeName.Length)),
+                                           captureValue: captureAttributeValue,
+                                           postabmle: (captureAttributeValue == null) ? null : input.Substring(captureAttributeValue.Index + captureAttributeValue.Length, (captureAttribute.Index + captureAttribute.Length) - (captureAttributeValue.Index + captureAttributeValue.Length))));
         }
 
-        yield return new HtmlElement(match,
-                                     match.Groups["localname"].Value,
-                                     attributes);
+        yield return new HtmlElement(match.Groups["localname"].Value,
+                                     match,
+                                     attributes,
+                                     match.Groups["elementclose"].Value);
 
         match = match.NextMatch();
       }
