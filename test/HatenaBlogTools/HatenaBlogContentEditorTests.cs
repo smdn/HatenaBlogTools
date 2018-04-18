@@ -94,84 +94,70 @@ namespace Smdn.Applications.HatenaBlogTools {
       Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
     }
 
-    [TestCase("<img src=\"//example.com/test.dat\">",
-              "<img src=\"//example.com/test.dat\">")]
-    public void TestFixMixedContentReferences_ProtocolRelativeReference(string input, string expectedResult)
+    [TestCase("<img src=\"//example.com/test.dat\">")]
+    public void TestFixMixedContentReferences_ProtocolRelativeReference(string input)
     {
       var editor = new HatenaBlogContentEditor(input);
 
       editor.FixMixedContentReferences();
 
-      Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
+      Assert.AreEqual(input, editor.ToString(), "modified content");
     }
 
-    [TestCase("<img src=\"/test.dat\">",
-              "<img src=\"/test.dat\">")]
-
-    [TestCase("<img src=\"./test.dat\">",
-              "<img src=\"./test.dat\">")]
-
-    [TestCase("<img src=\"test.dat\">",
-              "<img src=\"test.dat\">")]
-    public void TestFixMixedContentReferences_RelativeReference(string input, string expectedResult)
+    [TestCase("<img src=\"/test.dat\">")]
+    [TestCase("<img src=\"./test.dat\">")]
+    [TestCase("<img src=\"test.dat\">")]
+    public void TestFixMixedContentReferences_RelativeReference(string input)
     {
       var editor = new HatenaBlogContentEditor(input);
 
       editor.FixMixedContentReferences();
 
-      Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
+      Assert.AreEqual(input, editor.ToString(), "modified content");
     }
 
-    [TestCase("<img src=\"ftps://example.com/test.dat\">",
-              "<img src=\"ftps://example.com/test.dat\">")]
-    public void TestFixMixedContentReferences_NonHttpReference(string input, string expectedResult)
+    [TestCase("<img src=\"ftps://example.com/test.dat\">")]
+    public void TestFixMixedContentReferences_NonHttpReference(string input)
     {
       var editor = new HatenaBlogContentEditor(input);
 
       editor.FixMixedContentReferences();
 
-      Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
+      Assert.AreEqual(input, editor.ToString(), "modified content");
     }
 
-    [TestCase("<link rel=\"canonical\" href=\"http://example.com/test.dat\">",
-              "<link rel=\"canonical\" href=\"http://example.com/test.dat\">")]
-    public void TestFixMixedContentReferences_NonStylesheetLink(string input, string expectedResult)
+    [TestCase("<link rel=\"canonical\" href=\"http://example.com/test.dat\">")]
+    public void TestFixMixedContentReferences_NonStylesheetLink(string input)
     {
       var editor = new HatenaBlogContentEditor(input);
 
       editor.FixMixedContentReferences();
 
-      Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
+      Assert.AreEqual(input, editor.ToString(), "modified content");
     }
 
-    [TestCase("<a href=\"http://example.com/test.dat\">",
-              "<a href=\"http://example.com/test.dat\">")]
-    [TestCase("<a src=\"http://example.com/test.dat\">",
-              "<a src=\"http://example.com/test.dat\">")]
-    [TestCase("<link src=\"http://example.com/test.dat\">",
-              "<link src=\"http://example.com/test.dat\">")]
-    public void TestFixMixedContentReferences_NonEmbeddedReferences(string input, string expectedResult)
+    [TestCase("<a href=\"http://example.com/test.dat\">")]
+    [TestCase("<a src=\"http://example.com/test.dat\">")]
+    [TestCase("<link src=\"http://example.com/test.dat\">")]
+    public void TestFixMixedContentReferences_NonEmbeddedReferences(string input)
     {
       var editor = new HatenaBlogContentEditor(input);
 
       editor.FixMixedContentReferences();
 
-      Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
+      Assert.AreEqual(input, editor.ToString(), "modified content");
     }
 
-    [TestCase("http://example.com/test.dat",
-              "http://example.com/test.dat")]
-    [TestCase("img src=http://example.com/test.dat",
-              "img src=http://example.com/test.dat")]
-    [TestCase("&ltimg src=http://example.com/test.dat&gt;",
-              "&ltimg src=http://example.com/test.dat&gt;")]
-    public void TestFixMixedContentReferences_ContainsNoReferences(string input, string expectedResult)
+    [TestCase("http://example.com/test.dat")]
+    [TestCase("img src=http://example.com/test.dat")]
+    [TestCase("&ltimg src=http://example.com/test.dat&gt;")]
+    public void TestFixMixedContentReferences_ContainsNoReferences(string input)
     {
       var editor = new HatenaBlogContentEditor(input);
 
       editor.FixMixedContentReferences();
 
-      Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
+      Assert.AreEqual(input, editor.ToString(), "modified content");
     }
 
 
