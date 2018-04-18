@@ -43,5 +43,11 @@
     <Compile Include="..\CommonCli.cs">
       <Link>CommonCli.cs</Link>
     </Compile>
+    <Compile Include="..\HatenaBlogFunctions.cs">
+      <Link>HatenaBlogFunctions.cs</Link>
+    </Compile>
+    <Compile Include="..\DiffGenerator.cs">
+      <Link>DiffGenerator.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>

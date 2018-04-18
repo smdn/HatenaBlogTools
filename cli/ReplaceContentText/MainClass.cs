@@ -96,140 +96,90 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
-      if (string.IsNullOrEmpty(replaceFromText))
+      if (string.IsNullOrEmpty(replaceFromText)) {
         Usage("置換する文字列を指定してください");
+        return;
+      }
 
       if (replaceToText == null)
         replaceToText = string.Empty; // delete
 
-      var regex = replaceAsRegex ? new Regex(replaceFromText, RegexOptions.Multiline) : null;
-      var replace = new Func<string, string>(input => {
-        if (input == null)
-          return null;
+      var editor = replaceAsRegex
+        ? (IHatenaBlogEntryEditor)new RegexEntryEditor(replaceFromText, replaceToText)
+        : (IHatenaBlogEntryEditor)new EntryEditor(replaceFromText, replaceToText);
 
-        if (regex == null)
-          return input.Replace(replaceFromText, replaceToText);
-        else
-          return regex.Replace(input, replaceToText);
-      });
+      var diffGenerator = DiffGenerator.Create(!verbose,
+                                               diffCommand,
+                                               diffCommandArgs,
+                                               "置換前の本文",
+                                               "置換後の本文");
 
-      var showDiff = verbose ? new Action<string, string>((textOld, textNew) => {
-        if (string.IsNullOrEmpty(diffCommand))
-          ShowDiff(textOld, textNew);
-        else
-          ShowDiffWithCommand(diffCommand, diffCommandArgs, textOld, textNew);
-      }) : null;
+      if (!diffGenerator.IsAvailable()) {
+        Usage("指定されたdiffコマンドは利用できません。　コマンドのパスと、カレントディレクトリに書き込みができることを確認してください。");
+        return;
+      }
+
+      var postMode = dryrun
+        ? HatenaBlogFunctions.PostMode.PostNever
+        : HatenaBlogFunctions.PostMode.PostIfModified;
 
       if (!Login(hatenaBlog))
         return;
 
-      ReplaceContentText(hatenaBlog, verbose, dryrun, replace, showDiff);
+      HatenaBlogFunctions.EditAllEntryContent(hatenaBlog,
+                                              postMode,
+                                              editor,
+                                              diffGenerator);
     }
 
-    private static void ReplaceContentText(HatenaBlogAtomPubClient hatenaBlog,
-                                           bool verbose,
-                                           bool dryrun,
-                                           Func<string, string> replace,
-                                           Action<string, string> showDiff)
-    {
-      foreach (var entry in hatenaBlog.EnumerateEntries()) {
-        var newContent = replace(entry.Content);
+    private class EntryEditor : IHatenaBlogEntryEditor {
+      private readonly string replaceFrom;
+      private readonly string replaceTo;
 
-        Console.Write("{0} \"{1}\" ", entry.EntryUri, entry.Title);
+      public EntryEditor(string replaceFrom, string replaceTo)
+      {
+        this.replaceFrom = replaceFrom;
+        this.replaceTo = replaceTo;
+      }
 
-        if (string.Equals(entry.Content, newContent, StringComparison.Ordinal)) {
-          Console.WriteLine("(該当個所なし)");
-        }
-        else {
-          if (showDiff != null) {
-            Console.WriteLine("以下の内容に置換します");
+      public void Edit(PostedEntry entry, Action<string, string> actionIfModified)
+      {
+        var originalContent = entry.Content;
 
-            showDiff(entry.Content, newContent);
+        entry.Content = originalContent.Replace(replaceFrom, replaceTo);
 
-            Console.WriteLine();
-          }
+        var modified =
+          (originalContent.Length != entry.Content.Length) ||
+          !string.Equals(originalContent, entry.Content, StringComparison.Ordinal);
 
-          if (dryrun)
-            continue;
-
-          Console.Write("{0} \"{1}\" を更新中 ... ", entry.EntryUri, entry.Title);
-
-          entry.Content = newContent;
-
-          var statusCode = hatenaBlog.UpdateEntry(entry, out _);
-
-          if (statusCode == HttpStatusCode.OK) {
-            hatenaBlog.WaitForCinnamon();
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("更新しました");
-            Console.ResetColor();
-          }
-          else {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Error.WriteLine("更新に失敗しました: {0}", statusCode);
-            Console.ResetColor();
-          }
-        }
+        if (modified)
+          actionIfModified?.Invoke(originalContent, entry.Content);
       }
     }
 
-    private static void ShowDiff(string textOld, string textNew)
-    {
-      Console.WriteLine("[  現在の本文  ]");
-      Console.WriteLine(textOld);
-      Console.WriteLine("[  置換後の本文  ]");
-      Console.WriteLine(textNew);
-    }
+    private class RegexEntryEditor : IHatenaBlogEntryEditor {
+      private readonly Regex regexToReplace;
+      private readonly string replacement;
 
-    private static readonly Encoding utf8nobom = new UTF8Encoding(false);
-
-    private static void ShowDiffWithCommand(string command, string arguments, string textOld, string textNew)
-    {
-      const string dirTemp = "./.tmp/";
-      const string fileOld = dirTemp + "current.txt";
-      const string fileNew = dirTemp + "replace.txt";
-
-      try {
-        Directory.CreateDirectory(dirTemp);
-
-        File.WriteAllText(fileOld + Environment.NewLine, textOld, utf8nobom);
-        File.WriteAllText(fileNew + Environment.NewLine, textNew, utf8nobom);
-
-        arguments = $"'{fileOld}' '{fileNew}' {arguments}";
-
-        ProcessStartInfo psi;
-
-        if (File.Exists("/bin/sh")) { // XXX: for unix
-          if (arguments != null)
-            arguments = arguments.Replace("\"", "\\\"");
-
-          psi = new ProcessStartInfo("/bin/sh", string.Format("-c \"{0} {1}\"", command, arguments));
-        }
-        else { // for windows
-          psi = new ProcessStartInfo("cmd", string.Format("/c {0} {1}", command, arguments));
-          psi.CreateNoWindow = true;
-        }
-
-        psi.UseShellExecute = false;
-        psi.RedirectStandardOutput = true;
-        psi.RedirectStandardError = true;
-
-        using (var process = Process.Start(psi)) {
-          using (var stdout = Console.OpenStandardOutput()) {
-            process.StandardOutput.BaseStream.CopyTo(stdout);
-          }
-
-          using (var stderr = Console.OpenStandardError()) {
-            process.StandardError.BaseStream.CopyTo(stderr);
-          }
-
-          process.WaitForExit();
-        }
+      public RegexEntryEditor(string regexToReplace, string replacement)
+      {
+        this.regexToReplace = new Regex(regexToReplace, RegexOptions.Multiline);
+        this.replacement = replacement;
       }
-      finally {
-        if (Directory.Exists(dirTemp))
-          Directory.Delete(dirTemp, true);
+
+      public void Edit(PostedEntry entry, Action<string, string> actionIfModified)
+      {
+        var modified = false;
+        var originalContent = entry.Content;
+
+        entry.Content = regexToReplace.Replace(originalContent, (match) => {
+          modified |= true;
+
+          return match.Result(replacement);
+        });
+
+        if (modified)
+          actionIfModified?.Invoke(originalContent, entry.Content);
       }
     }
   }

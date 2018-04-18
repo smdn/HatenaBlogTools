@@ -55,7 +55,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       return input;
     }
 
-    public void FixMixedContentReferences()
+    public bool FixMixedContentReferences()
     {
       var modified = false;
 
@@ -119,12 +119,14 @@ namespace Smdn.Applications.HatenaBlogTools {
           target.Value = ReplaceSchemeToHttps(target.Value, regexReplaceAttributeReferenceToHttps, ref modified);
         }
       } // for each element
+
+      return modified;
     } // end of method
 
     /// <summary>
     /// replaces the blog url in plain text content and html a@href to https
     /// </summary>
-    public void ReplaceBlogUrlToHttps(IEnumerable<string> hostNames)
+    public bool ReplaceBlogUrlToHttps(IEnumerable<string> hostNames)
     {
       var modified = false;
 
@@ -141,6 +143,8 @@ namespace Smdn.Applications.HatenaBlogTools {
           }
         }
       }
+
+      return modified;
     }
   }
 }
