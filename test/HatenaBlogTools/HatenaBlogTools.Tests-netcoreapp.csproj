@@ -15,5 +15,8 @@
     <Compile Include="..\..\cli\Html.cs">
       <Link>Html.cs</Link>
     </Compile>
+    <Compile Include="..\..\cli\HatenaBlogContentEditor.cs">
+      <Link>HatenaBlogContentEditor.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>

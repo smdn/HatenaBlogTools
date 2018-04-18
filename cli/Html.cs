@@ -148,6 +148,11 @@ namespace Smdn.Applications.HatenaBlogTools {
     {
       return string.Concat(Preamble, Name, Delimiter, Value, Postamble);
     }
+
+    public bool IsNameEqualsTo(string name)
+    {
+      return string.Equals(Name, name, StringComparison.OrdinalIgnoreCase);
+    }
   }
 
   public static class Html {
