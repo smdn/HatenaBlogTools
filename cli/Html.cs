@@ -83,14 +83,14 @@ namespace Smdn.Applications.HatenaBlogTools {
     public IReadOnlyList<HtmlAttribute> Attributes { get; private set; }
 
     internal Match Match { get; private set; }
-    internal string ElementClose { get; private set; }
+    private readonly string elementClose;
 
     internal HtmlElement(string localName, Match match, List<HtmlAttribute> attributes, string elementClose)
     {
       this.LocalName = localName;
       this.Match = match;
       this.Attributes = attributes;
-      this.ElementClose = elementClose;
+      this.elementClose = elementClose;
     }
 
     public override string ConstructHtml()
@@ -107,7 +107,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         sb.Append(attr.ConstructHtml());
       }
 
-      sb.Append(ElementClose);
+      sb.Append(elementClose);
 
       return sb.ToString();
     }
@@ -124,29 +124,29 @@ namespace Smdn.Applications.HatenaBlogTools {
     //          |  capture 'attrname' -> CaptureName/Name
     //          preamble
 
-    internal string Preamble { get; private set; }
-    internal Capture CaptureName { get; private set; }
-    internal string Delimiter { get; private set; }
-    internal Capture CaptureValue { get; private set; }
-    internal string Postamble { get; private set; }
+    private readonly string preamble;
+    private readonly Capture captureName;
+    private readonly string delimiter;
+    private readonly Capture captureValue;
+    private readonly string postamble;
 
-    public string Name => CaptureName?.Value;
+    public string Name => captureName?.Value;
     public string Value { get; set; }
 
     internal HtmlAttribute(string preamble, Capture captureName, string delimiter, Capture captureValue, string postabmle)
     {
-      this.Preamble = preamble;
-      this.CaptureName = captureName;
-      this.Delimiter = delimiter;
-      this.CaptureValue = captureValue;
-      this.Postamble = postabmle;
+      this.preamble = preamble;
+      this.captureName = captureName;
+      this.delimiter = delimiter;
+      this.captureValue = captureValue;
+      this.postamble = postabmle;
 
       this.Value = captureValue?.Value;
     }
 
     internal string ConstructHtml()
     {
-      return string.Concat(Preamble, Name, Delimiter, Value, Postamble);
+      return string.Concat(preamble, Name, delimiter, Value, postamble);
     }
 
     public bool IsNameEqualsTo(string name)
