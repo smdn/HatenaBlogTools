@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <AssemblyName>FixMixedContent</AssemblyName>
+    <RootNamespace>Smdn.Applications.HatenaBlogTools</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\..\build\bin\Debug\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType></DebugType>
+    <OutputPath>..\..\build\bin\Release\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\AtomPubClient.cs">
+      <Link>AtomPubClient.cs</Link>
+    </Compile>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\HatenaBlogAtomPubClient.cs">
+      <Link>HatenaBlogAtomPubClient.cs</Link>
+    </Compile>
+    <Compile Include="..\AtomPub.cs">
+      <Link>AtomPub.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\Smdn\Smdn\src\Smdn\MathUtils.cs">
+      <Link>MathUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\Smdn\Smdn.Core.Miscellaneous\src\Smdn.Net\WsseClient.cs">
+      <Link>WsseClient.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\Smdn\Smdn\src\Smdn.Text\StringConversion.cs">
+      <Link>StringConversion.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\Smdn\Smdn.Xml.Xhtml\src\Smdn.Xml.Linq\Extensions.cs">
+      <Link>Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\CommonCli.cs">
+      <Link>CommonCli.cs</Link>
+    </Compile>
+    <Compile Include="..\Html.cs">
+      <Link>Html.cs</Link>
+    </Compile>
+    <Compile Include="..\HatenaBlogContentEditor.cs">
+      <Link>HatenaBlogContentEditor.cs</Link>
+    </Compile>
+    <Compile Include="..\HatenaBlogFunctions.cs">
+      <Link>HatenaBlogFunctions.cs</Link>
+    </Compile>
+    <Compile Include="..\DiffGenerator.cs">
+      <Link>DiffGenerator.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>
