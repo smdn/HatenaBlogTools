@@ -2,9 +2,9 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.Applications.HatenaBlogTools.Html {
   [TestFixture]
-  public class HtmlTests {
+  public class HtmlParserTests {
     [TestCase("<p>", "p")]
     [TestCase("<p> ", "p")]
     [TestCase(" <p>", "p")]
@@ -20,7 +20,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("<source/>", "source")]
     public void TestRegexElementStart_Elements(string input, string expectedLocalName)
     {
-      var e = Html.EnumerateHtmlElementStart(input).FirstOrDefault();
+      var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
       Assert.IsNotNull(e);
       Assert.AreEqual(expectedLocalName, e.LocalName, "local name");
@@ -36,7 +36,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("</source>")]
     public void TestRegexElementStart_Elements_MustNotMatchElementEnd(string input)
     {
-      var e = Html.EnumerateHtmlElementStart(input).FirstOrDefault();
+      var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
       Assert.IsNull(e);
     }
@@ -49,7 +49,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("<e  />")]
     public void TestRegexElementStart_WhiteSpacesAndSelfClosing_WithNoAttributes(string input)
     {
-      var e = Html.EnumerateHtmlElementStart(input).FirstOrDefault();
+      var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
       Assert.IsNotNull(e);
       Assert.AreEqual("e", e.LocalName, "local name");
@@ -70,7 +70,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("<e  attr  />")]
     public void TestRegexElementStart_WhiteSpacesAndSelfClosing_WithEmptyAttributes(string input)
     {
-      var e = Html.EnumerateHtmlElementStart(input).FirstOrDefault();
+      var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
       Assert.IsNotNull(e);
       Assert.AreEqual("e", e.LocalName, "local name");
@@ -85,7 +85,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("<e attr='' />")]
     public void TestRegexElementStart_WhiteSpacesAndSelfClosing_WithQuotedEmptyAttributes(string input)
     {
-      var e = Html.EnumerateHtmlElementStart(input).FirstOrDefault();
+      var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
       Assert.IsNotNull(e);
       Assert.AreEqual("e", e.LocalName, "local name");
@@ -108,7 +108,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("<e  attr=val  />")]
     public void TestRegexElementStart_WhiteSpacesAndSelfClosing_WithUnquotedValueAttributes(string input)
     {
-      var e = Html.EnumerateHtmlElementStart(input).FirstOrDefault();
+      var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
       Assert.IsNotNull(e);
       Assert.AreEqual("e", e.LocalName, "local name");
@@ -148,7 +148,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("<e attr=  'val'  >")]
     public void TestRegexElementStart_AttributeAndWhiteSpaces(string input)
     {
-      var e = Html.EnumerateHtmlElementStart(input).FirstOrDefault();
+      var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
       Assert.IsNotNull(e);
       Assert.AreEqual("e", e.LocalName, "local name");
@@ -179,7 +179,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("<e\fattr\t=\fval>")]
     public void TestRegexElementStart_AttributeAndWhiteSpaces_NonSPWhiteSpaces(string input)
     {
-      var e = Html.EnumerateHtmlElementStart(input).FirstOrDefault();
+      var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
       Assert.IsNotNull(e);
       Assert.AreEqual("e", e.LocalName, "local name");
@@ -192,7 +192,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("<e attr='foo=bar'>")]
     public void TestRegexElementStart_QuotedAttributeValueWithSpecialChars_1(string input)
     {
-      var e = Html.EnumerateHtmlElementStart(input).FirstOrDefault();
+      var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
       Assert.IsNotNull(e);
       Assert.AreEqual("e", e.LocalName, "local name");
@@ -205,7 +205,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("<e attr='<foo>'>")]
     public void TestRegexElementStart_QuotedAttributeValueWithSpecialChars_2(string input)
     {
-      var e = Html.EnumerateHtmlElementStart(input).FirstOrDefault();
+      var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
       Assert.IsNotNull(e);
       Assert.AreEqual("e", e.LocalName, "local name");
@@ -221,7 +221,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("<e  attr1  attr2  />")]
     public void TestRegexElementStart_MultipleAttributes_EmptyAttribute(string input)
     {
-      var e = Html.EnumerateHtmlElementStart(input).FirstOrDefault();
+      var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
       Assert.IsNotNull(e);
       Assert.AreEqual("e", e.LocalName, "local name");
@@ -244,7 +244,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("<e  attr1=\"val1\"  attr2='val2'  />")]
     public void TestRegexElementStart_MultipleAttributes_WithValue(string input)
     {
-      var e = Html.EnumerateHtmlElementStart(input).FirstOrDefault();
+      var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
       Assert.IsNotNull(e);
       Assert.AreEqual("e", e.LocalName, "local name");
@@ -264,7 +264,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("<p> <br> </p>")]
     public void TestRegexElementStart_StructuredHtml_WithNoAttribute(string input)
     {
-      var elements = Html.EnumerateHtmlElementStart(input).ToList();
+      var elements = HtmlParser.EnumerateHtmlElementStart(input).ToList();
 
       Assert.IsNotEmpty(elements);
       Assert.AreEqual(2, elements.Count);
@@ -279,7 +279,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("<p class='para' id='p1'><br></p>")]
     public void TestRegexElementStart_StructuredHtml_WithAttribute(string input)
     {
-      var elements = Html.EnumerateHtmlElementStart(input).ToList();
+      var elements = HtmlParser.EnumerateHtmlElementStart(input).ToList();
 
       Assert.IsNotEmpty(elements);
       Assert.AreEqual(2, elements.Count);
@@ -302,7 +302,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [TestCase("\n<p>\n<i>\n<b>\n")]
     public void TestRegexElementStart_StructuredHtml_MultipleElement(string input)
     {
-      var elements = Html.EnumerateHtmlElementStart(input).ToList();
+      var elements = HtmlParser.EnumerateHtmlElementStart(input).ToList();
 
       Assert.IsNotEmpty(elements);
       Assert.AreEqual(3, elements.Count);
