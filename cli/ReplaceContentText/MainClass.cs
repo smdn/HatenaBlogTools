@@ -134,18 +134,21 @@ namespace Smdn.Applications.HatenaBlogTools {
         this.replaceTo = replaceTo;
       }
 
-      public void Edit(PostedEntry entry, Action<string, string> actionIfModified)
+      public bool Edit(PostedEntry entry, out string originalText, out string modifiedText)
       {
-        var originalContent = entry.Content;
+        originalText = entry.Content;
+        modifiedText = originalText.Replace(replaceFrom, replaceTo);
 
-        entry.Content = originalContent.Replace(replaceFrom, replaceTo);
+        if (originalText.Length == modifiedText.Length &&
+            string.Equals(originalText, modifiedText, StringComparison.Ordinal)) {
+          // not modified
+          return false;
+        }
+        else {
+          entry.Content = modifiedText;
 
-        var modified =
-          (originalContent.Length != entry.Content.Length) ||
-          !string.Equals(originalContent, entry.Content, StringComparison.Ordinal);
-
-        if (modified)
-          actionIfModified?.Invoke(originalContent, entry.Content);
+          return true;
+        }
       }
     }
 
@@ -159,19 +162,22 @@ namespace Smdn.Applications.HatenaBlogTools {
         this.replacement = replacement;
       }
 
-      public void Edit(PostedEntry entry, Action<string, string> actionIfModified)
+      public bool Edit(PostedEntry entry, out string originalText, out string modifiedText)
       {
         var modified = false;
-        var originalContent = entry.Content;
 
-        entry.Content = regexToReplace.Replace(originalContent, (match) => {
+        originalText = entry.Content;
+
+        modifiedText = regexToReplace.Replace(originalText, (match) => {
           modified |= true;
 
           return match.Result(replacement);
         });
 
         if (modified)
-          actionIfModified?.Invoke(originalContent, entry.Content);
+          entry.Content = modifiedText;
+
+        return modified;
       }
     }
   }

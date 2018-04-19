@@ -107,9 +107,12 @@ namespace Smdn.Applications.HatenaBlogTools {
         this.replaceBlogUrl = replaceBlogUrl;
       }
 
-      public void Edit(PostedEntry entry, Action<string, string> actionIfModified)
+      public bool Edit(PostedEntry entry, out string originalText, out string modifiedText)
       {
-        var contentEditor = new HatenaBlogContentEditor(entry.Content);
+        originalText = entry.Content;
+        modifiedText = null;
+
+        var contentEditor = new HatenaBlogContentEditor(originalText);
         var modified = false;
 
         if (fixMixedContent)
@@ -119,12 +122,12 @@ namespace Smdn.Applications.HatenaBlogTools {
           modified |= contentEditor.ReplaceBlogUrlToHttps(blogDomains);
 
         if (modified) {
-          var originalContent = entry.Content;
-
           entry.Content = contentEditor.ToString();
 
-          actionIfModified?.Invoke(originalContent, entry.Content);
+          modifiedText = entry.Content;
         }
+
+        return modified;
       }
     }
   }

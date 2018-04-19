@@ -27,7 +27,7 @@ using System.Net;
 
 namespace Smdn.Applications.HatenaBlogTools {
   public interface IHatenaBlogEntryEditor {
-    void Edit(PostedEntry entry, Action<string, string> actionIfModified);
+    bool Edit(PostedEntry entry, out string originalText, out string modifiedText);
   }
 
   public static class HatenaBlogFunctions {
@@ -63,16 +63,16 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       var modified = false;
 
-      editor.Edit(entry, (originalText, modifiedText) => {
+      if (editor.Edit(entry, out string originalText, out string modifiedText)) {
+        modified = true;
+
         Console.WriteLine();
 
         diff.DisplayDifference(originalText, modifiedText);
-
-        modified = true;
-      });
-
-      if (!modified)
+      }
+      else {
         Console.WriteLine("(変更なし)");
+      }
 
       switch (postMode) {
         case PostMode.PostNever:
