@@ -37,10 +37,21 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public static void Main(string[] args)
     {
-      HatenaBlogAtomPubClient.InitializeHttpsServicePoint();
+      var skipInitializeHatenaBlog = false;
 
-      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubClient hatenaBlog))
-        return;
+      foreach (var arg in args) {
+        if (string.Equals(arg, "-diff-test", StringComparison.Ordinal))
+          skipInitializeHatenaBlog = true;
+      }
+
+      HatenaBlogAtomPubClient hatenaBlog = null;
+
+      if (!skipInitializeHatenaBlog) {
+        HatenaBlogAtomPubClient.InitializeHttpsServicePoint();
+
+        if (!ParseCommonCommandLineArgs(ref args, out hatenaBlog))
+          return;
+      }
 
       bool postAlways = false;
       bool fixMixedContent = false;
@@ -97,11 +108,6 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
-      var editor = new EntryEditor(blogDomain: hatenaBlog.BlogId,
-                                   customBlogDomain: customBlogDomain,
-                                   fixMixedContent: fixMixedContent,
-                                   replaceBlogUrl: fixBlogUrl);
-
       var diffGenerator = DiffGenerator.Create(false,
                                                diffCommand,
                                                diffCommandArgs,
@@ -112,6 +118,11 @@ namespace Smdn.Applications.HatenaBlogTools {
         DiffGenerator.Test(diffGenerator);
         return;
       }
+
+      var editor = new EntryEditor(blogDomain: hatenaBlog.BlogId,
+                                   customBlogDomain: customBlogDomain,
+                                   fixMixedContent: fixMixedContent,
+                                   replaceBlogUrl: fixBlogUrl);
 
       var postMode = HatenaBlogFunctions.PostMode.PostIfModified;
 
