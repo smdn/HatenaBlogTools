@@ -101,9 +101,9 @@ namespace Smdn.Applications.HatenaBlogTools {
   public class DiffCommand : IDiffGenerator {
     private static readonly Encoding utf8EncodingNoBom = new UTF8Encoding(false);
 
-    private static readonly string temporaryDirectoryPath = "./.tmp/";
-    private static readonly string temporaryFilePathOriginal = temporaryDirectoryPath + "original.txt";
-    private static readonly string temporaryFilePathModified = temporaryDirectoryPath + "modified.txt";
+    private static readonly string temporaryDirectoryPath = Path.Combine(".", ".tmp");
+    private static readonly string temporaryFilePathOriginal = Path.Combine(temporaryDirectoryPath, "original.txt");
+    private static readonly string temporaryFilePathModified = Path.Combine(temporaryDirectoryPath, "modified.txt");
 
     private readonly string command;
     private readonly string commandArgs;
@@ -132,24 +132,32 @@ namespace Smdn.Applications.HatenaBlogTools {
         File.WriteAllText(temporaryFilePathOriginal, originalText + Environment.NewLine, utf8EncodingNoBom);
         File.WriteAllText(temporaryFilePathModified, modifiedText + Environment.NewLine, utf8EncodingNoBom);
 
-        var arguments = $"{commandArgs} '{temporaryFilePathOriginal}' '{temporaryFilePathModified}'";
-
         ProcessStartInfo psi;
 
         if (File.Exists("/bin/sh")) { // XXX: for unix
+          var arguments = commandArgs;
+
           if (arguments != null)
             arguments = arguments.Replace("\"", "\\\"");
+
+          arguments = $"{arguments} '{temporaryFilePathOriginal}' '{temporaryFilePathModified}'";
 
           psi = new ProcessStartInfo("/bin/sh", string.Format("-c \"{0} {1}\"", command, arguments));
         }
         else { // for windows
-          psi = new ProcessStartInfo("cmd", string.Format("/c {0} {1}", command, arguments));
+          var arguments = $"{commandArgs} \"{Path.GetFullPath(temporaryFilePathOriginal)}\" \"{Path.GetFullPath(temporaryFilePathModified)}\"";
+
+          Console.WriteLine(arguments);
+          //psi = new ProcessStartInfo("cmd", string.Format("/c \"{0}\" {1}", command, arguments));
+          psi = new ProcessStartInfo(command, arguments);
           psi.CreateNoWindow = true;
         }
 
         psi.UseShellExecute = false;
         psi.RedirectStandardOutput = true;
         psi.RedirectStandardError = true;
+        psi.StandardOutputEncoding = utf8EncodingNoBom;
+        psi.StandardErrorEncoding = utf8EncodingNoBom;
 
         using (var process = Process.Start(psi)) {
           using (var stdout = openStdout()) {
