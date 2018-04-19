@@ -121,7 +121,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       this.HatenaId = hatenaId;
       this.BlogId = blogId;
       this.apiKey = apiKey;
-      this.RootEndPoint = GetRootEndPont(hatenaId, blogId, apiKey);
+      this.RootEndPoint = GetRootEndPont(hatenaId, blogId);
     }
 
     public void WaitForCinnamon()
