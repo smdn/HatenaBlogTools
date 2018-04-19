@@ -104,7 +104,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
 
     private AtomPubClient atom = null;
 
-    private static Uri GetRootEndPont(string hatenaId, string blogId, string apiKey)
+    private static Uri GetRootEndPont(string hatenaId, string blogId)
     {
       return new Uri(string.Concat("https://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom"));
     }
