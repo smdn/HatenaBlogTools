@@ -26,12 +26,11 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Xml;
 using System.Xml.Linq;
 
 using Smdn.Net;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
   public class AtomPubClient {
     public static readonly int DefaultTimeoutMilliseconds = 60 * 1000;
 

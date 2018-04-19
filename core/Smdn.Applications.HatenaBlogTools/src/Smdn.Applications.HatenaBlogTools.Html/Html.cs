@@ -27,7 +27,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.Applications.HatenaBlogTools.Html {
   public class HtmlDocument {
     private readonly List<HtmlNode> nodes;
 
@@ -40,7 +40,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     public HtmlDocument(string input)
     {
       this.nodes = new List<HtmlNode>();
-      this.elements = Html.EnumerateHtmlElementStart(input).ToList();
+      this.elements = HtmlParser.EnumerateHtmlElementStart(input).ToList();
 
       var endIndexOfLastElementStart = 0;
 
@@ -160,7 +160,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     }
   }
 
-  public static class Html {
+  public static class HtmlParser {
     private static readonly Regex regexElementStart = CreateElementStartRegex();
 
     private static Regex CreateElementStartRegex()

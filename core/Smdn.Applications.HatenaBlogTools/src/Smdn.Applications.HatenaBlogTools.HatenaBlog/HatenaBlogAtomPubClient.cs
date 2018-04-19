@@ -31,11 +31,11 @@ using System.Security.Cryptography.X509Certificates;
 using System.Xml;
 using System.Xml.Linq;
 
+using Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol;
 using Smdn.Text;
-using Smdn.Xml;
 using Smdn.Xml.Linq;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
   public class Entry {
     public string Title;
     public HashSet<string> Categories = new HashSet<string>(StringComparer.Ordinal);
