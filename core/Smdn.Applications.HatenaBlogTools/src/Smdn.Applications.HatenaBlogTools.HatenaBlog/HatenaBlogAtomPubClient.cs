@@ -52,6 +52,26 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
     public string FormattedContent;
   }
 
+  public class HatenaBlogAtomPubCredential {
+    public string HatenaId { get; private set; }
+    public string BlogId { get; private set; }
+    public string ApiKey { get; private set; }
+
+    public HatenaBlogAtomPubCredential(string hatenaId, string blogId, string apiKey)
+    {
+      if (string.IsNullOrEmpty(hatenaId))
+        throw new ArgumentException("must be non-empty string", nameof(hatenaId));
+      if (string.IsNullOrEmpty(blogId))
+        throw new ArgumentException("must be non-empty string", nameof(blogId));
+      if (string.IsNullOrEmpty(apiKey))
+        throw new ArgumentException("must be non-empty string", nameof(apiKey));
+
+      this.HatenaId = hatenaId;
+      this.BlogId = blogId;
+      this.ApiKey = apiKey;
+    }
+  }
+
   public class HatenaBlogAtomPubClient {
     public static void InitializeHttpsServicePoint()
     {
@@ -68,15 +88,10 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       };
     }
 
-    public string HatenaId {
-      get; private set;
-    }
+    private readonly HatenaBlogAtomPubCredential credential;
 
-    public string BlogId {
-      get; private set;
-    }
-
-    private readonly string apiKey;
+    public string HatenaId => credential.HatenaId;
+    public string BlogId => credential.BlogId;
 
     public Uri RootEndPoint {
       get; private set;
@@ -109,19 +124,13 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       return new Uri(string.Concat("https://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom"));
     }
 
-    public HatenaBlogAtomPubClient(string hatenaId, string blogId, string apiKey)
+    public HatenaBlogAtomPubClient(HatenaBlogAtomPubCredential credential)
     {
-      if (string.IsNullOrEmpty(hatenaId))
-        throw new ArgumentException("must be non empty value", nameof(hatenaId));
-      if (string.IsNullOrEmpty(blogId))
-        throw new ArgumentException("must be non empty value", nameof(blogId));
-      if (string.IsNullOrEmpty(apiKey))
-        throw new ArgumentException("must be non empty value", nameof(apiKey));
+      if (credential == null)
+        throw new ArgumentNullException(nameof(credential));
 
-      this.HatenaId = hatenaId;
-      this.BlogId = blogId;
-      this.apiKey = apiKey;
-      this.RootEndPoint = GetRootEndPont(hatenaId, blogId);
+      this.credential = credential;
+      this.RootEndPoint = GetRootEndPont(credential.HatenaId, credential.BlogId);
     }
 
     public void WaitForCinnamon()
@@ -135,7 +144,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
         return atom;
 
       atom = new AtomPubClient();
-      atom.Credential = new NetworkCredential(HatenaId, apiKey);
+      atom.Credential = new NetworkCredential(credential.HatenaId, credential.ApiKey);
       atom.UserAgent = userAgent;
 
       return atom;
