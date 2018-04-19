@@ -121,7 +121,10 @@ namespace Smdn.Applications.HatenaBlogTools {
       HatenaBlogFunctions.EditAllEntryContent(hatenaBlog,
                                               postMode,
                                               editor,
-                                              diffGenerator);
+                                              diffGenerator,
+                                              null,
+                                              out _,
+                                              out _);
     }
 
     private class EntryEditor : IHatenaBlogEntryEditor {

@@ -23,6 +23,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace Smdn.Applications.HatenaBlogTools {
@@ -40,28 +41,48 @@ namespace Smdn.Applications.HatenaBlogTools {
     public static void EditAllEntryContent(HatenaBlogAtomPubClient hatenaBlog,
                                            PostMode postMode,
                                            IHatenaBlogEntryEditor editor,
-                                           IDiffGenerator diff)
+                                           IDiffGenerator diff,
+                                           Func<bool> confirmBeforePosting,
+                                           out IReadOnlyList<PostedEntry> updatedEntries,
+                                           out IReadOnlyList<PostedEntry> modifiedEntries)
     {
+      var _updatedEntries = new List<PostedEntry>();
+      var _modifiedEntries = new List<PostedEntry>();
+
+      updatedEntries = _updatedEntries;
+      modifiedEntries = _modifiedEntries;
+
       foreach (var entry in hatenaBlog.EnumerateEntries()) {
-        EditEntryContent(hatenaBlog,
-                         entry,
-                         postMode,
-                         editor,
-                         diff);
+        var statusCode = EditEntryContent(hatenaBlog,
+                                          entry,
+                                          postMode,
+                                          editor,
+                                          diff,
+                                          confirmBeforePosting,
+                                          out bool modified);
+
+        if (statusCode == HttpStatusCode.OK) {
+          _updatedEntries.Add(entry);
+
+          if (modified)
+            _modifiedEntries.Add(entry);
+        }
 
         hatenaBlog.WaitForCinnamon();
       }
     }
 
-    public static void EditEntryContent(HatenaBlogAtomPubClient hatenaBlog,
-                                        PostedEntry entry,
-                                        PostMode postMode,
-                                        IHatenaBlogEntryEditor editor,
-                                        IDiffGenerator diff)
+    public static HttpStatusCode EditEntryContent(HatenaBlogAtomPubClient hatenaBlog,
+                                                  PostedEntry entry,
+                                                  PostMode postMode,
+                                                  IHatenaBlogEntryEditor editor,
+                                                  IDiffGenerator diff,
+                                                  Func<bool> confirmBeforePosting,
+                                                  out bool modified)
     {
       Console.Write("{0} \"{1}\" ", entry.EntryUri, entry.Title);
 
-      var modified = false;
+      modified = false;
 
       if (editor.Edit(entry, out string originalText, out string modifiedText)) {
         modified = true;
@@ -76,19 +97,24 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       switch (postMode) {
         case PostMode.PostNever:
-          return;
+          return (HttpStatusCode)0;
 
         case PostMode.PostIfModified:
           if (modified)
             break;
           else
-            return;
+            return (HttpStatusCode)0;
 
         case PostMode.PostAlways:
           break;
 
         default:
           throw new ArgumentException($"invalid mode: {postMode}", nameof(postMode));
+      }
+
+      if (confirmBeforePosting != null && !confirmBeforePosting()) {
+        Console.WriteLine("更新しません");
+        return (HttpStatusCode)0;
       }
 
       Console.Write("{0} \"{1}\" を更新中 ... ", entry.EntryUri, entry.Title);
@@ -105,6 +131,8 @@ namespace Smdn.Applications.HatenaBlogTools {
         Console.Error.WriteLine("更新に失敗しました: {0}", statusCode);
         Console.ResetColor();
       }
+
+      return statusCode;
     }
   }
 }

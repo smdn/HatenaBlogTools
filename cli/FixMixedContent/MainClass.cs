@@ -42,12 +42,34 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubClient hatenaBlog))
         return;
 
+      bool postAlways = false;
+      bool fixMixedContent = false;
+      bool fixBlogUrl = false;
+      string customBlogDomain = null;
       string diffCommand = null;
       string diffCommandArgs = null;
-      bool dryrun = false;
+      bool dryRun = false;
+      bool confirm = false;
+      bool listFixedEntries = false;
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
+          case "-update-content":
+            postAlways = true;
+            break;
+
+          case "-fix-mixed-content":
+            fixMixedContent = true;
+            break;
+
+          case "-fix-blog-url":
+            fixBlogUrl = true;
+            break;
+
+          case "-custom-domain":
+            customBlogDomain = args[++i];
+            break;
+
           case "-diff-cmd":
             diffCommand = args[++i];
             break;
@@ -57,15 +79,23 @@ namespace Smdn.Applications.HatenaBlogTools {
             break;
 
           case "-n":
-            dryrun = true;
+            dryRun = true;
+            break;
+
+          case "-i":
+            confirm = true;
+            break;
+
+          case "-list-fixed-entry":
+            listFixedEntries = true;
             break;
         }
       }
 
       var editor = new EntryEditor(blogDomain: hatenaBlog.BlogId,
-                                   customBlogDomain: null, // TODO
-                                   fixMixedContent: false, // TODO
-                                   replaceBlogUrl: false); // TODO
+                                   customBlogDomain: customBlogDomain,
+                                   fixMixedContent: fixMixedContent,
+                                   replaceBlogUrl: fixBlogUrl);
 
       var diffGenerator = DiffGenerator.Create(false,
                                                diffCommand,
@@ -78,9 +108,18 @@ namespace Smdn.Applications.HatenaBlogTools {
         return;
       }
 
-      var postMode = dryrun
-        ? HatenaBlogFunctions.PostMode.PostNever
-        : HatenaBlogFunctions.PostMode.PostIfModified;
+      var postMode = HatenaBlogFunctions.PostMode.PostIfModified;
+
+      if (postAlways)
+        postMode = HatenaBlogFunctions.PostMode.PostAlways;
+
+      if (dryRun)
+        postMode = HatenaBlogFunctions.PostMode.PostNever;
+
+      Func<bool> confirmBeforePosting = null;
+
+      if (confirm)
+        confirmBeforePosting = () => ConsoleUtils.AskYesNo(false, "更新しますか?");
 
       if (!Login(hatenaBlog))
         return;
@@ -88,7 +127,21 @@ namespace Smdn.Applications.HatenaBlogTools {
       HatenaBlogFunctions.EditAllEntryContent(hatenaBlog,
                                               postMode,
                                               editor,
-                                              diffGenerator);
+                                              diffGenerator,
+                                              confirmBeforePosting,
+                                              out IReadOnlyList<PostedEntry> updatedEntries,
+                                              out IReadOnlyList<PostedEntry> modifiedEntries);
+
+      if (listFixedEntries) {
+        Console.WriteLine();
+        Console.WriteLine("下記エントリに対して修正を行い再投稿しました。");
+
+        foreach (var modifiedEntry in modifiedEntries) {
+          Console.WriteLine("{0} \"{1}\"", modifiedEntry.EntryUri, modifiedEntry.Title);
+        }
+      }
+
+      Console.WriteLine("完了");
     }
 
     private class EntryEditor : IHatenaBlogEntryEditor {
