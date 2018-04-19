@@ -19,9 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FixMixedContent", "cli\FixM
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{9F54DDA1-D5B9-4E61-BD1B-C0EEE4E8D169}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HatenaBlogTools.Tests-netcoreapp", "test\HatenaBlogTools\HatenaBlogTools.Tests-netcoreapp.csproj", "{685AFFDA-5FCB-475F-9DB5-ABFC56FC9A62}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smdn.Applications.HatenaBlogTools-netstandard", "core\Smdn.Applications.HatenaBlogTools\src\Smdn.Applications.HatenaBlogTools-netstandard.csproj", "{044211B6-DE06-4A87-AF3F-D9EEEA61EBB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smdn.Applications.HatenaBlogTools.Tests-netcoreapp", "test\HatenaBlogTools\Smdn.Applications.HatenaBlogTools.Tests-netcoreapp.csproj", "{B8FC01E8-B08B-40A6-8EDB-5239FC34C4B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,14 +53,14 @@ Global
 		{9D01166D-6274-4400-85A9-1B7A8C5BF9E2}.Debug|x86.Build.0 = Debug|Any CPU
 		{9D01166D-6274-4400-85A9-1B7A8C5BF9E2}.Release|x86.ActiveCfg = Release|Any CPU
 		{9D01166D-6274-4400-85A9-1B7A8C5BF9E2}.Release|x86.Build.0 = Release|Any CPU
-		{685AFFDA-5FCB-475F-9DB5-ABFC56FC9A62}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{685AFFDA-5FCB-475F-9DB5-ABFC56FC9A62}.Debug|x86.Build.0 = Debug|Any CPU
-		{685AFFDA-5FCB-475F-9DB5-ABFC56FC9A62}.Release|x86.ActiveCfg = Release|Any CPU
-		{685AFFDA-5FCB-475F-9DB5-ABFC56FC9A62}.Release|x86.Build.0 = Release|Any CPU
 		{044211B6-DE06-4A87-AF3F-D9EEEA61EBB1}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{044211B6-DE06-4A87-AF3F-D9EEEA61EBB1}.Debug|x86.Build.0 = Debug|Any CPU
 		{044211B6-DE06-4A87-AF3F-D9EEEA61EBB1}.Release|x86.ActiveCfg = Release|Any CPU
 		{044211B6-DE06-4A87-AF3F-D9EEEA61EBB1}.Release|x86.Build.0 = Release|Any CPU
+		{B8FC01E8-B08B-40A6-8EDB-5239FC34C4B4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B8FC01E8-B08B-40A6-8EDB-5239FC34C4B4}.Debug|x86.Build.0 = Debug|Any CPU
+		{B8FC01E8-B08B-40A6-8EDB-5239FC34C4B4}.Release|x86.ActiveCfg = Release|Any CPU
+		{B8FC01E8-B08B-40A6-8EDB-5239FC34C4B4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C75CA0A0-AA2A-4C28-A1FA-B0F51671F7DB} = {7448DB9E-F012-4EF2-BFAA-7A03F4861DD5}
@@ -69,8 +69,8 @@ Global
 		{FC279681-6215-4880-93E6-65A9F7638F9B} = {7448DB9E-F012-4EF2-BFAA-7A03F4861DD5}
 		{FF37175D-F68B-4720-8D9D-59532E026123} = {7448DB9E-F012-4EF2-BFAA-7A03F4861DD5}
 		{9D01166D-6274-4400-85A9-1B7A8C5BF9E2} = {7448DB9E-F012-4EF2-BFAA-7A03F4861DD5}
-		{685AFFDA-5FCB-475F-9DB5-ABFC56FC9A62} = {9F54DDA1-D5B9-4E61-BD1B-C0EEE4E8D169}
 		{044211B6-DE06-4A87-AF3F-D9EEEA61EBB1} = {88BC1CDA-25A5-47A5-8F8C-D188E82486F0}
+		{B8FC01E8-B08B-40A6-8EDB-5239FC34C4B4} = {9F54DDA1-D5B9-4E61-BD1B-C0EEE4E8D169}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = cli\DumpAllEntries\DumpAllEntries.csproj
