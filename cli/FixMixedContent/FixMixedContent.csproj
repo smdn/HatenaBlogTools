@@ -28,18 +28,6 @@
     <Compile Include="..\AtomPub.cs">
       <Link>AtomPub.cs</Link>
     </Compile>
-    <Compile Include="..\..\core\Smdn\Smdn\src\Smdn\MathUtils.cs">
-      <Link>MathUtils.cs</Link>
-    </Compile>
-    <Compile Include="..\..\core\Smdn\Smdn.Core.Miscellaneous\src\Smdn.Net\WsseClient.cs">
-      <Link>WsseClient.cs</Link>
-    </Compile>
-    <Compile Include="..\..\core\Smdn\Smdn\src\Smdn.Text\StringConversion.cs">
-      <Link>StringConversion.cs</Link>
-    </Compile>
-    <Compile Include="..\..\core\Smdn\Smdn.Xml.Xhtml\src\Smdn.Xml.Linq\Extensions.cs">
-      <Link>Extensions.cs</Link>
-    </Compile>
     <Compile Include="..\CommonCli.cs">
       <Link>CommonCli.cs</Link>
     </Compile>
@@ -55,8 +43,8 @@
     <Compile Include="..\DiffGenerator.cs">
       <Link>DiffGenerator.cs</Link>
     </Compile>
-    <Compile Include="..\..\core\Smdn\Smdn.Core.Miscellaneous\src\Smdn\ConsoleUtils.cs">
-      <Link>ConsoleUtils.cs</Link>
-    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\core\Smdn.Applications.HatenaBlogTools\src\Smdn.Applications.HatenaBlogTools-netstandard.csproj" />
   </ItemGroup>
 </Project>
