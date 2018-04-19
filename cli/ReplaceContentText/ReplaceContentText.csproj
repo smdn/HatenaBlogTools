@@ -19,8 +19,8 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\CommonCli.cs">
-      <Link>CommonCli.cs</Link>
+    <Compile Include="..\CliBase.cs">
+      <Link>CliBase.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
