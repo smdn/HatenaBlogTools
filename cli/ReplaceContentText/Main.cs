@@ -29,12 +29,7 @@ using System.Text.RegularExpressions;
 using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  class ReplaceContentText : CliBase {
-    static void Main(string[] args)
-    {
-      (new ReplaceContentText()).Run(args);
-    }
-
+  partial class ReplaceContentText : CliBase {
     protected override string GetUsageExtraMandatoryOptions() => "-from 'oldtext' [-to 'newtext']";
 
     protected override IEnumerable<string> GetUsageExtraOptionDescriptions()

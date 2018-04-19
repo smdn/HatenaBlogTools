@@ -34,12 +34,7 @@ using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 using Smdn.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  class PostNewEntry : CliBase {
-    static void Main(string[] args)
-    {
-      (new PostNewEntry()).Run(args);
-    }
-
+  partial class PostNewEntry : CliBase {
     protected override string GetUsageExtraMandatoryOptions() => "-title <title> -category <category> <content>";
 
     protected override IEnumerable<string> GetUsageExtraOptionDescriptions()

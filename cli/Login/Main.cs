@@ -30,12 +30,7 @@ using System.Xml.Linq;
 using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  class Login : CliBase {
-    static void Main(string[] args)
-    {
-      (new Login()).Run(args);
-    }
-
+  partial class Login : CliBase {
     protected override string GetUsageExtraMandatoryOptions() => string.Empty;
 
     protected override IEnumerable<string> GetUsageExtraOptionDescriptions()

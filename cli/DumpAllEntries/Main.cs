@@ -36,12 +36,7 @@ using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 using Smdn.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  class DumpAllEntries : CliBase {
-    static void Main(string[] args)
-    {
-      (new DumpAllEntries()).Run(args);
-    }
-
+  partial class DumpAllEntries : CliBase {
     private enum OutputFormat {
       Atom,
       MovableType,

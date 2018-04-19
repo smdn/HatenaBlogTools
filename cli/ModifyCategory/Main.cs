@@ -57,12 +57,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     }
   }
 
-  class ModifyCategory : CliBase {
-    static void Main(string[] args)
-    {
-      (new ModifyCategory()).Run(args);
-    }
-
+  partial class ModifyCategory : CliBase {
     protected override string GetUsageExtraMandatoryOptions() => "old1:new1 old2:new2 ...";
 
     protected override IEnumerable<string> GetUsageExtraOptionDescriptions()

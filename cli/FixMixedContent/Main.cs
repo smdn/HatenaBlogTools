@@ -31,12 +31,7 @@ using System.Text;
 using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  class FixMixedContent : CliBase {
-    static void Main(string[] args)
-    {
-      (new FixMixedContent()).Run(args);
-    }
-
+  partial class FixMixedContent : CliBase {
     protected override string GetUsageExtraMandatoryOptions() => ""; // TODO
 
     protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
