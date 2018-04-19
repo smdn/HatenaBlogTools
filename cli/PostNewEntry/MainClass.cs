@@ -34,10 +34,15 @@ using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 using Smdn.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  partial class MainClass {
-    private static string GetUsageExtraMandatoryOptions() => "-title <title> -category <category> <content>";
+  class PostNewEntry : CliBase {
+    static void Main(string[] args)
+    {
+      (new PostNewEntry()).Run(args);
+    }
 
-    private static IEnumerable<string> GetUsageExtraOptionDescriptions()
+    protected override string GetUsageExtraMandatoryOptions() => "-title <title> -category <category> <content>";
+
+    protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
     {
       yield return "<content>            : content of new entry";
       yield return "-title <title>       : title of new entry";
@@ -48,7 +53,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       yield return "-fromfile -          : post entry content from stdin";
     }
 
-    public static void Main(string[] args)
+    public void Run(string[] args)
     {
       if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubCredential credential))
         return;

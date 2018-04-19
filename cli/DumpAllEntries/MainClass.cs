@@ -36,7 +36,12 @@ using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 using Smdn.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  partial class MainClass {
+  class DumpAllEntries : CliBase {
+    static void Main(string[] args)
+    {
+      (new DumpAllEntries()).Run(args);
+    }
+
     private enum OutputFormat {
       Atom,
       MovableType,
@@ -60,9 +65,9 @@ namespace Smdn.Applications.HatenaBlogTools {
     }
 #endif
 
-    private static string GetUsageExtraMandatoryOptions() => "[-format <hatena|mt|atom>] [outfile|-]";
+    protected override string GetUsageExtraMandatoryOptions() => "[-format <hatena|mt|atom>] [outfile|-]";
 
-    private static IEnumerable<string> GetUsageExtraOptionDescriptions()
+    protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
     {
 #if RETRIEVE_COMMENTS
       yield return "-comment : dump comments posted on entry"
@@ -76,7 +81,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       yield return "[outfile|-]              : save to <outfile> or stdout (-)";
     }
 
-    public static void Main(string[] args)
+    public void Run(string[] args)
     {
       if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubCredential credential))
         return;
@@ -152,7 +157,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (!Login(credential, out HatenaBlogAtomPubClient hatenaBlog))
         return;
 
-      var outputDocument = DumpAllEntries(hatenaBlog, filterMode, categoriesToFilter, out List<PostedEntry> entries);
+      var outputDocument = DumpEntries(hatenaBlog, filterMode, categoriesToFilter, out List<PostedEntry> entries);
 
       if (outputDocument == null)
         return;
@@ -184,7 +189,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       Console.Error.WriteLine("完了");
     }
 
-    private static XDocument DumpAllEntries(HatenaBlogAtomPubClient hatenaBlog, CategoryFilterMode filterMode, HashSet<string> categoriesToFilter, out List<PostedEntry> entries)
+    private static XDocument DumpEntries(HatenaBlogAtomPubClient hatenaBlog, CategoryFilterMode filterMode, HashSet<string> categoriesToFilter, out List<PostedEntry> entries)
     {
       var filteredEntries = new List<PostedEntry>();
 

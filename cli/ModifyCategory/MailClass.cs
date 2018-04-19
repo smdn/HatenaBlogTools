@@ -57,16 +57,15 @@ namespace Smdn.Applications.HatenaBlogTools {
     }
   }
 
-  partial class MainClass {
-    private static string GetUsageExtraMandatoryOptions() => "old1:new1 old2:new2 ...";
-
-    private static void Hoge()
+  class ModifyCategory : CliBase {
+    static void Main(string[] args)
     {
-      Console.Error.WriteLine("options:");
-      Console.Error.WriteLine("  -n : dry run");
+      (new ModifyCategory()).Run(args);
     }
 
-    private static IEnumerable<string> GetUsageExtraOptionDescriptions()
+    protected override string GetUsageExtraMandatoryOptions() => "old1:new1 old2:new2 ...";
+
+    protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
     {
       yield return "<old>:<new>          : replace category <old> to <new>";
       yield return "<old>:               : delete category <old>";
@@ -75,7 +74,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       yield return "-n                   : dry run";
     }
 
-    public static void Main(string[] args)
+    public void Run(string[] args)
     {
       if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubCredential credential))
         return;

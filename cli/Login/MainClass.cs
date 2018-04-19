@@ -30,15 +30,20 @@ using System.Xml.Linq;
 using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  partial class MainClass {
-    private static string GetUsageExtraMandatoryOptions() => string.Empty;
+  class Login : CliBase {
+    static void Main(string[] args)
+    {
+      (new Login()).Run(args);
+    }
 
-    private static IEnumerable<string> GetUsageExtraOptionDescriptions()
+    protected override string GetUsageExtraMandatoryOptions() => string.Empty;
+
+    protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
     {
       yield return "-v : display response document";
     }
 
-    public static void Main(string[] args)
+    public void Run(string[] args)
     {
       if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubCredential credential))
         return;

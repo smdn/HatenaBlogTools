@@ -31,16 +31,21 @@ using System.Text;
 using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  partial class MainClass {
-    private static string GetUsageExtraMandatoryOptions() => ""; // TODO
+  class FixMixedContent : CliBase {
+    static void Main(string[] args)
+    {
+      (new FixMixedContent()).Run(args);
+    }
 
-    private static IEnumerable<string> GetUsageExtraOptionDescriptions()
+    protected override string GetUsageExtraMandatoryOptions() => ""; // TODO
+
+    protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
     {
       // TODO
       yield break;
     }
 
-    public static void Main(string[] args)
+    public void Run(string[] args)
     {
       var requireHatenaBlogClient = true;
 

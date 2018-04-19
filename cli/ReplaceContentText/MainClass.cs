@@ -29,10 +29,15 @@ using System.Text.RegularExpressions;
 using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  partial class MainClass {
-    private static string GetUsageExtraMandatoryOptions() => "-from 'oldtext' [-to 'newtext']";
+  class ReplaceContentText : CliBase {
+    static void Main(string[] args)
+    {
+      (new ReplaceContentText()).Run(args);
+    }
 
-    private static IEnumerable<string> GetUsageExtraOptionDescriptions()
+    protected override string GetUsageExtraMandatoryOptions() => "-from 'oldtext' [-to 'newtext']";
+
+    protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
     {
       yield return "-from <oldtext>       : text to be replaced";
       yield return "-to <newtext>         : text to replace <oldtext>";
@@ -43,7 +48,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       yield return "-n                    : dry run";
     }
 
-    public static void Main(string[] args)
+    public void Run(string[] args)
     {
       if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubCredential credential))
         return;

@@ -30,8 +30,8 @@ using System.Reflection;
 using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.Applications.HatenaBlogTools {
-  partial class MainClass {
-    private static bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPubCredential credential)
+  abstract class CliBase {
+    protected bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPubCredential credential)
     {
       credential = null;
 
@@ -88,7 +88,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       return true;
     }
 
-    private static HatenaBlogAtomPubClient CreateClient(HatenaBlogAtomPubCredential credential)
+    protected HatenaBlogAtomPubClient CreateClient(HatenaBlogAtomPubCredential credential)
     {
       HatenaBlogAtomPubClient.InitializeHttpsServicePoint();
 
@@ -99,7 +99,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       return client;
     }
 
-    private static bool Login(HatenaBlogAtomPubCredential credential, out HatenaBlogAtomPubClient hatenaBlog)
+    protected bool Login(HatenaBlogAtomPubCredential credential, out HatenaBlogAtomPubClient hatenaBlog)
     {
       hatenaBlog = CreateClient(credential);
 
@@ -125,7 +125,11 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
     }
 
-    private static void Usage(string format, params string[] args)
+    protected abstract string GetUsageExtraMandatoryOptions();
+
+    protected abstract IEnumerable<string> GetUsageExtraOptionDescriptions();
+
+    protected void Usage(string format, params string[] args)
     {
       if (format != null) {
         Console.ForegroundColor = ConsoleColor.Red;
