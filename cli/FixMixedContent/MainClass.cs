@@ -48,6 +48,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       string customBlogDomain = null;
       string diffCommand = null;
       string diffCommandArgs = null;
+      bool testDiffCommand = false;
       bool dryRun = false;
       bool confirm = false;
       bool listFixedEntries = false;
@@ -78,6 +79,10 @@ namespace Smdn.Applications.HatenaBlogTools {
             diffCommandArgs = args[++i];
             break;
 
+          case "-diff-test":
+            testDiffCommand = true;
+            break;
+
           case "-n":
             dryRun = true;
             break;
@@ -103,8 +108,8 @@ namespace Smdn.Applications.HatenaBlogTools {
                                                "変更前の本文",
                                                "変更後の本文");
 
-      if (!diffGenerator.IsAvailable()) {
-        Usage("指定されたdiffコマンドは利用できません。　コマンドのパスと、カレントディレクトリに書き込みができることを確認してください。");
+      if (testDiffCommand) {
+        DiffGenerator.Test(diffGenerator);
         return;
       }
 

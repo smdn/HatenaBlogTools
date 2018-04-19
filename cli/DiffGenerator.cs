@@ -29,14 +29,11 @@ using System.Text;
 
 namespace Smdn.Applications.HatenaBlogTools {
   public interface IDiffGenerator {
-    bool IsAvailable();
     void DisplayDifference(string originalText, string modifiedText);
   }
 
   public static class DiffGenerator {
     private class NullDiffGenerator : IDiffGenerator {
-      public bool IsAvailable() => true;
-
       public void DisplayDifference(string originalText, string modifiedText)
       {
         // do nothing
@@ -81,6 +78,24 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       return new DiffCommand(command, commandArgs);
     }
+
+    private static readonly string[] testOriginalTextLines = new[] {
+      "diffコマンドのテストです",
+      "この行の差分が見えていなければ失敗です",
+      "diffコマンドのテストです",
+    };
+
+    private static readonly string[] testModifiedTextLines = new[] {
+      "diffコマンドのテストです",
+      "この行の差分が見えていれば成功です",
+      "diffコマンドのテストです",
+    };
+
+    public static void Test(IDiffGenerator generator)
+    {
+      generator.DisplayDifference(string.Join(Environment.NewLine, testOriginalTextLines),
+                                  string.Join(Environment.NewLine, testModifiedTextLines));
+    }
   }
 
   public class DiffCommand : IDiffGenerator {
@@ -97,22 +112,6 @@ namespace Smdn.Applications.HatenaBlogTools {
     {
       this.command = command;
       this.commandArgs = commandArgs;
-    }
-
-    public bool IsAvailable()
-    {
-      try {
-        Diff(() => Stream.Null,
-             () => Stream.Null,
-             "original",
-             "modified");
-
-        return true;
-      }
-      catch {
-        // swallow any exceptions
-        return false;
-      }
     }
 
     public void DisplayDifference(string originalText, string modifiedText)
@@ -133,7 +132,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         File.WriteAllText(temporaryFilePathOriginal, originalText + Environment.NewLine, utf8EncodingNoBom);
         File.WriteAllText(temporaryFilePathModified, modifiedText + Environment.NewLine, utf8EncodingNoBom);
 
-        var arguments = $"'{temporaryFilePathOriginal}' '{temporaryFilePathModified}' {commandArgs}";
+        var arguments = $"{commandArgs} '{temporaryFilePathOriginal}' '{temporaryFilePathModified}'";
 
         ProcessStartInfo psi;
 
