@@ -53,12 +53,10 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
-      HatenaBlogAtomPubClient hatenaBlog = null;
+      HatenaBlogAtomPubCredential credential = null;
 
       if (requireHatenaBlogClient) {
-        HatenaBlogAtomPubClient.InitializeHttpsServicePoint();
-
-        if (!ParseCommonCommandLineArgs(ref args, out hatenaBlog))
+        if (!ParseCommonCommandLineArgs(ref args, out credential))
           return;
       }
 
@@ -146,7 +144,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         return;
       }
 
-      var editor = new EntryEditor(blogDomain: hatenaBlog?.BlogId,
+      var editor = new EntryEditor(blogDomain: credential?.BlogId,
                                    customBlogDomain: customBlogDomain,
                                    fixMixedContent: fixMixedContent,
                                    replaceBlogUrl: fixBlogUrl);
@@ -169,7 +167,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (confirm)
         confirmBeforePosting = () => ConsoleUtils.AskYesNo(false, "更新しますか?");
 
-      if (!Login(hatenaBlog))
+      if (!Login(credential, out HatenaBlogAtomPubClient hatenaBlog))
         return;
 
       HatenaBlogFunctions.EditAllEntryContent(hatenaBlog,

@@ -40,9 +40,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public static void Main(string[] args)
     {
-      HatenaBlogAtomPubClient.InitializeHttpsServicePoint();
-
-      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubClient hatenaBlog))
+      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubCredential credential))
         return;
 
       bool verbose = false;
@@ -54,6 +52,8 @@ namespace Smdn.Applications.HatenaBlogTools {
             break;
         }
       }
+
+      var hatenaBlog = CreateClient(credential);
 
       var statusCode = hatenaBlog.Login(out XDocument serviceDocument);
 

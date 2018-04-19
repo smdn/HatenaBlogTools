@@ -50,9 +50,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public static void Main(string[] args)
     {
-      HatenaBlogAtomPubClient.InitializeHttpsServicePoint();
-
-      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubClient hatenaBlog))
+      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubCredential credential))
         return;
 
       var entry = new Entry();
@@ -96,7 +94,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
-      if (!Login(hatenaBlog))
+      if (!Login(credential, out HatenaBlogAtomPubClient hatenaBlog))
         return;
 
       Console.Write("投稿しています ... ");

@@ -45,9 +45,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public static void Main(string[] args)
     {
-      HatenaBlogAtomPubClient.InitializeHttpsServicePoint();
-
-      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubClient hatenaBlog))
+      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubCredential credential))
         return;
 
       string replaceFromText = null;
@@ -122,7 +120,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         ? HatenaBlogFunctions.PostMode.PostNever
         : HatenaBlogFunctions.PostMode.PostIfModified;
 
-      if (!Login(hatenaBlog))
+      if (!Login(credential, out HatenaBlogAtomPubClient hatenaBlog))
         return;
 
       HatenaBlogFunctions.EditAllEntryContent(hatenaBlog,

@@ -31,9 +31,9 @@ using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.Applications.HatenaBlogTools {
   partial class MainClass {
-    private static bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPubClient hatenaBlog)
+    private static bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPubCredential credential)
     {
-      hatenaBlog = null;
+      credential = null;
 
       string hatenaId = null;
       string blogId = null;
@@ -81,16 +81,28 @@ namespace Smdn.Applications.HatenaBlogTools {
         return false;
       }
 
-      hatenaBlog = new HatenaBlogAtomPubClient(hatenaId, blogId, apiKey);
-      hatenaBlog.UserAgent = $"{AssemblyInfo.Name}/{AssemblyInfo.Version} ({AssemblyInfo.TargetFramework}; {Environment.OSVersion.VersionString})";
+      credential = new HatenaBlogAtomPubCredential(hatenaId, blogId, apiKey);
 
       args = unparsedArgs.ToArray();
 
       return true;
     }
 
-    private static bool Login(HatenaBlogAtomPubClient hatenaBlog)
+    private static HatenaBlogAtomPubClient CreateClient(HatenaBlogAtomPubCredential credential)
     {
+      HatenaBlogAtomPubClient.InitializeHttpsServicePoint();
+
+      var client = new HatenaBlogAtomPubClient(credential);
+
+      client.UserAgent = $"{AssemblyInfo.Name}/{AssemblyInfo.Version} ({AssemblyInfo.TargetFramework}; {Environment.OSVersion.VersionString})";
+
+      return client;
+    }
+
+    private static bool Login(HatenaBlogAtomPubCredential credential, out HatenaBlogAtomPubClient hatenaBlog)
+    {
+      hatenaBlog = CreateClient(credential);
+
       Console.Write("ログインしています ... ");
 
       var statusCode = hatenaBlog.Login(out _);
@@ -103,6 +115,8 @@ namespace Smdn.Applications.HatenaBlogTools {
         return true;
       }
       else {
+        hatenaBlog = null;
+
         Console.ForegroundColor = ConsoleColor.Red;
         Console.Error.WriteLine("ログインに失敗しました。　({0:D} {0})", statusCode);
         Console.ResetColor();

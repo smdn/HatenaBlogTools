@@ -78,9 +78,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public static void Main(string[] args)
     {
-      HatenaBlogAtomPubClient.InitializeHttpsServicePoint();
-
-      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubClient hatenaBlog))
+      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubCredential credential))
         return;
 
       bool retrieveComments = false;
@@ -151,7 +149,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
-      if (!Login(hatenaBlog))
+      if (!Login(credential, out HatenaBlogAtomPubClient hatenaBlog))
         return;
 
       var outputDocument = DumpAllEntries(hatenaBlog, filterMode, categoriesToFilter, out List<PostedEntry> entries);
