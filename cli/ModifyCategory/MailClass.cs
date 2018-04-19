@@ -27,6 +27,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
+using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+
 using CategorySet = System.Collections.Generic.HashSet<string>;
 
 namespace Smdn.Applications.HatenaBlogTools {

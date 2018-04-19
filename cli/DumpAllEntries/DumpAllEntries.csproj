@@ -16,17 +16,8 @@
     <OutputPath>..\..\build\bin\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\AtomPubClient.cs">
-      <Link>AtomPubClient.cs</Link>
-    </Compile>
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\HatenaBlogAtomPubClient.cs">
-      <Link>HatenaBlogAtomPubClient.cs</Link>
-    </Compile>
-    <Compile Include="..\AtomPub.cs">
-      <Link>AtomPub.cs</Link>
     </Compile>
     <Compile Include="..\CommonCli.cs">
       <Link>CommonCli.cs</Link>

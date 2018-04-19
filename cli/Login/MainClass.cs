@@ -27,6 +27,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Xml.Linq;
 
+using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+
 namespace Smdn.Applications.HatenaBlogTools {
   partial class MainClass {
     private static string GetUsageExtraMandatoryOptions() => string.Empty;

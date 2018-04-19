@@ -31,6 +31,8 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 
+using Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol;
+using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 using Smdn.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {

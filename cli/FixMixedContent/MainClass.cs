@@ -28,6 +28,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+
 namespace Smdn.Applications.HatenaBlogTools {
   partial class MainClass {
     private static string GetUsageExtraMandatoryOptions() => ""; // TODO

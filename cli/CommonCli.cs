@@ -27,6 +27,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 
+using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+
 namespace Smdn.Applications.HatenaBlogTools {
   partial class MainClass {
     private static bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPubClient hatenaBlog)

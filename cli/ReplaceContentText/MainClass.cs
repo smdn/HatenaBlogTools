@@ -26,6 +26,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
+using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+
 namespace Smdn.Applications.HatenaBlogTools {
   partial class MainClass {
     private static string GetUsageExtraMandatoryOptions() => "-from 'oldtext' [-to 'newtext']";
