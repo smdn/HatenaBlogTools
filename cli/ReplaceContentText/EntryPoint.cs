@@ -24,9 +24,16 @@
 
 namespace Smdn.Applications.HatenaBlogTools {
   partial class ReplaceContentText {
-    static void Main(string[] args)
+    static int Main(string[] args)
     {
-      (new ReplaceContentText()).Run(args);
+      try {
+        (new ReplaceContentText()).Run(args);
+
+        return 0;
+      }
+      catch (AbortCommandException) {
+        return -1;
+      }
     }
   }
 }

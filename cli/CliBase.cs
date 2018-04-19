@@ -30,6 +30,8 @@ using System.Reflection;
 using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.Applications.HatenaBlogTools {
+  public class AbortCommandException : Exception { }
+
   abstract class CliBase {
     protected bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPubCredential credential)
     {
@@ -163,7 +165,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       Console.Error.WriteLine("  -h, --help, /help : show usage");
 
-      Environment.Exit(-1);
+      throw new AbortCommandException();
     }
   }
 }

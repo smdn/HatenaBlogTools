@@ -24,9 +24,16 @@
 
 namespace Smdn.Applications.HatenaBlogTools {
   partial class FixMixedContent {
-    static void Main(string[] args)
+    static int Main(string[] args)
     {
-      (new FixMixedContent()).Run(args);
+      try {
+        (new FixMixedContent()).Run(args);
+
+        return 0;
+      }
+      catch (AbortCommandException) {
+        return -1;
+      }
     }
   }
 }

@@ -24,9 +24,16 @@
 
 namespace Smdn.Applications.HatenaBlogTools {
   partial class ModifyCategory {
-    static void Main(string[] args)
+    static int Main(string[] args)
     {
-      (new ModifyCategory()).Run(args);
+      try {
+        (new ModifyCategory()).Run(args);
+
+        return 0;
+      }
+      catch (AbortCommandException) {
+        return -1;
+      }
     }
   }
 }

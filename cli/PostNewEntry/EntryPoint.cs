@@ -24,9 +24,16 @@
 
 namespace Smdn.Applications.HatenaBlogTools {
   partial class PostNewEntry {
-    static void Main(string[] args)
+    static int Main(string[] args)
     {
-      (new PostNewEntry()).Run(args);
+      try {
+        (new PostNewEntry()).Run(args);
+
+        return 0;
+      }
+      catch (AbortCommandException) {
+        return -1;
+      }
     }
   }
 }

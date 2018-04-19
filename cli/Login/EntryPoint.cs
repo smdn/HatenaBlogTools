@@ -24,9 +24,16 @@
 
 namespace Smdn.Applications.HatenaBlogTools {
   partial class Login {
-    static void Main(string[] args)
+    static int Main(string[] args)
     {
-      (new Login()).Run(args);
+      try {
+        (new Login()).Run(args);
+
+        return 0;
+      }
+      catch (AbortCommandException) {
+        return -1;
+      }
     }
   }
 }
