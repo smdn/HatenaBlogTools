@@ -39,7 +39,9 @@ internal static partial class AssemblyInfo {
   internal const string Copyright = "Copyright (C) 2013-2018 smdn";
 
   internal const string TargetFramework =
-#if NET46
+#if NET461
+    ".NET Framework 4.6.1"
+#elif NET46
     ".NET Framework 4.6"
 #elif NETCOREAPP2_0
     ".NET Core 2.0"
@@ -49,7 +51,9 @@ internal static partial class AssemblyInfo {
     ;
 
   internal const string TargetFrameworkSuffix =
-#if NET46
+#if NET461
+    "net4.6.1"
+#elif NET46
     "net4.6"
 #elif NETCOREAPP2_0
     "netcoreapp2.0"
