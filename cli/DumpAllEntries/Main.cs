@@ -89,6 +89,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
+          case "--format":
           case "-format":
             var format = args[++i];
 
@@ -111,10 +112,12 @@ namespace Smdn.Applications.HatenaBlogTools {
             }
             break;
 
+          case "--exclude-category":
           case "-excat":
             categoriesToExclude.Add(args[++i]);
             break;
 
+          case "--include-category":
           case "-incat":
             categoriesToInclude.Add(args[++i]);
             break;
@@ -135,7 +138,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       HashSet<string> categoriesToFilter = null;
 
       if (0 < categoriesToExclude.Count && 0 < categoriesToInclude.Count) {
-        Usage("-excatと-incatを同時に指定することはできません");
+        Usage("--exclude-categoryと--include-categoryを同時に指定することはできません");
         return;
       }
       else {

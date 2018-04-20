@@ -47,6 +47,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
+          case "--verbose":
           case "-v":
             verbose = true;
             break;

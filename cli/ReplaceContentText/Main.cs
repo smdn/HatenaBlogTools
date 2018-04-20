@@ -63,38 +63,44 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
+          case "--from":
           case "-from":
             replaceFromText = args[++i];
             break;
 
+          case "--to":
           case "-to":
             replaceToText = args[++i];
             break;
 
+          case "--regex":
           case "-regex":
             replaceAsRegex = true;
             break;
 
-          case "-diff-cmd":
+          case "--diff-cmd":
             diffCommand = args[++i];
             break;
 
-          case "-diff-cmd-args":
+          case "--diff-cmd-args":
             diffCommandArgs = args[++i];
             break;
 
-          case "-diff-test":
+          case "--diff-test":
             testDiffCommand = true;
             break;
 
+          case "--verbose":
           case "-v":
             verbose = true;
             break;
 
+          case "--dry-run":
           case "-n":
             dryrun = true;
             break;
 
+          case "--interactive":
           case "-i":
             confirm = true;
             break;

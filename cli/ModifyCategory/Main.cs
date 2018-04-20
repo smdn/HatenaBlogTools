@@ -79,6 +79,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
+          case "--dry-run":
           case "-n":
             dryrun = true;
             break;

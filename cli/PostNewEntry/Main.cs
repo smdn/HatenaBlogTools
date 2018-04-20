@@ -58,18 +58,22 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
+          case "--title":
           case "-title":
             entry.Title = args[++i];
             break;
 
+          case "--category":
           case "-category":
             entry.Categories.Add(args[++i]);
             break;
 
+          case "--draft":
           case "-draft":
             entry.IsDraft = true;
             break;
 
+          case "--from-file":
           case "-fromfile":
             contentFile = args[++i];
             break;

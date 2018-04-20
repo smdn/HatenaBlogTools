@@ -43,11 +43,10 @@ namespace Smdn.Applications.HatenaBlogTools {
     public void Run(string[] args)
     {
       if (!ParseCommonCommandLineArgs(ref args,
-                                      new[] { "-diff-test", "-input-content", "-output-content" },
+                                      new[] { "--diff-test", "--input-content", "--output-content" },
                                       out HatenaBlogAtomPubCredential credential)) {
         return;
       }
-
 
       bool postAlways = false;
       bool fixMixedContent = false;
@@ -65,53 +64,55 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
-          case "-update-content":
+          case "--update-content":
             postAlways = true;
             break;
 
-          case "-fix-mixed-content":
+          case "--fix-mixed-content":
             fixMixedContent = true;
             break;
 
-          case "-fix-blog-url":
+          case "--fix-blog-url":
             fixBlogUrl = true;
             break;
 
-          case "-custom-domain":
+          case "--custom-domain":
             customBlogDomain = args[++i];
             break;
 
-          case "-diff-cmd":
+          case "--diff-cmd":
             diffCommand = args[++i];
             break;
 
-          case "-diff-cmd-args":
+          case "--diff-cmd-args":
             diffCommandArgs = args[++i];
             break;
 
-          case "-diff-test":
+          case "--diff-test":
             testDiffCommand = true;
             break;
 
-          case "-input-content":
+          case "--input-content":
             contentInput = args[++i];
             editLocalContent = true;
             break;
 
-          case "-output-content":
+          case "--output-content":
             contentOutput = args[++i];
             editLocalContent = true;
             break;
 
+          case "--dry-run":
           case "-n":
             dryRun = true;
             break;
 
+          case "--interactive":
           case "-i":
             confirm = true;
             break;
 
-          case "-list-fixed-entry":
+          case "--list-fixed-entry":
             listFixedEntries = true;
             break;
         }
@@ -129,7 +130,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
 
       if (editLocalContent && string.IsNullOrEmpty(customBlogDomain)) {
-        Usage("-custom-domainを指定してください");
+        Usage("--custom-domainを指定してください");
         return;
       }
 

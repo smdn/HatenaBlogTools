@@ -48,6 +48,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       credential = null;
 
       var _argsNotRequireHatenaBlogClient = new List<string>() {
+        "/?",
         "/help",
         "-h",
         "--help",
@@ -64,18 +65,22 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
+          case "--id":
           case "-id":
             hatenaId = args[++i];
             break;
 
+          case "--blog-id":
           case "-blogid":
             blogId = args[++i];
             break;
 
+          case "--api-key":
           case "-apikey":
             apiKey = args[++i];
             break;
 
+          case "/?":
           case "/help":
           case "-h":
           case "--help":
@@ -182,7 +187,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       Console.Error.WriteLine($"{AssemblyInfo.Name} {AssemblyInfo.SubName} version {informationalVersion} (for {AssemblyInfo.TargetFramework})");
       Console.Error.WriteLine();
       Console.Error.WriteLine("usage:");
-      Console.Error.WriteLine($"  {commandLine} -id <hatena-id> -blogid <blog-id> -apikey <api-key> " + GetUsageExtraMandatoryOptions());
+      Console.Error.WriteLine($"  {commandLine} --id <hatena-id> --blog-id <blog-id> --api-key <api-key> " + GetUsageExtraMandatoryOptions());
       Console.Error.WriteLine();
       Console.Error.WriteLine("  <hatena-id> : your Hatena id");
       Console.Error.WriteLine("  <blog-id>   : your blog domain name (xxx.hatenablog.jp, xxx.hateblo.jp, etc.)");
@@ -195,7 +200,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         Console.Error.WriteLine($"  {extraOptionDescription}");
       }
 
-      Console.Error.WriteLine("  -h, --help, /help : show usage");
+      Console.Error.WriteLine("  -h, --help, /help, /?   : show usage");
 
       throw new AbortCommandException();
     }
