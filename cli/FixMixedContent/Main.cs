@@ -165,7 +165,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       Func<bool> confirmBeforePosting = null;
 
       if (confirm)
-        confirmBeforePosting = () => ConsoleUtils.AskYesNo(false, "更新しますか?");
+        confirmBeforePosting = () => ConsoleUtils.AskYesNo(false, "更新しますか");
 
       if (!Login(credential, out HatenaBlogAtomPubClient hatenaBlog))
         return;

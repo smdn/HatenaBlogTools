@@ -56,6 +56,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       bool testDiffCommand = false;
       bool verbose = false;
       bool dryrun = false;
+      bool confirm = false;
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
@@ -90,6 +91,10 @@ namespace Smdn.Applications.HatenaBlogTools {
           case "-n":
             dryrun = true;
             break;
+
+          case "-i":
+            confirm = true;
+            break;
         }
       }
 
@@ -120,6 +125,11 @@ namespace Smdn.Applications.HatenaBlogTools {
         ? HatenaBlogFunctions.PostMode.PostNever
         : HatenaBlogFunctions.PostMode.PostIfModified;
 
+      Func<bool> confirmBeforePosting = null;
+
+      if (confirm)
+        confirmBeforePosting = () => ConsoleUtils.AskYesNo(false, "更新しますか");
+
       if (!Login(credential, out HatenaBlogAtomPubClient hatenaBlog))
         return;
 
@@ -127,7 +137,7 @@ namespace Smdn.Applications.HatenaBlogTools {
                                               postMode,
                                               editor,
                                               diffGenerator,
-                                              null,
+                                              confirmBeforePosting,
                                               out _,
                                               out _);
     }
