@@ -11,13 +11,13 @@ using System.Runtime.CompilerServices;
 
 internal static partial class AssemblyInfo {
   internal const string Name = "HatenaBlogTools";
-  internal const string Version = "1.06";
-  internal const string Copyright = "Copyright (C) 2013-2014 smdn";
+  internal const string Version = "2.0";
+  internal const string Copyright = "Copyright (C) 2013-2018 smdn";
 
   internal const string TargetFramework =
 #if NET46
     ".NET Framework 4.6"
-    #elif NETCOREAPP2_0
+#elif NETCOREAPP2_0
     ".NET Core 2.0"
 #else
     ""
