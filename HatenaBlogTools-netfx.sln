@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostNewEntry-netfx", "cli\P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReplaceContentText-netfx", "cli\ReplaceContentText\ReplaceContentText-netfx.csproj", "{23D039DB-2CFD-4D91-B9FB-06E97979DDCF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{7811696D-9D2D-4D12-B23D-1AF6466E914D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smdn.Applications.HatenaBlogTools.Tests-netfx", "test\HatenaBlogTools\Smdn.Applications.HatenaBlogTools.Tests-netfx.csproj", "{6BA7FA26-0C79-426F-9803-6DCD9D01C1D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +59,10 @@ Global
 		{23D039DB-2CFD-4D91-B9FB-06E97979DDCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23D039DB-2CFD-4D91-B9FB-06E97979DDCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23D039DB-2CFD-4D91-B9FB-06E97979DDCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BA7FA26-0C79-426F-9803-6DCD9D01C1D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BA7FA26-0C79-426F-9803-6DCD9D01C1D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BA7FA26-0C79-426F-9803-6DCD9D01C1D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BA7FA26-0C79-426F-9803-6DCD9D01C1D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +75,7 @@ Global
 		{28977E9C-958C-427C-A050-5E013C48F918} = {AC51698D-288D-41E6-9417-4053AAE38053}
 		{FB3D9149-D070-4CFE-BA25-11A700A8C8B7} = {AC51698D-288D-41E6-9417-4053AAE38053}
 		{23D039DB-2CFD-4D91-B9FB-06E97979DDCF} = {AC51698D-288D-41E6-9417-4053AAE38053}
+		{6BA7FA26-0C79-426F-9803-6DCD9D01C1D4} = {7811696D-9D2D-4D12-B23D-1AF6466E914D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0124BFB4-A616-49ED-A133-F3C8861937E3}
