@@ -3,19 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cli", "cli", "{7448DB9E-F012-4EF2-BFAA-7A03F4861DD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumpAllEntries", "cli\DumpAllEntries\DumpAllEntries.csproj", "{C75CA0A0-AA2A-4C28-A1FA-B0F51671F7DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumpAllEntries", "cli\DumpAllEntries\DumpAllEntries-netcoreapp.csproj", "{C75CA0A0-AA2A-4C28-A1FA-B0F51671F7DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModifyCategory", "cli\ModifyCategory\ModifyCategory.csproj", "{69B775E5-8B31-48F3-A71B-94AA5EF33F15}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModifyCategory", "cli\ModifyCategory\ModifyCategory-netcoreapp.csproj", "{69B775E5-8B31-48F3-A71B-94AA5EF33F15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Login", "cli\Login\Login.csproj", "{EB061C25-6DFF-47EA-BF8E-0C1F22D1BBE8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Login", "cli\Login\Login-netcoreapp.csproj", "{EB061C25-6DFF-47EA-BF8E-0C1F22D1BBE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReplaceContentText", "cli\ReplaceContentText\ReplaceContentText.csproj", "{FC279681-6215-4880-93E6-65A9F7638F9B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReplaceContentText", "cli\ReplaceContentText\ReplaceContentText-netcoreapp.csproj", "{FC279681-6215-4880-93E6-65A9F7638F9B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{88BC1CDA-25A5-47A5-8F8C-D188E82486F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostNewEntry", "cli\PostNewEntry\PostNewEntry.csproj", "{FF37175D-F68B-4720-8D9D-59532E026123}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostNewEntry", "cli\PostNewEntry\PostNewEntry-netcoreapp.csproj", "{FF37175D-F68B-4720-8D9D-59532E026123}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FixMixedContent", "cli\FixMixedContent\FixMixedContent.csproj", "{9D01166D-6274-4400-85A9-1B7A8C5BF9E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FixMixedContent", "cli\FixMixedContent\FixMixedContent-netcoreapp.csproj", "{9D01166D-6274-4400-85A9-1B7A8C5BF9E2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{9F54DDA1-D5B9-4E61-BD1B-C0EEE4E8D169}"
 EndProject
