@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>Smdn.Applications.HatenaBlogTools.Tests</AssemblyName>
     <RootNamespace>Smdn.Applications.HatenaBlogTools</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.10.1" />
@@ -12,8 +13,20 @@
   <ItemGroup>
     <Compile Include="..\..\core\Smdn\NUnitLiteTestRunner.cs" />
     <Compile Include="..\..\core\Smdn\NUnitTestUtils.cs" Link="NUnitTestUtils.cs" />
+    <Compile Include="..\..\cli\CliBase.cs">
+      <Link>CliBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\cli\FixMixedContent\Main.cs">
+      <Link>FixMixedContent\Main.cs</Link>
+    </Compile>
+    <Compile Include="..\..\cli\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\core\Smdn.Applications.HatenaBlogTools\src\Smdn.Applications.HatenaBlogTools-netstandard.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="FixMixedContent\" />
   </ItemGroup>
 </Project>
