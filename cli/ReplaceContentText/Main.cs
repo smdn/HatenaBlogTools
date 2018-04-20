@@ -45,8 +45,21 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public void Run(string[] args)
     {
-      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubCredential credential))
-        return;
+      var requireHatenaBlogClient = true;
+
+      foreach (var arg in args) {
+        if (string.Equals(arg, "-diff-test", StringComparison.Ordinal)) {
+          requireHatenaBlogClient = false;
+          break;
+        }
+      }
+
+      HatenaBlogAtomPubCredential credential = null;
+
+      if (requireHatenaBlogClient) {
+        if (!ParseCommonCommandLineArgs(ref args, out credential))
+          return;
+      }
 
       string replaceFromText = null;
       string replaceToText = null;
@@ -98,6 +111,17 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
+      var diffGenerator = DiffGenerator.Create(!testDiffCommand && !verbose,
+                                               diffCommand,
+                                               diffCommandArgs,
+                                               "置換前の本文",
+                                               "置換後の本文");
+
+      if (testDiffCommand) {
+        DiffGenerator.Test(diffGenerator);
+        return;
+      }
+
       if (string.IsNullOrEmpty(replaceFromText)) {
         Usage("置換する文字列を指定してください");
         return;
@@ -109,17 +133,6 @@ namespace Smdn.Applications.HatenaBlogTools {
       var editor = replaceAsRegex
         ? (IHatenaBlogEntryEditor)new RegexEntryEditor(replaceFromText, replaceToText)
         : (IHatenaBlogEntryEditor)new EntryEditor(replaceFromText, replaceToText);
-
-      var diffGenerator = DiffGenerator.Create(!verbose,
-                                               diffCommand,
-                                               diffCommandArgs,
-                                               "置換前の本文",
-                                               "置換後の本文");
-
-      if (testDiffCommand) {
-        DiffGenerator.Test(diffGenerator);
-        return;
-      }
 
       var postMode = dryrun
         ? HatenaBlogFunctions.PostMode.PostNever
