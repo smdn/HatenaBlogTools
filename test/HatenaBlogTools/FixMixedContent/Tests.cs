@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using NUnit.Framework;
 
-namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
+namespace Smdn.Applications.HatenaBlogTools {
   [TestFixture]
   public class FixMixedContentTests {
     private void WithInputFile(string input, Action<FileInfo> actionWithFile)
