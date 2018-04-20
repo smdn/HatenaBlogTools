@@ -24,6 +24,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 
@@ -35,7 +36,26 @@ namespace Smdn.Applications.HatenaBlogTools {
   abstract class CliBase {
     protected bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPubCredential credential)
     {
+      return ParseCommonCommandLineArgs(ref args,
+                                        Array.Empty<string>(),
+                                        out credential);
+    }
+
+    protected bool ParseCommonCommandLineArgs(ref string[] args,
+                                              string[] argsNotRequireHatenaBlogClient,
+                                              out HatenaBlogAtomPubCredential credential)
+    {
       credential = null;
+
+      var _argsNotRequireHatenaBlogClient = new List<string>() {
+        "/help",
+        "-h",
+        "--help",
+      };
+
+      _argsNotRequireHatenaBlogClient.AddRange(argsNotRequireHatenaBlogClient);
+
+      var requireHatenaBlogClient = !(new HashSet<string>(args, StringComparer.Ordinal)).Overlaps(_argsNotRequireHatenaBlogClient);
 
       string hatenaId = null;
       string blogId = null;
@@ -68,22 +88,24 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
-      if (string.IsNullOrEmpty(hatenaId)) {
-        Usage("hatena-idを指定してください");
-        return false;
-      }
+      if (requireHatenaBlogClient) {
+        if (string.IsNullOrEmpty(hatenaId)) {
+          Usage("hatena-idを指定してください");
+          return false;
+        }
 
-      if (string.IsNullOrEmpty(blogId)) {
-        Usage("blog-idを指定してください");
-        return false;
-      }
+        if (string.IsNullOrEmpty(blogId)) {
+          Usage("blog-idを指定してください");
+          return false;
+        }
 
-      if (string.IsNullOrEmpty(apiKey)) {
-        Usage("api-keyを指定してください");
-        return false;
-      }
+        if (string.IsNullOrEmpty(apiKey)) {
+          Usage("api-keyを指定してください");
+          return false;
+        }
 
-      credential = new HatenaBlogAtomPubCredential(hatenaId, blogId, apiKey);
+        credential = new HatenaBlogAtomPubCredential(hatenaId, blogId, apiKey);
+      }
 
       args = unparsedArgs.ToArray();
 

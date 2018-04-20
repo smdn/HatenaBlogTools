@@ -42,23 +42,12 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public void Run(string[] args)
     {
-      var requireHatenaBlogClient = true;
-
-      foreach (var arg in args) {
-        if (string.Equals(arg, "-diff-test", StringComparison.Ordinal) ||
-            string.Equals(arg, "-input-content", StringComparison.Ordinal) ||
-            string.Equals(arg, "-output-content", StringComparison.Ordinal)) {
-          requireHatenaBlogClient = false;
-          break;
-        }
+      if (!ParseCommonCommandLineArgs(ref args,
+                                      new[] { "-diff-test", "-input-content", "-output-content" },
+                                      out HatenaBlogAtomPubCredential credential)) {
+        return;
       }
 
-      HatenaBlogAtomPubCredential credential = null;
-
-      if (requireHatenaBlogClient) {
-        if (!ParseCommonCommandLineArgs(ref args, out credential))
-          return;
-      }
 
       bool postAlways = false;
       bool fixMixedContent = false;

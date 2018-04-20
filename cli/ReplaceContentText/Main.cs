@@ -45,20 +45,10 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public void Run(string[] args)
     {
-      var requireHatenaBlogClient = true;
-
-      foreach (var arg in args) {
-        if (string.Equals(arg, "-diff-test", StringComparison.Ordinal)) {
-          requireHatenaBlogClient = false;
-          break;
-        }
-      }
-
-      HatenaBlogAtomPubCredential credential = null;
-
-      if (requireHatenaBlogClient) {
-        if (!ParseCommonCommandLineArgs(ref args, out credential))
-          return;
+      if (!ParseCommonCommandLineArgs(ref args,
+                                      new[] {"-diff-test"},
+                                      out HatenaBlogAtomPubCredential credential)) {
+        return;
       }
 
       string replaceFromText = null;
