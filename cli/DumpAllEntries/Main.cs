@@ -60,20 +60,24 @@ namespace Smdn.Applications.HatenaBlogTools {
     }
 #endif
 
-    protected override string GetUsageExtraMandatoryOptions() => "[-format <hatena|mt|atom>] [outfile|-]";
+    protected override string GetDescription() => "すべてのブロク記事をダンプします。";
+
+    protected override string GetUsageExtraMandatoryOptions() => "[--format [hatena|mt|atom]] [出力ファイル名|-]";
 
     protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
     {
 #if RETRIEVE_COMMENTS
       yield return "-comment : dump comments posted on entry"
 #endif
-      yield return "-format <hatena|mt|atom> : specify output format";
-      yield return "                             hatena : Hatena Diary";
-      yield return "                             mt     : Movable Type";
-      yield return "                             atom   : Atom feed (default)";
-      yield return "-excat <category>        : category to be excluded";
-      yield return "-incat <category>        : category to be included";
-      yield return "[outfile|-]              : save to <outfile> or stdout (-)";
+      yield return "--format [hatena|mt|atom]      : 出力形式を指定します";
+      yield return "                                 hatena : はてなダイアリー日記データ形式";
+      yield return "                                 mt     : Movable Type形式";
+      yield return "                                 atom   : Atomフィード形式";
+      yield return "　                               省略した場合はatomと同じ形式になります";
+      yield return "--exclude-category <カテゴリ>  : 指定された<カテゴリ>を除外してダンプします(複数指定可)";
+      yield return "--include-category <カテゴリ>  : 指定された<カテゴリ>のみを抽出してダンプします(複数指定可)";
+      yield return "[出力ファイル名|-]             : ダンプした内容を保存するファイル名を指定します";
+      yield return "                                 省略した場合、- を指定した場合は標準出力に書き込みます";
     }
 
     public void Run(string[] args)

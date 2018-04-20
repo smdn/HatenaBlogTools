@@ -31,11 +31,13 @@ using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.Applications.HatenaBlogTools {
   partial class Login : CliBase {
+    protected override string GetDescription() => "AtomPubによるはてなブログへのログインを行います。　記事の変更等は行いません。";
+
     protected override string GetUsageExtraMandatoryOptions() => string.Empty;
 
     protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
     {
-      yield return "-v : display response document";
+      yield return "-v, --verbose   : ログインに成功した場合、レスポンスのサービス文書を表示します。";
     }
 
     public void Run(string[] args)

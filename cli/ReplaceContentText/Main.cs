@@ -30,17 +30,23 @@ using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.Applications.HatenaBlogTools {
   partial class ReplaceContentText : CliBase {
-    protected override string GetUsageExtraMandatoryOptions() => "-from 'oldtext' [-to 'newtext']";
+    protected override string GetDescription() => "すべての記事に対して置換を行います。";
+
+    protected override string GetUsageExtraMandatoryOptions() => "--from <置換前の文字列> [--to <置換後の文字列>]";
 
     protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
     {
-      yield return "-from <oldtext>       : text to be replaced";
-      yield return "-to <newtext>         : text to replace <oldtext>";
-      yield return "-regex                : treat <oldtext> and <newtext> as regular expressions";
-      yield return "-diff-cmd <command>   : use <command> as diff command";
-      yield return "-diff-cmd-args <args> : specify arguments for diff command";
-      yield return "-v                    : display replacement result";
-      yield return "-n                    : dry run";
+      yield return "--from <置換前の文字列>    : 置換したい文字列を指定します";
+      yield return "--to <置換後の文字列>      : 置換後の文字列を指定します";
+      yield return "--regex                    : --fromおよび--toで指定された文字列を正規表現として解釈します";
+      yield return "-n, --dry-run              : 置換結果の確認だけ行い、再投稿を行いません";
+      yield return "-i, --interactive          : 置換結果の再投稿を行う前に確認を行います";
+      yield return "";
+      yield return "変更箇所の表示に関するオプション:";
+      yield return "  --diff-cmd <コマンド>           : 再投稿前に指定された<コマンド>を使って変更箇所を表示します";
+      yield return "  --diff-cmd-args <コマンド引数>  : --diff-cmdで指定されたコマンドに渡す引数(オプション)を指定します";
+      yield return "  --diff-test                     : --diff-cmdで指定されたコマンドの動作テストを行います";
+      yield return "                                    このオプションを指定した場合、はてなブログの記事の更新は一切行いません";
     }
 
     public void Run(string[] args)
@@ -57,7 +63,6 @@ namespace Smdn.Applications.HatenaBlogTools {
       string diffCommand = null;
       string diffCommandArgs = null;
       bool testDiffCommand = false;
-      bool verbose = false;
       bool dryrun = false;
       bool confirm = false;
 
@@ -90,11 +95,6 @@ namespace Smdn.Applications.HatenaBlogTools {
             testDiffCommand = true;
             break;
 
-          case "--verbose":
-          case "-v":
-            verbose = true;
-            break;
-
           case "--dry-run":
           case "-n":
             dryrun = true;
@@ -107,7 +107,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
-      var diffGenerator = DiffGenerator.Create(!testDiffCommand && !verbose,
+      var diffGenerator = DiffGenerator.Create(false,
                                                diffCommand,
                                                diffCommandArgs,
                                                "置換前の本文",

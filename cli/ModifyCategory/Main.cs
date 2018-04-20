@@ -58,15 +58,40 @@ namespace Smdn.Applications.HatenaBlogTools {
   }
 
   partial class ModifyCategory : CliBase {
-    protected override string GetUsageExtraMandatoryOptions() => "old1:new1 old2:new2 ...";
+    protected override string GetDescription() => "記事のカテゴリを一括変更します。";
+
+    protected override string GetUsageExtraMandatoryOptions() => "\"旧カテゴリ1:新カテゴリ1\" \"旧カテゴリ2:新カテゴリ2\" ...";
 
     protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
     {
-      yield return "<old>:<new>          : replace category <old> to <new>";
-      yield return "<old>:               : delete category <old>";
-      yield return ":<new>               : add category <new> to uncategorized entries";
-      yield return "<old>:<old>;<new>    : add category <new> to entries of category <old>";
-      yield return "-n                   : dry run";
+      yield return "-n, --dry-run        : 変更内容の確認だけ行い、変更の投稿は行いません";
+      yield return "";
+      yield return "変更カテゴリの指定(例):";
+      yield return "  <old>:<new>        : カテゴリ<old>を<new>に置き換えます";
+      yield return "  <old>:             : カテゴリ<old>を削除します";
+      yield return "  :<new>             : カテゴリが設定されていない記事にカテゴリ<new>を設定します";
+      yield return "  <old>:<old>;<new>  : カテゴリ<old>の記事にカテゴリ<new>を追加します";
+      yield return "";
+      yield return "カテゴリ指定の構文:";
+      yield return "  <置換前のカテゴリグループ>:<置換後のカテゴリグループ>";
+      yield return "  ";
+      yield return "  置換前後のカテゴリグループには;で区切ることで1つ以上のカテゴリを指定できます";
+      yield return "  ";
+      yield return "  \"a;b;c...:A;B;C...\"と指定した場合、記事にカテゴリa, b, c, ...の'すべて'が";
+      yield return "  設定されている場合に、新たなカテゴリA, B, C, ...への置換を行います";
+      yield return "  ";
+      yield return "  置換前後で異なるカテゴリ数にすることもできます";
+      yield return "  ";
+      yield return "  \"a;b;c...:A\"と指定した場合、記事にカテゴリa, b, c, ...の'すべて'が";
+      yield return "  設定されている場合に、カテゴリAへと統合します";
+      yield return "  ";
+      yield return "  置換後のカテゴリグループに何も指定しない場合、空のカテゴリへの置換となります";
+      yield return "  つまり、置換前のカテゴリが'削除されます'";
+      yield return "";
+      yield return "  \"a;b:\"と指定した場合、記事にカテゴリaとbが設定されている場合に、カテゴリの設定を削除します";
+      yield return "  ";
+      yield return "  置換前のカテゴリグループに何も指定しない場合、空のカテゴリからの置換となります";
+      yield return "  つまり、'カテゴリが設定されてない記事に対してのみ'置換を行います";
     }
 
     public void Run(string[] args)

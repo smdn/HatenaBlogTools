@@ -35,17 +35,21 @@ using Smdn.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
   partial class PostNewEntry : CliBase {
-    protected override string GetUsageExtraMandatoryOptions() => "-title <title> -category <category> <content>";
+    protected override string GetDescription() => "指定された内容で新しい記事を投稿します。";
+
+    protected override string GetUsageExtraMandatoryOptions() => "--title <タイトル> --category <カテゴリ1> --category <カテゴリ2> <本文>";
 
     protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
     {
-      yield return "<content>            : content of new entry";
-      yield return "-title <title>       : title of new entry";
-      yield return "-category <category> : category of new entry";
-      yield return "                       (ex: -category diary -category tech)";
-      yield return "-draft               : post entry as draft";
-      yield return "-fromfile <file>     : post entry content from <file>";
-      yield return "-fromfile -          : post entry content from stdin";
+      yield return "--title <タイトル>     : 投稿する記事のタイトルを指定します";
+      yield return "--category <カテゴリ>  : 投稿する記事に設定するカテゴリを指定します";
+      yield return "                         \"--category カテゴリ1 --category カテゴリ2\"のように指定することで";
+      yield return "                         複数のカテゴリを指定することができます";
+      yield return "--draft                : 記事を下書きとして投稿します";
+      yield return "";
+      yield return "<本文>                 : 投稿する記事の本文を指定します";
+      yield return "--from-file <ファイル> : 指定された<ファイル>の内容を本文として投稿します";
+      yield return "--from-file -          : 標準入力に与えられた内容を本文として投稿します";
     }
 
     public void Run(string[] args)

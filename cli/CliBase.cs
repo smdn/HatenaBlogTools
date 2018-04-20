@@ -154,6 +154,8 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
     }
 
+    protected abstract string GetDescription();
+
     protected abstract string GetUsageExtraMandatoryOptions();
 
     protected abstract IEnumerable<string> GetUsageExtraOptionDescriptions();
@@ -186,21 +188,23 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       Console.Error.WriteLine($"{AssemblyInfo.Name} {AssemblyInfo.SubName} version {informationalVersion} (for {AssemblyInfo.TargetFramework})");
       Console.Error.WriteLine();
-      Console.Error.WriteLine("usage:");
-      Console.Error.WriteLine($"  {commandLine} --id <hatena-id> --blog-id <blog-id> --api-key <api-key> " + GetUsageExtraMandatoryOptions());
+      Console.Error.WriteLine("説明: " + GetDescription());
       Console.Error.WriteLine();
-      Console.Error.WriteLine("  <hatena-id> : your Hatena id");
-      Console.Error.WriteLine("  <blog-id>   : your blog domain name (xxx.hatenablog.jp, xxx.hateblo.jp, etc.)");
-      Console.Error.WriteLine("  <api-key>   : AtomPub API key (see http://blog.hatena.ne.jp/my/config/detail)");
+      Console.Error.WriteLine($"使い方: {commandLine} --id <hatena-id> --blog-id <blog-id> --api-key <api-key> " + GetUsageExtraMandatoryOptions());
+      Console.Error.WriteLine();
+      Console.Error.WriteLine("  <hatena-id> : はてなID");
+      Console.Error.WriteLine("  <blog-id>   : ブログID (xxx.hatenablog.jp, xxx.hateblo.jpなどのブログドメイン)");
+      Console.Error.WriteLine("  <api-key>   : AtomPub APIキー ( https://blog.hatena.ne.jp/my/config/detail より取得できます)");
       Console.Error.WriteLine();
 
-      Console.Error.WriteLine("options:");
+      Console.Error.WriteLine("オプション:");
 
       foreach (var extraOptionDescription in GetUsageExtraOptionDescriptions()) {
         Console.Error.WriteLine($"  {extraOptionDescription}");
       }
 
-      Console.Error.WriteLine("  -h, --help, /help, /?   : show usage");
+      Console.Error.WriteLine();
+      Console.Error.WriteLine("  -h, --help, /help, /?   : 使い方を表示します");
 
       throw new AbortCommandException();
     }
