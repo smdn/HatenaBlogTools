@@ -34,6 +34,12 @@
     <Compile Include="..\..\Smdn\Smdn.Xml.Xhtml\src\Smdn.Xml.Linq\Extensions.cs">
       <Link>Extensions.cs</Link>
     </Compile>
+    <Compile Include="..\..\Smdn\Smdn\src\Smdn\Runtime.cs">
+      <Link>Runtime.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Smdn\Smdn\src\Smdn\RuntimeEnvironment.cs">
+      <Link>RuntimeEnvironment.cs</Link>
+    </Compile>
   </ItemGroup>
 
 </Project>

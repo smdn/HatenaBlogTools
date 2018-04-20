@@ -167,7 +167,17 @@ namespace Smdn.Applications.HatenaBlogTools {
       var assm = Assembly.GetEntryAssembly();
       var informationalVersion = (assm.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)[0] as AssemblyInformationalVersionAttribute).InformationalVersion;
 
-      var commandLine = $"dotnet {System.IO.Path.GetFileName(assm.Location)} --"; // TODO: on .NET Framework, etc.
+      string commandLine = null;
+
+      switch (Runtime.RuntimeEnvironment) {
+        case RuntimeEnvironment.NetCore: commandLine = $"dotnet {System.IO.Path.GetFileName(assm.Location)} --"; break;
+        case RuntimeEnvironment.Mono: commandLine = $"mono {System.IO.Path.GetFileName(assm.Location)}"; break;
+
+        case RuntimeEnvironment.NetFx:
+        default:
+          commandLine = $"{System.IO.Path.GetFileName(assm.Location)}";
+          break;
+      }
 
       Console.Error.WriteLine($"{AssemblyInfo.Name} {AssemblyInfo.SubName} version {informationalVersion} (for {AssemblyInfo.TargetFramework})");
       Console.Error.WriteLine();
