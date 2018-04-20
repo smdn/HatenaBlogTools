@@ -256,8 +256,6 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       writer.NewLine = "\n"; // ???
 
-      var entryRootLocation = string.Concat("http://", blogId, "/entry/"); // TODO: HTTP/HTTPS
-
       foreach (var entry in entries) {
         /*
          * metadata seciton
@@ -265,10 +263,10 @@ namespace Smdn.Applications.HatenaBlogTools {
         writer.WriteLine(string.Concat("AUTHOR: ", entry.Author));
         writer.WriteLine(string.Concat("TITLE: ", entry.Title));
 
-        var entryLocation = entry.EntryUri.ToString();
+        var entryLocation = entry.EntryUri?.LocalPath;
 
-        if (entryLocation != null && entryLocation.StartsWith(entryRootLocation, StringComparison.Ordinal))
-          writer.WriteLine(string.Concat("BASENAME: ", entryLocation.Substring(entryRootLocation.Length)));
+        if (entryLocation != null)
+          writer.WriteLine(string.Concat("BASENAME: ", entryLocation.Substring(7))); // remove prefix '/entry/'
 
         writer.WriteLine(string.Concat("STATUS: ", entry.IsDraft ? "Draft" : "Publish"));
         writer.WriteLine("CONVERT BREAKS: 0");
