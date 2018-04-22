@@ -154,7 +154,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         return;
       }
 
-      if (editLocalContent && string.IsNullOrEmpty(customBlogDomain)) {
+      if (editLocalContent && fixBlogUrl && string.IsNullOrEmpty(customBlogDomain)) {
         Usage("--custom-domainを指定してください");
         return;
       }
