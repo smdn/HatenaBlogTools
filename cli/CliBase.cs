@@ -121,7 +121,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     {
       HatenaBlogAtomPubClient.InitializeHttpsServicePoint();
 
-      var client = new HatenaBlogAtomPubClient(credential);
+      var client = HatenaBlogAtomPubClient.Create(credential);
 
       client.UserAgent = $"{AssemblyInfo.Name}/{AssemblyInfo.Version} ({AssemblyInfo.TargetFramework}; {Environment.OSVersion.VersionString})";
 

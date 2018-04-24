@@ -72,7 +72,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
     }
   }
 
-  public class HatenaBlogAtomPubClient {
+  public abstract class HatenaBlogAtomPubClient {
     public static void InitializeHttpsServicePoint()
     {
       ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
@@ -88,6 +88,52 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       };
     }
 
+    public static HatenaBlogAtomPubClient Create(HatenaBlogAtomPubCredential credential)
+    {
+      return new DefaultHatenaBlogAtomPubClient(credential);
+    }
+
+#if DEBUG
+    public static HatenaBlogAtomPubClient Create(IReadOnlyList<PostedEntry> entries)
+    {
+      return new PseudoHatenaBlogAtomPubClient(entries);
+    }
+#endif
+
+    /*
+     * instance members
+     */
+    public abstract string UserAgent { get; set; }
+
+    public abstract void WaitForCinnamon();
+
+    public abstract HttpStatusCode Login(out XDocument serviceDocument);
+
+    public IEnumerable<PostedEntry> EnumerateEntries()
+    {
+      foreach (var pair in EnumerateAllEntries()) {
+        yield return pair.Item1;
+      }
+    }
+
+    public void EnumerateEntries(Action<PostedEntry, XElement> actionForEachEntry)
+    {
+      if (actionForEachEntry == null)
+        throw new ArgumentNullException(nameof(actionForEachEntry));
+
+      foreach (var pair in EnumerateAllEntries()) {
+        actionForEachEntry(pair.Item1, pair.Item2);
+      }
+    }
+
+    protected abstract IEnumerable<Tuple<PostedEntry, XElement>> EnumerateAllEntries();
+
+    public abstract HttpStatusCode UpdateEntry(PostedEntry updatingEntry, out XDocument responseDocument);
+
+    public abstract HttpStatusCode PostEntry(Entry entry, out XDocument responseDocument);
+  }
+
+  internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
     private readonly HatenaBlogAtomPubCredential credential;
 
     public string HatenaId => credential.HatenaId;
@@ -107,7 +153,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
 
     private string userAgent;
 
-    public string UserAgent {
+    public override string UserAgent {
       get { return atom?.UserAgent ?? userAgent; }
       set {
         userAgent = value;
@@ -124,7 +170,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       return new Uri(string.Concat("https://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom"));
     }
 
-    public HatenaBlogAtomPubClient(HatenaBlogAtomPubCredential credential)
+    internal DefaultHatenaBlogAtomPubClient(HatenaBlogAtomPubCredential credential)
     {
       if (credential == null)
         throw new ArgumentNullException(nameof(credential));
@@ -133,7 +179,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       this.RootEndPoint = GetRootEndPont(credential.HatenaId, credential.BlogId);
     }
 
-    public void WaitForCinnamon()
+    public override void WaitForCinnamon()
     {
       System.Threading.Thread.Sleep(250);
     }
@@ -150,7 +196,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       return atom;
     }
 
-    public HttpStatusCode Login(out XDocument serviceDocument)
+    public override HttpStatusCode Login(out XDocument serviceDocument)
     {
       return GetServiceDocuments(out serviceDocument);
     }
@@ -179,24 +225,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       return statusCode;
     }
 
-    public IEnumerable<PostedEntry> EnumerateEntries()
-    {
-      foreach (var pair in EnumerateAllEntries()) {
-        yield return pair.Item1;
-      }
-    }
-
-    public void EnumerateEntries(Action<PostedEntry, XElement> actionForEachEntry)
-    {
-      if (actionForEachEntry == null)
-        throw new ArgumentNullException(nameof(actionForEachEntry));
-
-      foreach (var pair in EnumerateAllEntries()) {
-        actionForEachEntry(pair.Item1, pair.Item2);
-      }
-    }
-
-    private IEnumerable<Tuple<PostedEntry, XElement>> EnumerateAllEntries()
+    protected override IEnumerable<Tuple<PostedEntry, XElement>> EnumerateAllEntries()
     {
       if (atom == null)
         throw new InvalidOperationException("not logged in");
@@ -284,7 +313,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       }
     }
 
-    public HttpStatusCode UpdateEntry(PostedEntry updatingEntry, out XDocument responseDocument)
+    public override HttpStatusCode UpdateEntry(PostedEntry updatingEntry, out XDocument responseDocument)
     {
       if (atom == null)
         throw new InvalidOperationException("not logged in");
@@ -306,7 +335,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       return atom.Put(updatingEntry.MemberUri, putDocument, out responseDocument);
     }
 
-    public HttpStatusCode PostEntry(Entry entry, out XDocument responseDocument)
+    public override HttpStatusCode PostEntry(Entry entry, out XDocument responseDocument)
     {
       if (atom == null)
         throw new InvalidOperationException("not logged in");
@@ -350,4 +379,50 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
                            entry);
     }
   }
+
+#if DEBUG
+  internal class PseudoHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
+    private readonly IReadOnlyList<PostedEntry> entries;
+
+    internal PseudoHatenaBlogAtomPubClient(IReadOnlyList<PostedEntry> entries)
+    {
+      this.entries = entries;
+    }
+
+    public override string UserAgent { get; set; }
+
+    public override HttpStatusCode Login(out XDocument serviceDocument)
+    {
+      serviceDocument = new XDocument();
+
+      return HttpStatusCode.OK;
+    }
+
+    public override HttpStatusCode PostEntry(Entry entry, out XDocument responseDocument)
+    {
+      responseDocument = new XDocument();
+
+      return HttpStatusCode.OK;
+    }
+
+    public override HttpStatusCode UpdateEntry(PostedEntry updatingEntry, out XDocument responseDocument)
+    {
+      responseDocument = new XDocument();
+
+      return HttpStatusCode.OK;
+    }
+
+    public override void WaitForCinnamon()
+    {
+      // do nothing
+    }
+
+    protected override IEnumerable<Tuple<PostedEntry, XElement>> EnumerateAllEntries()
+    {
+      foreach (var entry in entries) {
+        yield return Tuple.Create(entry, new XElement("null"));
+      }
+    }
+  }
+#endif
 }
