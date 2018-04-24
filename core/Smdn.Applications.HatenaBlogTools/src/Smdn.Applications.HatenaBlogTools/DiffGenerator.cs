@@ -59,7 +59,6 @@ namespace Smdn.Applications.HatenaBlogTools {
         Console.WriteLine(originalText);
         Console.WriteLine($"[  {descriptionForModifiedText}  ]");
         Console.WriteLine(modifiedText);
-        Console.WriteLine();
       }
     }
 
@@ -120,8 +119,6 @@ namespace Smdn.Applications.HatenaBlogTools {
            () => Console.OpenStandardError(),
            originalText,
            modifiedText);
-
-      Console.WriteLine(); // XXX
     }
 
     private void Diff(Func<Stream> openStdout, Func<Stream> openStderr, string originalText, string modifiedText)

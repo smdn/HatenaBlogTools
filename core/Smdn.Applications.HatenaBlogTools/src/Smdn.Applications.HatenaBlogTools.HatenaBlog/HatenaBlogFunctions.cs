@@ -90,6 +90,8 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
         Console.WriteLine();
 
         diff.DisplayDifference(originalText, modifiedText);
+
+        Console.WriteLine();
       }
       else {
         Console.WriteLine("(変更なし)");
