@@ -34,6 +34,8 @@ namespace Smdn.Applications.HatenaBlogTools {
   public class AbortCommandException : Exception { }
 
   abstract class CliBase {
+    private static string UserAgent => $"{AssemblyInfo.Name}/{AssemblyInfo.Version} ({AssemblyInfo.TargetFramework}; {Environment.OSVersion.VersionString})";
+
     protected bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPubCredential credential)
     {
       return ParseCommonCommandLineArgs(ref args,
@@ -123,7 +125,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       var client = HatenaBlogAtomPubClient.Create(credential);
 
-      client.UserAgent = $"{AssemblyInfo.Name}/{AssemblyInfo.Version} ({AssemblyInfo.TargetFramework}; {Environment.OSVersion.VersionString})";
+      client.UserAgent = UserAgent;
 
       return client;
     }
@@ -187,6 +189,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
 
       Console.Error.WriteLine($"{AssemblyInfo.Name} {AssemblyInfo.SubName} version {informationalVersion} (for {AssemblyInfo.TargetFramework})");
+      Console.Error.WriteLine($"User-Agent: {UserAgent}");
       Console.Error.WriteLine();
       Console.Error.WriteLine("説明: " + GetDescription());
       Console.Error.WriteLine();
