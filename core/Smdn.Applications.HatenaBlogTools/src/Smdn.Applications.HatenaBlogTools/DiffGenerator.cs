@@ -147,7 +147,6 @@ namespace Smdn.Applications.HatenaBlogTools {
         else { // for windows
           var arguments = $"{commandArgs} \"{Path.GetFullPath(temporaryFilePathOriginal)}\" \"{Path.GetFullPath(temporaryFilePathModified)}\"";
 
-          Console.WriteLine(arguments);
           //psi = new ProcessStartInfo("cmd", string.Format("/c \"{0}\" {1}", command, arguments));
           psi = new ProcessStartInfo(command, arguments);
           psi.CreateNoWindow = true;
