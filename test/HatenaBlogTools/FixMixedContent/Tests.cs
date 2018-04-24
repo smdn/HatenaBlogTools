@@ -138,6 +138,44 @@ http://example.net/
     }
 
     [Test]
+    public void TestEditLocalContent_FixMixedContent_IncludeDomain()
+    {
+      const string input = @"
+<script src=""http://example.com/"">
+<script src=""http://example.net/"">
+<script src=""http://example.org/"">
+";
+      const string expectedOutput = @"
+<script src=""https://example.com/"">
+<script src=""https://example.net/"">
+<script src=""http://example.org/"">
+";
+
+      var output = EditLocalContent(input, new[] { "--fix-mixed-content", "--include-domain", "example.com", "--include-domain", "example.net" });
+
+      Assert.AreEqual(expectedOutput, output);
+    }
+
+    [Test]
+    public void TestEditLocalContent_FixMixedContent_ExcludeDomain()
+    {
+      const string input = @"
+<script src=""http://example.com/"">
+<script src=""http://example.net/"">
+<script src=""http://example.org/"">
+";
+      const string expectedOutput = @"
+<script src=""http://example.com/"">
+<script src=""http://example.net/"">
+<script src=""https://example.org/"">
+";
+
+      var output = EditLocalContent(input, new[] { "--fix-mixed-content", "--exclude-domain", "example.com", "--exclude-domain", "example.net" });
+
+      Assert.AreEqual(expectedOutput, output);
+    }
+
+    [Test]
     public void TestEditLocalContent_FixMixedContentAndBlogUrl()
     {
       const string input = @"
