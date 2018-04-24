@@ -59,6 +59,14 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
 
     public bool FixMixedContentReferences()
     {
+      return FixMixedContentReferences(attribute => true);
+    }
+
+    public bool FixMixedContentReferences(Predicate<HtmlAttribute> targetPredicate)
+    {
+      if (targetPredicate == null)
+        throw new ArgumentNullException(nameof(targetPredicate));
+
       var modified = false;
 
       foreach (var element in Elements) {
@@ -118,7 +126,8 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
           continue;
 
         foreach (var target in targets) {
-          target.Value = ReplaceSchemeToHttps(target.Value, regexReplaceAttributeReferenceToHttps, ref modified);
+          if (targetPredicate(target))
+            target.Value = ReplaceSchemeToHttps(target.Value, regexReplaceAttributeReferenceToHttps, ref modified);
         }
       } // for each element
 

@@ -160,6 +160,16 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       Assert.AreEqual(input, editor.ToString(), "modified content");
     }
 
+    [TestCase("<img src=\"http://example.com/test.dat\">", "<img src=\"https://example.com/test.dat\">")]
+    [TestCase("<img src=\"http://example.net/test.dat\">", "<img src=\"http://example.net/test.dat\">")]
+    public void TestFixMixedContentReferences_WithPredicate(string input, string expectedResult)
+    {
+      var editor = new HatenaBlogContentEditor(input);
+
+      editor.FixMixedContentReferences(attribute => attribute.Value.Contains("//example.com/"));
+
+      Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
+    }
 
 
     [TestCase("http://example.com/",
