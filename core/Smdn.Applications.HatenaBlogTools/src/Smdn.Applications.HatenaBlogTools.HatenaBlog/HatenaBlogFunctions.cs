@@ -87,14 +87,18 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       if (editor.Edit(entry, out string originalText, out string modifiedText)) {
         modified = true;
 
-        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("(変更あり)");
+        Console.ResetColor();
 
         diff.DisplayDifference(originalText, modifiedText);
 
         Console.WriteLine();
       }
       else {
+        Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("(変更なし)");
+        Console.ResetColor();
       }
 
       switch (postMode) {
