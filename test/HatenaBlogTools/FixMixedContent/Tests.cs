@@ -50,7 +50,8 @@ namespace Smdn.Applications.HatenaBlogTools {
             outputFile.FullName,
           };
 
-          mergedArgs.AddRange(args);
+          if (args != null)
+            mergedArgs.AddRange(args);
 
           (new FixMixedContent()).Run(mergedArgs.ToArray());
         });
@@ -69,7 +70,7 @@ http://example.com/
 http://example.com/
 ";
 
-      var output = EditLocalContent(input, new[] { "--custom-domain", "example.com" });
+      var output = EditLocalContent(input, null);
 
       Assert.AreEqual(expectedOutput, output);
     }
@@ -131,7 +132,7 @@ http://example.net/
 <script src=""https://example.net/"">
 ";
 
-      var output = EditLocalContent(input, new[] { "--fix-mixed-content", "--custom-domain", "example.com" });
+      var output = EditLocalContent(input, new[] { "--fix-mixed-content" });
 
       Assert.AreEqual(expectedOutput, output);
     }
@@ -185,7 +186,7 @@ http://example.net/
 <p><iframe class=""embed-card embed-webcard"" style=""display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"" title=""smdn:総武ソフトウェア推進所"" src=""https://hatenablog-parts.com/embed?url=http%3A%2F%2Fsmdn.jp%2F"" frameborder=""0"" scrolling=""no""></iframe><cite class=""hatena-citation""><a href=""http://smdn.jp/"">smdn.jp</a></cite></p>
 ";
 
-      var output = EditLocalContent(input, new[] { "--fix-mixed-content", "--custom-domain", "example.com" });
+      var output = EditLocalContent(input, new[] { "--fix-mixed-content" });
 
       Assert.AreEqual(expectedOutput, output);
     }
