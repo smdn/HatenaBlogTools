@@ -97,17 +97,17 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       if (requireHatenaBlogClient) {
         if (string.IsNullOrEmpty(hatenaId)) {
-          Usage("hatena-idを指定してください");
+          Usage("--idを指定してください");
           return false;
         }
 
         if (string.IsNullOrEmpty(blogId)) {
-          Usage("blog-idを指定してください");
+          Usage("--blog-idを指定してください");
           return false;
         }
 
         if (string.IsNullOrEmpty(apiKey)) {
-          Usage("api-keyを指定してください");
+          Usage("--api-keyを指定してください");
           return false;
         }
 
@@ -193,11 +193,11 @@ namespace Smdn.Applications.HatenaBlogTools {
       Console.Error.WriteLine();
       Console.Error.WriteLine("説明: " + GetDescription());
       Console.Error.WriteLine();
-      Console.Error.WriteLine($"使い方: {commandLine} --id <hatena-id> --blog-id <blog-id> --api-key <api-key> " + GetUsageExtraMandatoryOptions());
+      Console.Error.WriteLine($"使い方: {commandLine} --id <はてなID> --blog-id <ブログID> --api-key <APIキー> " + GetUsageExtraMandatoryOptions());
       Console.Error.WriteLine();
-      Console.Error.WriteLine("  <hatena-id> : はてなID");
-      Console.Error.WriteLine("  <blog-id>   : ブログID (xxx.hatenablog.jp, xxx.hateblo.jpなどのブログドメイン)");
-      Console.Error.WriteLine("  <api-key>   : AtomPub APIキー ( https://blog.hatena.ne.jp/my/config/detail より取得できます)");
+      Console.Error.WriteLine("  --id <はてなID>       : はてなID ( https://blog.hatena.ne.jp/-/config にて確認できます)");
+      Console.Error.WriteLine("  --blog-id <ブログID>  : ブログID (xxx.hatenablog.jp, xxx.hateblo.jpなどのブログドメイン)");
+      Console.Error.WriteLine("  --api-key <APIキー>   : AtomPub APIキー ( https://blog.hatena.ne.jp/my/config/detail より取得できます)");
       Console.Error.WriteLine();
 
       Console.Error.WriteLine("オプション:");
