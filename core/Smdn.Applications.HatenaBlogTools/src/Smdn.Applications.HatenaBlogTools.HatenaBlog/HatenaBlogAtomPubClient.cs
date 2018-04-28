@@ -103,6 +103,11 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
     /*
      * instance members
      */
+    public abstract string HatenaId { get; }
+    public abstract string BlogId { get; }
+    public abstract Uri RootEndPoint { get; }
+    public abstract string BlogTitle { get; }
+    public abstract Uri CollectionUri { get; }
     public abstract string UserAgent { get; set; }
 
     public abstract void WaitForCinnamon();
@@ -136,20 +141,17 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
   internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
     private readonly HatenaBlogAtomPubCredential credential;
 
-    public string HatenaId => credential.HatenaId;
-    public string BlogId => credential.BlogId;
+    public override string HatenaId => credential.HatenaId;
+    public override string BlogId => credential.BlogId;
 
-    public Uri RootEndPoint {
-      get; private set;
-    }
+    private readonly Uri rootEndPoint;
+    public override Uri RootEndPoint => rootEndPoint;
 
-    public string BlogTitle {
-      get; private set;
-    }
+    private string blogTitle;
+    public override string BlogTitle => blogTitle;
 
-    public Uri CollectionUri {
-      get; private set;
-    }
+    private Uri collectionUri;
+    public override Uri CollectionUri => collectionUri;
 
     private string userAgent;
 
@@ -176,7 +178,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
         throw new ArgumentNullException(nameof(credential));
 
       this.credential = credential;
-      this.RootEndPoint = GetRootEndPont(credential.HatenaId, credential.BlogId);
+      this.rootEndPoint = GetRootEndPont(credential.HatenaId, credential.BlogId);
     }
 
     public override void WaitForCinnamon()
@@ -211,16 +213,16 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       if (serviceDocument.Root.Name != AtomPub.ElementNames.AppService)
         throw new NotSupportedException($"unexpected document type: {serviceDocument.Root.Name}");
 
-      BlogTitle = serviceDocument.Root
-                                 .Element(AtomPub.ElementNames.AppWorkspace)
-                                 ?.Element(AtomPub.ElementNames.AtomTitle)
-                                 ?.Value;
+      this.blogTitle = serviceDocument.Root
+                                      .Element(AtomPub.ElementNames.AppWorkspace)
+                                      ?.Element(AtomPub.ElementNames.AtomTitle)
+                                      ?.Value;
 
-      CollectionUri = serviceDocument.Root
-                                     .Element(AtomPub.ElementNames.AppWorkspace)
-                                     ?.Elements(AtomPub.ElementNames.AppCollection)
-                                     ?.FirstOrDefault(e => e.Element(AtomPub.ElementNames.AppAccept).Value.Contains("type=entry"))
-                                     ?.GetAttributeValue("href", StringConversion.ToUri);
+      this.collectionUri = serviceDocument.Root
+                                          .Element(AtomPub.ElementNames.AppWorkspace)
+                                          ?.Elements(AtomPub.ElementNames.AppCollection)
+                                          ?.FirstOrDefault(e => e.Element(AtomPub.ElementNames.AppAccept).Value.Contains("type=entry"))
+                                          ?.GetAttributeValue("href", StringConversion.ToUri);
 
       return statusCode;
     }
@@ -389,6 +391,11 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       this.entries = entries;
     }
 
+    public override string HatenaId => string.Empty;
+    public override string BlogId => string.Empty;
+    public override Uri RootEndPoint => throw new NotImplementedException();
+    public override string BlogTitle => string.Empty;
+    public override Uri CollectionUri => throw new NotImplementedException();
     public override string UserAgent { get; set; }
 
     public override HttpStatusCode Login(out XDocument serviceDocument)
