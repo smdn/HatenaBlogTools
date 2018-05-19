@@ -51,7 +51,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       yield return "--from-file <ファイル> : 指定された<ファイル>の内容を本文として投稿します";
       yield return "--from-file -          : 標準入力に与えられた内容を本文として投稿します";
       yield return "";
-      yield return "--from-atom-file <ファイル> : Atomフィード形式のファイルに記載されている内容で投稿います";
+      yield return "--from-atom-file <ファイル> : Atomフィード形式のファイルに記載されている内容で投稿します";
       yield return "                              複数のエントリが記載されている場合は、それをすべて投稿します";
       yield return "                              既存のエントリの場合(メンバURIが定義されている場合)はエントリを更新します";
       yield return "                              このオプションを指定した場合、ほかのオプションによる投稿内容の";
