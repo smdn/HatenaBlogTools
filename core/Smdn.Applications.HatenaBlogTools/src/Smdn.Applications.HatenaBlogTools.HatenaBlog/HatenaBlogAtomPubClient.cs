@@ -72,6 +72,16 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
     }
   }
 
+  public class PostEntryFailedException : Exception {
+    public Entry CausedEntry { get; private set; }
+
+    public PostEntryFailedException(Entry causedEntry, Exception innerException)
+      : base("exception occured while posting entry", innerException)
+    {
+      this.CausedEntry = causedEntry;
+    }
+  }
+
   public abstract class HatenaBlogAtomPubClient {
     public static void InitializeHttpsServicePoint()
     {
@@ -324,19 +334,24 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
 
       responseDocument = null;
 
-      var putDocument = CreatePostDocument(updatingEntry);
+      try {
+        var putDocument = CreatePostDocument(updatingEntry);
 
-      if (updatingEntry.Author != null) {
-        putDocument.Root.Add(new XElement(
-          AtomPub.Namespaces.Atom + "author",
-          new XElement(
-            AtomPub.Namespaces.Atom + "name",
-            new XText(updatingEntry.Author)
-          )
-        ));
+        if (updatingEntry.Author != null) {
+          putDocument.Root.Add(new XElement(
+            AtomPub.Namespaces.Atom + "author",
+            new XElement(
+              AtomPub.Namespaces.Atom + "name",
+              new XText(updatingEntry.Author)
+            )
+          ));
+        }
+
+        return atom.Put(updatingEntry.MemberUri, putDocument, out responseDocument);
       }
-
-      return atom.Put(updatingEntry.MemberUri, putDocument, out responseDocument);
+      catch (Exception ex) {
+        throw new PostEntryFailedException(updatingEntry, ex);
+      }
     }
 
     public override HttpStatusCode PostEntry(Entry entry, out XDocument responseDocument)
@@ -344,7 +359,12 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       if (atom == null)
         throw new InvalidOperationException("not logged in");
 
-      return atom.Post(CollectionUri, CreatePostDocument(entry), out responseDocument);
+      try {
+        return atom.Post(CollectionUri, CreatePostDocument(entry), out responseDocument);
+      }
+      catch (Exception ex) {
+        throw new PostEntryFailedException(entry, ex);
+      }
     }
 
     private static XDocument CreatePostDocument(Entry postEntry)
