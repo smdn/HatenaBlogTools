@@ -432,7 +432,10 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
           ),
         new XElement(
           AtomPub.Namespaces.Atom + "content",
+#if false
           new XAttribute("type", postEntry.ContentType ?? EntryContentType.Default),
+#endif
+          new XAttribute("type", EntryContentType.Default),
           new XText(postEntry.Content)
         ),
         postEntry.Categories.Select(c => new XElement(
