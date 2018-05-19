@@ -36,12 +36,21 @@ using Smdn.Text;
 using Smdn.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
+  public static class EntryContentType {
+    public static readonly string Default = "text/plain";
+    public static readonly string HatenaSyntax = "text/x-hatena-syntax";
+    public static readonly string Markdown = "text/x-markdown";
+    public static readonly string Html = "text/html";
+  }
+
   public class Entry {
     public string Title;
     public HashSet<string> Categories = new HashSet<string>(StringComparer.Ordinal);
     public DateTimeOffset? Updated;
     public bool IsDraft;
+    public string Summary;
     public string Content;
+    public string ContentType;
   }
 
   public class PostedEntry : Entry {
@@ -293,7 +302,9 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
 
         e.Title = entry.Element(AtomPub.Namespaces.Atom + "title")?.Value;
         e.Author = entry.Element(AtomPub.Namespaces.Atom + "author")?.Element(AtomPub.Namespaces.Atom + "name")?.Value;
+        e.Summary = entry.Element(AtomPub.Namespaces.Atom + "summary")?.Value;
         e.Content = entry.Element(AtomPub.Namespaces.Atom + "content")?.Value;
+        e.ContentType = entry.Element(AtomPub.Namespaces.Atom + "content")?.GetAttributeValue("type");
         e.FormattedContent = entry.Element(AtomPub.Namespaces.Hatena + "formatted-content")?.Value;
 
         try {
@@ -385,9 +396,16 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
             new XText(XmlConvert.ToString(postEntry.Updated.Value))
           )
           : null,
+        postEntry.Summary == null
+          ? null
+          : new XElement(
+            AtomPub.Namespaces.Atom + "summary",
+            new XAttribute("type", "text"),
+            new XText(postEntry.Summary)
+          ),
         new XElement(
           AtomPub.Namespaces.Atom + "content",
-          new XAttribute("type", "text/plain"),
+          new XAttribute("type", postEntry.ContentType ?? EntryContentType.Default),
           new XText(postEntry.Content)
         ),
         postEntry.Categories.Select(c => new XElement(
