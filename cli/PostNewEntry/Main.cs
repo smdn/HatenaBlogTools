@@ -107,21 +107,31 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       Console.Write("投稿しています ... ");
 
-      var statusCode = hatenaBlog.PostEntry(entry, out XDocument responseDocument);
+      try {
+        var statusCode = hatenaBlog.PostEntry(entry, out XDocument responseDocument);
 
-      if (statusCode == HttpStatusCode.Created) {
-        var createdUri = responseDocument.Element(AtomPub.Namespaces.Atom + "entry")
-                                         ?.Elements(AtomPub.Namespaces.Atom + "link")
-                                         ?.FirstOrDefault(e => e.HasAttributeWithValue("rel", "alternate"))
-                                         ?.GetAttributeValue("href");
+        if (statusCode == HttpStatusCode.Created) {
+          var createdUri = responseDocument.Element(AtomPub.Namespaces.Atom + "entry")
+                                           ?.Elements(AtomPub.Namespaces.Atom + "link")
+                                           ?.FirstOrDefault(e => e.HasAttributeWithValue("rel", "alternate"))
+                                           ?.GetAttributeValue("href");
 
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("完了しました: {0}", createdUri);
-        Console.ResetColor();
+          Console.ForegroundColor = ConsoleColor.Green;
+          Console.WriteLine("完了しました: {0}", createdUri);
+          Console.ResetColor();
+        }
+        else {
+          Console.ForegroundColor = ConsoleColor.Red;
+          Console.Error.WriteLine("失敗しました: {0}", statusCode);
+          Console.ResetColor();
+        }
       }
-      else {
+      catch (PostEntryFailedException ex) {
+        Console.WriteLine();
+        Console.Error.WriteLine(ex);
+
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.Error.WriteLine("失敗しました: {0}", statusCode);
+        Console.Error.WriteLine("失敗しました");
         Console.ResetColor();
       }
     }
