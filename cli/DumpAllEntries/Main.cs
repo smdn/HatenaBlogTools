@@ -39,6 +39,7 @@ namespace Smdn.Applications.HatenaBlogTools {
   partial class DumpAllEntries : CliBase {
     private enum OutputFormat {
       Atom,
+      AtomPostData,
       MovableType,
       HatenaDiary,
 
@@ -69,11 +70,12 @@ namespace Smdn.Applications.HatenaBlogTools {
 #if RETRIEVE_COMMENTS
       yield return "-comment : dump comments posted on entry"
 #endif
-      yield return "--format [hatena|mt|atom]      : 出力形式を指定します";
-      yield return "                                 hatena : はてなダイアリー日記データ形式";
-      yield return "                                 mt     : Movable Type形式";
-      yield return "                                 atom   : Atomフィード形式";
-      yield return "　                               省略した場合はatomと同じ形式になります";
+      yield return "--format [hatena|mt|atom|atom-post]  : 出力形式を指定します";
+      yield return "                                       hatena     : はてなダイアリー日記データ形式";
+      yield return "                                       mt         : Movable Type形式";
+      yield return "                                       atom       : Atomフィード形式(取得できる全内容)";
+      yield return "                                       atom-post  : Atomフィード形式(投稿データのみ)";
+      yield return "　                                     省略した場合は'atom'と同じ形式になります";
       yield return "--exclude-category <カテゴリ>  : 指定された<カテゴリ>を除外してダンプします(複数指定可)";
       yield return "--include-category <カテゴリ>  : 指定された<カテゴリ>のみを抽出してダンプします(複数指定可)";
       yield return "[出力ファイル名|-]             : ダンプした内容を保存するファイル名を指定します";
@@ -108,6 +110,10 @@ namespace Smdn.Applications.HatenaBlogTools {
 
               case "atom":
                 outputFormat = OutputFormat.Atom;
+                break;
+
+              case "atom-post":
+                outputFormat = OutputFormat.AtomPostData;
                 break;
 
               default:
@@ -159,7 +165,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (!Login(credential, out HatenaBlogAtomPubClient hatenaBlog))
         return;
 
-      var outputDocument = DumpEntries(hatenaBlog, filterMode, categoriesToFilter, out List<PostedEntry> entries);
+      var outputDocument = DumpEntries(hatenaBlog, (outputFormat == OutputFormat.AtomPostData), filterMode, categoriesToFilter, out List<PostedEntry> entries);
 
       if (outputDocument == null)
         return;
@@ -180,6 +186,7 @@ namespace Smdn.Applications.HatenaBlogTools {
             break;
 
           case OutputFormat.Atom:
+          case OutputFormat.AtomPostData:
             outputDocument.Save(outputStream);
             break;
 
@@ -191,7 +198,11 @@ namespace Smdn.Applications.HatenaBlogTools {
       Console.Error.WriteLine("完了");
     }
 
-    private static XDocument DumpEntries(HatenaBlogAtomPubClient hatenaBlog, CategoryFilterMode filterMode, HashSet<string> categoriesToFilter, out List<PostedEntry> entries)
+    private static XDocument DumpEntries(HatenaBlogAtomPubClient hatenaBlog,
+                                         bool removeNonPostData,
+                                         CategoryFilterMode filterMode,
+                                         HashSet<string> categoriesToFilter,
+                                         out List<PostedEntry> entries)
     {
       var filteredEntries = new List<PostedEntry>();
 
@@ -237,7 +248,16 @@ namespace Smdn.Applications.HatenaBlogTools {
             break; // do nothing
         }
 
-        outputDocument.Root.Add(new XElement(entryElement));
+        var modifiedEntryElement = new XElement(entryElement);
+
+        if (removeNonPostData) {
+          modifiedEntryElement.Elements(AtomPub.Namespaces.Atom + "id").Remove();
+          modifiedEntryElement.Elements(AtomPub.Namespaces.Atom + "link").Remove();
+          modifiedEntryElement.Elements(AtomPub.Namespaces.App + "edited").Remove();
+          modifiedEntryElement.Elements(AtomPub.Namespaces.Hatena + "formatted-content").Remove();
+        }
+
+        outputDocument.Root.Add(modifiedEntryElement);
 
         filteredEntries.Add(postedEntry);
 
