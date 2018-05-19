@@ -111,47 +111,42 @@ namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
           }
         }
       }
-      catch (WebException ex) {
-        if (ex.Status == WebExceptionStatus.ProtocolError) {
-          var resp = ex.Response as HttpWebResponse;
+      catch (WebException ex) when (ex.Status == WebExceptionStatus.ProtocolError) {
+        var resp = ex.Response as HttpWebResponse;
 
-          Console.Error.WriteLine("{0} {1} ({2} {3})",
-                                  (int)resp.StatusCode,
-                                  resp.StatusDescription,
-                                  req.Method,
-                                  resp.ResponseUri);
+        Console.Error.WriteLine("{0} {1} ({2} {3})",
+                                (int)resp.StatusCode,
+                                resp.StatusDescription,
+                                req.Method,
+                                resp.ResponseUri);
 
 #if false
-          foreach (string h in resp.Headers.Keys) {
-            Console.Error.WriteLine("{0}: {1}", h, resp.Headers[h]);
-          }
+        foreach (string h in resp.Headers.Keys) {
+          Console.Error.WriteLine("{0}: {1}", h, resp.Headers[h]);
+        }
 #endif
 
-          // try read response body
-          // XXX: cannot read chunked response with GetResponseStream() (?)
-          // XXX: or cannot read empty response (?)
-          try {
-            using (var memoryStream = new MemoryStream()) {
-              using (var respStream = resp.GetResponseStream()) {
-                respStream.CopyTo(memoryStream);
-              }
+        // try read response body
+        // XXX: cannot read chunked response with GetResponseStream() (?)
+        // XXX: or cannot read empty response (?)
+        try {
+          using (var memoryStream = new MemoryStream()) {
+            using (var respStream = resp.GetResponseStream()) {
+              respStream.CopyTo(memoryStream);
+            }
 
-              memoryStream.Position = 0L;
+            memoryStream.Position = 0L;
 
-              using (var reader = new StreamReader(memoryStream, Encoding.UTF8)) {
-                Console.Error.WriteLine(reader.ReadToEnd());
-              }
+            using (var reader = new StreamReader(memoryStream, Encoding.UTF8)) {
+              Console.Error.WriteLine(reader.ReadToEnd());
             }
           }
-          catch {
-            // ignore exceptions
-          }
+        }
+        catch {
+          // ignore exceptions
+        }
 
-          return resp.StatusCode;
-        }
-        else {
-          throw;
-        }
+        return resp.StatusCode;
       }
     }
   }
