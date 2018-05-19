@@ -32,7 +32,7 @@ using Smdn.Net;
 
 namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
   public class AtomPubClient {
-    public static readonly int DefaultTimeoutMilliseconds = 60 * 1000;
+    public static readonly int DefaultTimeoutMilliseconds = 30 * 1000;
 
     private int timeout = DefaultTimeoutMilliseconds;
 
@@ -98,55 +98,75 @@ namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
       return req;
     }
 
-    private static HttpStatusCode GetResponse(HttpWebRequest req, out XDocument responseDocument)
+    private static readonly int maxTimeoutRetryCount = 3;
+
+    private static HttpStatusCode GetResponse(HttpWebRequest request, out XDocument responseDocument)
     {
       responseDocument = null;
 
-      try {
-        using (var resp = req.GetResponse() as HttpWebResponse) {
-          using (var respStream = resp.GetResponseStream()) {
-            responseDocument = XDocument.Load(respStream);
-
-            return resp.StatusCode;
-          }
-        }
-      }
-      catch (WebException ex) when (ex.Status == WebExceptionStatus.ProtocolError) {
-        var resp = ex.Response as HttpWebResponse;
-
-        Console.Error.WriteLine("{0} {1} ({2} {3})",
-                                (int)resp.StatusCode,
-                                resp.StatusDescription,
-                                req.Method,
-                                resp.ResponseUri);
+      for (var timeoutRetryCount = maxTimeoutRetryCount;;) {
+        try {
+          using (var response = GetResponseCore(request)) {
+            if (2 == ((int)response.StatusCode) / 100) { // 2XX
+              using (var responseStream = response.GetResponseStream()) {
+                responseDocument = XDocument.Load(responseStream);
+              }
+            }
+            else {
+              Console.Error.WriteLine("{0} {1} ({2} {3})",
+                                      (int)response.StatusCode,
+                                      response.StatusDescription,
+                                      response.Method,
+                                      response.ResponseUri);
 
 #if false
-        foreach (string h in resp.Headers.Keys) {
-          Console.Error.WriteLine("{0}: {1}", h, resp.Headers[h]);
-        }
+              foreach (string h in resp.Headers.Keys) {
+                Console.Error.WriteLine("{0}: {1}", h, resp.Headers[h]);
+              }
 #endif
+              // try read response body
+              // XXX: cannot read chunked response with GetResponseStream() (?)
+              // XXX: or cannot read empty response (?)
+              try {
+                using (var memoryStream = new MemoryStream()) {
+                  using (var respStream = response.GetResponseStream()) {
+                    respStream.CopyTo(memoryStream);
+                  }
 
-        // try read response body
-        // XXX: cannot read chunked response with GetResponseStream() (?)
-        // XXX: or cannot read empty response (?)
+                  memoryStream.Position = 0L;
+
+                  using (var reader = new StreamReader(memoryStream, Encoding.UTF8)) {
+                    Console.Error.WriteLine(reader.ReadToEnd());
+                  }
+                }
+              }
+              catch {
+                // ignore exceptions
+              }
+            }
+
+            return response.StatusCode;
+          } // using response
+        }
+        catch (TimeoutException) {
+          if (0 < timeoutRetryCount--)
+            continue;
+          else
+            throw;
+        }
+      }
+
+      HttpWebResponse GetResponseCore(HttpWebRequest req)
+      {
         try {
-          using (var memoryStream = new MemoryStream()) {
-            using (var respStream = resp.GetResponseStream()) {
-              respStream.CopyTo(memoryStream);
-            }
-
-            memoryStream.Position = 0L;
-
-            using (var reader = new StreamReader(memoryStream, Encoding.UTF8)) {
-              Console.Error.WriteLine(reader.ReadToEnd());
-            }
-          }
+          return req.GetResponse() as HttpWebResponse;
         }
-        catch {
-          // ignore exceptions
+        catch (WebException ex) when (ex.Status == WebExceptionStatus.Timeout) {
+          throw new TimeoutException("request timed out", ex);
         }
-
-        return resp.StatusCode;
+        catch (WebException ex) when (ex.Status == WebExceptionStatus.ProtocolError) {
+          return ex.Response as HttpWebResponse;
+        }
       }
     }
   }
