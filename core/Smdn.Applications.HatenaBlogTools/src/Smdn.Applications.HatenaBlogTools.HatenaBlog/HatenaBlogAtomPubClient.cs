@@ -51,6 +51,26 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
     public string Summary;
     public string Content;
     public string ContentType;
+
+    // default constructor
+    public Entry()
+    {
+    }
+
+    // copy constructor
+    public Entry(Entry baseEntry)
+    {
+      if (baseEntry == null)
+        throw new ArgumentNullException(nameof(baseEntry));
+
+      this.Title = baseEntry.Title;
+      this.Categories = new HashSet<string>(baseEntry.Categories, StringComparer.Ordinal);
+      this.Updated = baseEntry.Updated;
+      this.IsDraft = baseEntry.IsDraft;
+      this.Summary = baseEntry.Summary;
+      this.Content = baseEntry.Content;
+      this.ContentType = baseEntry.ContentType;
+    }
   }
 
   public class PostedEntry : Entry {
@@ -122,6 +142,13 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       return new PseudoHatenaBlogAtomPubClient(entries);
     }
 #endif
+
+    public static IEnumerable<PostedEntry> ReadEntriesFrom(XDocument document)
+    {
+      foreach (var entry in DefaultHatenaBlogAtomPubClient.ReadEntries(document)) {
+        yield return entry.Item1;
+      }
+    }
 
     /*
      * instance members
@@ -280,7 +307,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       }
     }
 
-    private static IEnumerable<Tuple<PostedEntry, XElement>> ReadEntries(XDocument doc)
+    internal static IEnumerable<Tuple<PostedEntry, XElement>> ReadEntries(XDocument doc)
     {
       return doc.Element(AtomPub.Namespaces.Atom + "feed")
                 ?.Elements(AtomPub.Namespaces.Atom + "entry")
