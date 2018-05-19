@@ -252,6 +252,8 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
 
         if (nextUri == null)
           break;
+
+        WaitForCinnamon();
       }
     }
 
