@@ -56,9 +56,7 @@ namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
 
     public HttpStatusCode Get(Uri requestUri, out XDocument responseDocument)
     {
-      var req = CreateRequest(WebRequestMethods.Http.Get, requestUri);
-
-      return GetResponse(req, out responseDocument);
+      return GetResponse(() => CreateRequest(WebRequestMethods.Http.Get, requestUri), out responseDocument);
     }
 
     public HttpStatusCode Post(Uri requestUri, XDocument requestDocument, out XDocument responseDocument)
@@ -73,15 +71,17 @@ namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
 
     private HttpStatusCode PostPut(string method, Uri requestUri, XDocument requestDocument, out XDocument responseDocument)
     {
-      var req = CreateRequest(method, requestUri);
+      return GetResponse(() => {
+        var req = CreateRequest(method, requestUri);
 
-      req.ContentType = "application/atom+xml";
+        req.ContentType = "application/atom+xml";
 
-      using (var reqStream = req.GetRequestStream()) {
-        requestDocument.Save(reqStream);
-      }
+        using (var reqStream = req.GetRequestStream()) {
+          requestDocument.Save(reqStream);
+        }
 
-      return GetResponse(req, out responseDocument);
+        return req;
+      }, out responseDocument);
     }
 
     private HttpWebRequest CreateRequest(string method, Uri requestUri)
@@ -100,13 +100,13 @@ namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
 
     private static readonly int maxTimeoutRetryCount = 3;
 
-    private static HttpStatusCode GetResponse(HttpWebRequest request, out XDocument responseDocument)
+    private static HttpStatusCode GetResponse(Func<HttpWebRequest> createRequest, out XDocument responseDocument)
     {
       responseDocument = null;
 
       for (var timeoutRetryCount = maxTimeoutRetryCount;;) {
         try {
-          using (var response = GetResponseCore(request)) {
+          using (var response = GetResponseCore(createRequest())) {
             if (2 == ((int)response.StatusCode) / 100) { // 2XX
               using (var responseStream = response.GetResponseStream()) {
                 responseDocument = XDocument.Load(responseStream);
