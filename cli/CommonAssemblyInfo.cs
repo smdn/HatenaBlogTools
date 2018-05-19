@@ -35,7 +35,7 @@ using System.Runtime.CompilerServices;
 
 internal static partial class AssemblyInfo {
   internal const string Name = "HatenaBlogTools";
-  internal const string Version = "2.1";
+  internal const string Version = "2.2";
   internal const string Copyright = "Copyright (C) 2013-2018 smdn";
 
   internal const string TargetFramework =
