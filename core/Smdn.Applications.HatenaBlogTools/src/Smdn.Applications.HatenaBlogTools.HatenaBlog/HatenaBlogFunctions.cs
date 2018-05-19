@@ -42,6 +42,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
                                            PostMode postMode,
                                            IHatenaBlogEntryEditor editor,
                                            IDiffGenerator diff,
+                                           Uri entryUrlSkipTo,
                                            Func<bool> confirmBeforePosting,
                                            out IReadOnlyList<PostedEntry> updatedEntries,
                                            out IReadOnlyList<PostedEntry> modifiedEntries)
@@ -53,6 +54,21 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       modifiedEntries = _modifiedEntries;
 
       foreach (var entry in hatenaBlog.EnumerateEntries()) {
+        if (entryUrlSkipTo != null) {
+          if (entry.EntryUri.Equals(entryUrlSkipTo)) {
+            entryUrlSkipTo = null;
+          }
+          else {
+            Console.Write("{0} \"{1}\" ", entry.EntryUri, entry.Title);
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("(スキップしました)");
+            Console.ResetColor();
+
+            continue;
+          }
+        }
+
         var statusCode = EditEntryContent(hatenaBlog,
                                           entry,
                                           postMode,
