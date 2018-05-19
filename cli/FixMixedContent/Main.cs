@@ -262,7 +262,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         Console.ResetColor();
       }
 
-      if (listFixedEntries && modifiedEntries != null) {
+      if (listFixedEntries && modifiedEntries != null && 0 < modifiedEntries.Count) {
         Console.WriteLine();
         Console.WriteLine("下記エントリに対して修正を行い再投稿しました。");
 
