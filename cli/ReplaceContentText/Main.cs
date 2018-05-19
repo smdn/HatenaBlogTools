@@ -161,16 +161,26 @@ namespace Smdn.Applications.HatenaBlogTools {
 
         Console.Error.WriteLine(ex);
 
+        Console.ForegroundColor = ConsoleColor.Red;
+
         if (ex.CausedEntry is PostedEntry entry)
           Console.WriteLine($"エントリの更新に失敗しました ({entry.EntryUri} \"{entry.Title}\")");
         else
           Console.WriteLine($"エントリの投稿に失敗しました");
+
+        Console.ResetColor();
       }
 
-      if (success)
+      if (success) {
+        Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("完了");
-      else
+        Console.ResetColor();
+      }
+      else {
+        Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("エラーにより中断しました");
+        Console.ResetColor();
+      }
     }
 
     private class EntryEditor : IHatenaBlogEntryEditor {
