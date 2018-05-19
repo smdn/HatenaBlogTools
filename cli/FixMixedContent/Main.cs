@@ -233,16 +233,32 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (!Login(credential, out HatenaBlogAtomPubClient hatenaBlog))
         return;
 
-      HatenaBlogFunctions.EditAllEntryContent(hatenaBlog,
-                                              postMode,
-                                              editor,
-                                              diffGenerator,
-                                              entryUrlSkipTo,
-                                              confirmBeforePosting,
-                                              out IReadOnlyList<PostedEntry> updatedEntries,
-                                              out IReadOnlyList<PostedEntry> modifiedEntries);
+      IList<PostedEntry> updatedEntries = null;
+      IList<PostedEntry> modifiedEntries = null;
+      var success = true;
 
-      if (listFixedEntries) {
+      try {
+        HatenaBlogFunctions.EditAllEntryContent(hatenaBlog,
+                                                postMode,
+                                                editor,
+                                                diffGenerator,
+                                                entryUrlSkipTo,
+                                                confirmBeforePosting,
+                                                ref updatedEntries,
+                                                ref modifiedEntries);
+      }
+      catch (PostEntryFailedException ex) {
+        success = false;
+
+        Console.Error.WriteLine(ex);
+
+        if (ex.CausedEntry is PostedEntry entry)
+          Console.WriteLine($"エントリの更新に失敗しました ({entry.EntryUri} \"{entry.Title}\")");
+        else
+          Console.WriteLine($"エントリの投稿に失敗しました");
+      }
+
+      if (listFixedEntries && modifiedEntries != null) {
         Console.WriteLine();
         Console.WriteLine("下記エントリに対して修正を行い再投稿しました。");
 
@@ -251,7 +267,10 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
-      Console.WriteLine("完了");
+      if (success)
+        Console.WriteLine("完了");
+      else
+        Console.WriteLine("エラーにより中断しました");
     }
 
     private static void EditContent(IHatenaBlogEntryEditor editor, string input, string output)
