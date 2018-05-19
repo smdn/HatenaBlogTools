@@ -51,6 +51,8 @@ namespace Smdn.Applications.HatenaBlogTools {
       yield return "--update-content            : 変更箇所がない場合でも常に再投稿して記事を更新します";
       yield return "                              ブログをHTTPS化している場合は、再投稿によりはてな記法等で埋め込まれたURLが更新されます";
       yield return "";
+      yield return "--entry-url-skip-to         : TODO";
+      yield return "";
       yield return "--list-fixed-entry          : すべての記事の更新を行ったあとに、再投稿した記事のURL一覧を表示します";
       yield return "";
       yield return "-n, --dry-run               : 修正した内容の確認だけ行い、再投稿を行いません";
@@ -86,6 +88,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       var fixMixedContentDomainsExclude = new HashSet<string>(StringComparer.Ordinal);
       bool fixBlogUrl = false;
       string customBlogDomain = null;
+      Uri entryUrlSkipTo = null;
       string diffCommand = null;
       string diffCommandArgs = null;
       bool testDiffCommand = false;
@@ -120,6 +123,10 @@ namespace Smdn.Applications.HatenaBlogTools {
 
           case "--custom-domain":
             customBlogDomain = args[++i];
+            break;
+
+          case "--entry-url-skip-to":
+            entryUrlSkipTo = new Uri(args[++i]);
             break;
 
           case "--diff-cmd":
@@ -230,6 +237,7 @@ namespace Smdn.Applications.HatenaBlogTools {
                                               postMode,
                                               editor,
                                               diffGenerator,
+                                              entryUrlSkipTo,
                                               confirmBeforePosting,
                                               out IReadOnlyList<PostedEntry> updatedEntries,
                                               out IReadOnlyList<PostedEntry> modifiedEntries);

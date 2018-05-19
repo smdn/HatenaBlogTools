@@ -146,6 +146,7 @@ namespace Smdn.Applications.HatenaBlogTools {
                                               postMode,
                                               editor,
                                               diffGenerator,
+                                              null,
                                               confirmBeforePosting,
                                               out _,
                                               out _);
