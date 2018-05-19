@@ -51,7 +51,8 @@ namespace Smdn.Applications.HatenaBlogTools {
       yield return "--update-content            : 変更箇所がない場合でも常に再投稿して記事を更新します";
       yield return "                              ブログをHTTPS化している場合は、再投稿によりはてな記法等で埋め込まれたURLが更新されます";
       yield return "";
-      yield return "--entry-url-skip-to         : TODO";
+      yield return "--entry-url-skip-to <URL>   : 指定されたURLのエントリまで処理をスキップします";
+      yield return "                              エラー等により中断した処理を途中から再開する場合などに指定してください";
       yield return "";
       yield return "--list-fixed-entry          : すべての記事の更新を行ったあとに、再投稿した記事のURL一覧を表示します";
       yield return "";
