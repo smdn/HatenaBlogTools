@@ -34,7 +34,18 @@ namespace Smdn.Applications.HatenaBlogTools {
   public class AbortCommandException : Exception { }
 
   abstract class CliBase {
-    private static string UserAgent => $"{AssemblyInfo.Name}/{AssemblyInfo.Version} ({AssemblyInfo.TargetFramework}; {Environment.OSVersion.VersionString})";
+    internal static class AssemblyInfo {
+      private static Assembly _Assembly { get; } = Assembly.GetEntryAssembly();
+
+      public static string Name => _Assembly.GetName().Name;
+      public static Version Version => _Assembly.GetName().Version;
+      public static string VersionMajorMinorString => $"{Version.Major}.{Version.Minor}";
+      public static string Title => _Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
+      public static string InformationalVersion => _Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+      public static string TargetFramework => _Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()?.FirstOrDefault(meta => meta.Key == "TargetFramework")?.Value;
+    }
+
+    private static string UserAgent => $"{AssemblyInfo.Title?.Replace(' ', '-')}/{AssemblyInfo.VersionMajorMinorString} ({AssemblyInfo.TargetFramework}; {Environment.OSVersion.VersionString})";
 
     protected bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPubCredential credential)
     {
@@ -174,7 +185,6 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
 
       var assm = Assembly.GetEntryAssembly();
-      var informationalVersion = (assm.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)[0] as AssemblyInformationalVersionAttribute).InformationalVersion;
 
       string commandLine = null;
 
@@ -188,7 +198,7 @@ namespace Smdn.Applications.HatenaBlogTools {
           break;
       }
 
-      Console.Error.WriteLine($"{AssemblyInfo.Name} {AssemblyInfo.SubName} version {informationalVersion} (for {AssemblyInfo.TargetFramework})");
+      Console.Error.WriteLine($"{AssemblyInfo.Title} version {AssemblyInfo.InformationalVersion}");
       Console.Error.WriteLine($"User-Agent: {UserAgent}");
       Console.Error.WriteLine();
       Console.Error.WriteLine("説明: " + GetDescription());
