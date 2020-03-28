@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>Smdn.Applications.HatenaBlogTools</AssemblyName>
+    <RootNamespace>Smdn.Applications.HatenaBlogTools</RootNamespace>
+    <VersionPrefix>3.0</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+    <BaseOutputPath>..\build\bin\</BaseOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Label="metadata">
+    <Title>Smdn.Applications.HatenaBlogTools</Title>
+    <Description>A library for HatenaBlogTools.</Description>
+    <Company>smdn:総武ソフトウェア推進所</Company>
+    <Copyright>Copyright © 2018 smdn</Copyright>
+
+    <!-- AssemblyInfo -->
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <InformationalVersion>$(VersionPrefix)$(VersionSuffix) ($(TargetFramework))</InformationalVersion>
+    <Product>$(AssemblyName)-$(InformationalVersion)</Product>
+
+    <!-- NuGet -->
+    <!--
+    <Authors>smdn</Authors>
+    <Owners>$(Authors)</Owners>
+    <PackageTags>smdn.jp;mono;netframework;dotnet-core;dotnet-standard</PackageTags>
+    <PackageProjectUrl>https://smdn.jp/works/tools/HatenaBlogTools/</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIconUrl>https://smdn.jp/works/libs/Smdn.dll/Smdn-3.0_64x64.png</PackageIconUrl>
+    -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Smdn" Version="3.0.0-beta*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\Smdn\Smdn.Core.Miscellaneous\src\Smdn\ConsoleUtils.cs">
+      <Link>ConsoleUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Smdn\Smdn.Core.Miscellaneous\src\Smdn.Net\WsseClient.cs">
+      <Link>WsseClient.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Smdn\Smdn.Xml.Xhtml\src\Smdn.Xml.Linq\Extensions.cs">
+      <Link>Extensions.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>
