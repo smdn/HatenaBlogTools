@@ -1,0 +1,40 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{6E15B0C0-3961-41D5-A334-3E2F504F86AD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{7A2838C7-2DED-4CAD-8354-18CF8844C51B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HatenaBlogTools.Tests", "test\HatenaBlogTools\HatenaBlogTools.Tests.csproj", "{FD5EEC9B-4C6C-4677-9398-2322F881C71E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smdn.Applications.HatenaBlogTools", "core\Smdn.Applications.HatenaBlogTools\src\Smdn.Applications.HatenaBlogTools.csproj", "{9182D313-0904-4813-A7F3-AA059F99D8B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smdn.Applications.HatenaBlogTools.Tests", "core\Smdn.Applications.HatenaBlogTools\test\Smdn.Applications.HatenaBlogTools.Tests.csproj", "{48F1AAD3-DB26-4BC6-AD3E-19F0CE1E429B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cli", "cli", "{65BC2C7C-E357-4745-89D0-8F34F40449D1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FD5EEC9B-4C6C-4677-9398-2322F881C71E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD5EEC9B-4C6C-4677-9398-2322F881C71E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD5EEC9B-4C6C-4677-9398-2322F881C71E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD5EEC9B-4C6C-4677-9398-2322F881C71E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9182D313-0904-4813-A7F3-AA059F99D8B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9182D313-0904-4813-A7F3-AA059F99D8B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9182D313-0904-4813-A7F3-AA059F99D8B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9182D313-0904-4813-A7F3-AA059F99D8B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48F1AAD3-DB26-4BC6-AD3E-19F0CE1E429B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48F1AAD3-DB26-4BC6-AD3E-19F0CE1E429B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48F1AAD3-DB26-4BC6-AD3E-19F0CE1E429B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48F1AAD3-DB26-4BC6-AD3E-19F0CE1E429B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FD5EEC9B-4C6C-4677-9398-2322F881C71E} = {7A2838C7-2DED-4CAD-8354-18CF8844C51B}
+		{9182D313-0904-4813-A7F3-AA059F99D8B0} = {6E15B0C0-3961-41D5-A334-3E2F504F86AD}
+		{48F1AAD3-DB26-4BC6-AD3E-19F0CE1E429B} = {7A2838C7-2DED-4CAD-8354-18CF8844C51B}
+	EndGlobalSection
+EndGlobal
