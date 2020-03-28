@@ -22,10 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\core\Smdn.Applications.HatenaBlogTools\src\Smdn.Applications.HatenaBlogTools.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Include="..\CliBase.cs">
       <Link>CliBase.cs</Link>
     </Compile>
