@@ -1,0 +1,33 @@
+<Project>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Smdn.Applications.HatenaBlogTools</RootNamespace>
+    <VersionPrefix>3.0</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+    <BaseOutputPath>..\..\build\bin\</BaseOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Label="metadata">
+    <Company>smdn:総武ソフトウェア推進所</Company>
+    <Copyright>Copyright © 2013-2020 smdn</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" >
+        <_Parameter1>TargetFramework</_Parameter1>
+        <_Parameter2>$(TargetFramework)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\core\Smdn.Applications.HatenaBlogTools\src\Smdn.Applications.HatenaBlogTools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\CliBase.cs">
+      <Link>CliBase.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>
