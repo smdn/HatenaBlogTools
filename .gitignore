@@ -3,5 +3,5 @@ bin/
 obj/
 *.userprefs
 .vs/
+packages/
 TestResult.xml
-

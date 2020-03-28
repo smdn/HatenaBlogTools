@@ -1,0 +1,10 @@
+* text=auto
+
+*.sln           text eol=crlf
+*.csproj        text eol=crlf
+*.vbproj        text eol=crlf
+*.resx          text eol=crlf
+*.dll.config    text eol=crlf
+*.Build.props   text eol=crlf
+*.Build.targets text eol=crlf
+
