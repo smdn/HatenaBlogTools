@@ -1,8 +1,5 @@
 // 
-// Author:
-//       smdn <smdn@smdn.jp>
-// 
-// Copyright (c) 2018 smdn
+// Copyright (c) 2018 smdn <smdn@smdn.jp>
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +19,4 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-
-[assembly: CLSCompliant(true)]
-
-internal static partial class AssemblyInfo {
-  internal const string Name = "Smdn.Applications.HatenaBlogTools";
-  internal const string Version = "2.0";
-  internal const string VersionSuffix = "";
-  internal const string Copyright = "Copyright (C) 2018 smdn";
-}
+[assembly: System.CLSCompliant(true)]
