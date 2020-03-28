@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>HatenaBlogTools.Tests</AssemblyName>
+    <RootNamespace>Smdn.Applications.HatenaBlogTools</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildRuntimeType)' == 'Mono'">
+    <!-- for MonoDevelop test runner -->
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="3.11.0" />
+    <PackageReference Include="NUnitLite" Version="3.11.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.11.2" />
+  </ItemGroup>
+  <ItemGroup Condition="$(TargetFramework.StartsWith('netcoreapp'))">
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\core\Smdn.Applications.HatenaBlogTools\src\Smdn.Applications.HatenaBlogTools.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\cli\CliBase.cs">
+      <Link>CliBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\cli\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\cli\FixMixedContent\Main.cs">
+      <Link>FixMixedContent\Main.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\Smdn\NUnit\NUnitLiteTestRunner.cs" Link="NUnitLiteTestRunner.cs" Condition="$(OutputType) == 'Exe'" />
+    <Compile Include="..\..\core\Smdn\NUnit\NUnitTestUtils.cs" Link="NUnitTestUtils.cs" />
+    <Compile Include="..\..\core\Smdn\NUnit\NUnitTestUtils.Encodings.cs" Link="NUnitTestUtils.Encodings.cs" />
+  </ItemGroup>
+</Project>
