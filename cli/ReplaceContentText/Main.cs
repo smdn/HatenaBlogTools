@@ -161,14 +161,16 @@ namespace Smdn.Applications.HatenaBlogTools {
       var success = true;
 
       try {
-        HatenaBlogFunctions.EditAllEntryContent(hatenaBlog,
-                                                postMode,
-                                                editor,
-                                                diffGenerator,
-                                                null,
-                                                confirmBeforePosting,
-                                                ref updatedEntries,
-                                                ref modifiedEntries);
+        HatenaBlogFunctions.EditAllEntry(
+          hatenaBlog,
+          postMode,
+          editor,
+          diffGenerator,
+          entryUrlSkipTo: null,
+          confirmBeforePosting,
+          ref updatedEntries,
+          ref modifiedEntries
+        );
       }
       catch (PostEntryFailedException ex) {
         success = false;

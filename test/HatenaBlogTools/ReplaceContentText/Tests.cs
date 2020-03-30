@@ -19,7 +19,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       IList<PostedEntry> updated = null;
       IList<PostedEntry> modified = null;
 
-      HatenaBlogFunctions.EditAllEntryContent(
+      HatenaBlogFunctions.EditAllEntry(
         hatenaBlog,
         HatenaBlogFunctions.PostMode.PostIfModified,
         editor,

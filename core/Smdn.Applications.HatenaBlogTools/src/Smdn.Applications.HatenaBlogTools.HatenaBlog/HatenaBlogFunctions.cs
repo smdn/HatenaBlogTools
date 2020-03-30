@@ -38,14 +38,16 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       PostIfModified,
     }
 
-    public static void EditAllEntryContent(HatenaBlogAtomPubClient hatenaBlog,
-                                           PostMode postMode,
-                                           IHatenaBlogEntryEditor editor,
-                                           IDiffGenerator diff,
-                                           Uri entryUrlSkipTo,
-                                           Func<bool> confirmBeforePosting,
-                                           ref IList<PostedEntry> updatedEntries,
-                                           ref IList<PostedEntry> modifiedEntries)
+    public static void EditAllEntry(
+      HatenaBlogAtomPubClient hatenaBlog,
+      PostMode postMode,
+      IHatenaBlogEntryEditor editor,
+      IDiffGenerator diff,
+      Uri entryUrlSkipTo,
+      Func<bool> confirmBeforePosting,
+      ref IList<PostedEntry> updatedEntries,
+      ref IList<PostedEntry> modifiedEntries
+    )
     {
       updatedEntries = new List<PostedEntry>();
       modifiedEntries = new List<PostedEntry>();
@@ -66,18 +68,20 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
           }
         }
 
-        var statusCode = EditEntryContent(hatenaBlog,
-                                          entry,
-                                          postMode,
-                                          editor,
-                                          diff,
-                                          confirmBeforePosting,
-                                          out var modified);
+        var statusCode = EditEntry(
+          hatenaBlog,
+          entry,
+          postMode,
+          editor,
+          diff,
+          confirmBeforePosting,
+          out var isModified
+        );
 
         if (statusCode == HttpStatusCode.OK) {
           updatedEntries.Add(entry);
 
-          if (modified)
+          if (isModified)
             modifiedEntries.Add(entry);
         }
 
@@ -85,20 +89,22 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       }
     }
 
-    public static HttpStatusCode EditEntryContent(HatenaBlogAtomPubClient hatenaBlog,
-                                                  PostedEntry entry,
-                                                  PostMode postMode,
-                                                  IHatenaBlogEntryEditor editor,
-                                                  IDiffGenerator diff,
-                                                  Func<bool> confirmBeforePosting,
-                                                  out bool modified)
+    public static HttpStatusCode EditEntry(
+      HatenaBlogAtomPubClient hatenaBlog,
+      PostedEntry entry,
+      PostMode postMode,
+      IHatenaBlogEntryEditor editor,
+      IDiffGenerator diff,
+      Func<bool> confirmBeforePosting,
+      out bool isModified
+    )
     {
       Console.Write("{0} \"{1}\" ", entry.EntryUri, entry.Title);
 
-      modified = false;
+      isModified = false;
 
       if (editor.Edit(entry, out var originalText, out var modifiedText)) {
-        modified = true;
+        isModified = true;
 
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("(変更あり)");
@@ -119,7 +125,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
           return (HttpStatusCode)0;
 
         case PostMode.PostIfModified:
-          if (modified)
+          if (isModified)
             break;
           else
             return (HttpStatusCode)0;
