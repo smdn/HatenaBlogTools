@@ -1,0 +1,140 @@
+using System;
+using System.Collections.Generic;
+using NUnit.Framework;
+
+using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+
+namespace Smdn.Applications.HatenaBlogTools {
+  [TestFixture]
+  public class ReplaceContentTextTests {
+#if DEBUG
+    private static void EditAllEntry(
+      IReadOnlyList<PostedEntry> entries,
+      IHatenaBlogEntryEditor editor,
+      out IList<PostedEntry> updatedEntries,
+      out IList<PostedEntry> modifiedEntries
+    )
+    {
+      var hatenaBlog = HatenaBlogAtomPubClient.Create(entries);
+      IList<PostedEntry> updated = null;
+      IList<PostedEntry> modified = null;
+
+      HatenaBlogFunctions.EditAllEntryContent(
+        hatenaBlog,
+        HatenaBlogFunctions.PostMode.PostIfModified,
+        editor,
+        DiffGenerator.Create(silent: true, null, null, null, null),
+        null,
+        null,
+        ref updated,
+        ref modified
+      );
+
+      updatedEntries = updated;
+      modifiedEntries = modified;
+    }
+
+    [Test]
+    public void TestReplaceContent()
+    {
+      var entries = new List<PostedEntry>() {
+        new PostedEntry() { Content = "foobar", Title = "foobar" },
+      };
+      var editor = new EntryEditor("foo", "bar");
+
+      EditAllEntry(
+        entries,
+        editor,
+        out _,
+        out var modifiedEntries
+      );
+
+      Assert.AreEqual(1, modifiedEntries.Count);
+      Assert.AreEqual("barbar", modifiedEntries[0].Content);
+      Assert.AreEqual("foobar", modifiedEntries[0].Title);
+    }
+
+    [Test]
+    public void TestReplaceContent_NotModified()
+    {
+      var entries = new List<PostedEntry>() {
+        new PostedEntry() { Content = "foobar", Title = "foobar" },
+      };
+      var editor = new EntryEditor("baz", "bar");
+
+      EditAllEntry(
+        entries,
+        editor,
+        out _,
+        out var modifiedEntries
+      );
+
+      Assert.AreEqual(0, modifiedEntries.Count);
+
+      Assert.AreEqual("foobar", entries[0].Content);
+      Assert.AreEqual("foobar", entries[0].Title);
+    }
+
+    [Test]
+    public void TestReplaceContentRegex()
+    {
+      var entries = new List<PostedEntry>() {
+        new PostedEntry() { Content = "foobar", Title = "foobar" },
+      };
+      var editor = new RegexEntryEditor(@"fo{2}", "bar");
+
+      EditAllEntry(
+        entries,
+        editor,
+        out _,
+        out var modifiedEntries
+      );
+
+      Assert.AreEqual(1, modifiedEntries.Count);
+      Assert.AreEqual("barbar", modifiedEntries[0].Content);
+      Assert.AreEqual("foobar", modifiedEntries[0].Title);
+    }
+
+    [Test]
+    public void TestReplaceContentRegex_NotModified()
+    {
+      var entries = new List<PostedEntry>() {
+        new PostedEntry() { Content = "foobar", Title = "foobar" },
+      };
+      var editor = new RegexEntryEditor(@"fo{3}", "bar");
+
+      EditAllEntry(
+        entries,
+        editor,
+        out _,
+        out var modifiedEntries
+      );
+
+      Assert.AreEqual(0, modifiedEntries.Count);
+
+      Assert.AreEqual("foobar", entries[0].Content);
+      Assert.AreEqual("foobar", entries[0].Title);
+    }
+
+    [Test]
+    public void TestReplaceContentRegex_WithReplaceString()
+    {
+      var entries = new List<PostedEntry>() {
+        new PostedEntry() { Content = "foobar", Title = "foobar" },
+      };
+      var editor = new RegexEntryEditor(@"(o+)", "<$1>");
+
+      EditAllEntry(
+        entries,
+        editor,
+        out _,
+        out var modifiedEntries
+      );
+
+      Assert.AreEqual(1, modifiedEntries.Count);
+      Assert.AreEqual("f<oo>bar", modifiedEntries[0].Content);
+      Assert.AreEqual("foobar", modifiedEntries[0].Title);
+    }
+#endif
+  }
+}

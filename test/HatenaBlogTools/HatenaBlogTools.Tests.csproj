@@ -31,5 +31,8 @@
     <Compile Include="..\..\core\Smdn\NUnit\NUnitLiteTestRunner.cs" Link="NUnitLiteTestRunner.cs" Condition="$(OutputType) == 'Exe'" />
     <Compile Include="..\..\core\Smdn\NUnit\NUnitTestUtils.cs" Link="NUnitTestUtils.cs" />
     <Compile Include="..\..\core\Smdn\NUnit\NUnitTestUtils.Encodings.cs" Link="NUnitTestUtils.Encodings.cs" />
+    <Compile Include="..\..\cli\ReplaceContentText\EntryEditor.cs">
+      <Link>ReplaceContentText\EntryEditor.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>
