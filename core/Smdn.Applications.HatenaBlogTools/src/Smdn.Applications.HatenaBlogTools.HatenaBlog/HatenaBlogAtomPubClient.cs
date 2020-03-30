@@ -116,9 +116,6 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
     {
       ServicePointManager.SecurityProtocol = SecurityProtocolType.SystemDefault;
 
-#if false
-      // Unhandled Exception: System.PlatformNotSupportedException?: The handler does not support custom handling of certificates with this combination of libcurl (7.58.0) and its SSL backend ("OpenSSL/1.1.0g").
-
       ServicePointManager.ServerCertificateValidationCallback = (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => {
         if (sslPolicyErrors == SslPolicyErrors.None) {
           return true;
@@ -129,7 +126,6 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
           return false;
         }
       };
-#endif
     }
 
     public static HatenaBlogAtomPubClient Create(HatenaBlogAtomPubCredential credential)
