@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <RootNamespace>Smdn.Applications.HatenaBlogTools</RootNamespace>
     <VersionPrefix>3.0</VersionPrefix>
