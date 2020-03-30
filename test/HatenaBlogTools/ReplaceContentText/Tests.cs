@@ -40,7 +40,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       var entries = new List<PostedEntry>() {
         new PostedEntry() { Content = "foobar", Title = "foobar" },
       };
-      var editor = new EntryEditor("foo", "bar");
+      var editor = new EntryEditor("foo", "bar", new EntryContentModifier());
 
       EditAllEntry(
         entries,
@@ -60,7 +60,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       var entries = new List<PostedEntry>() {
         new PostedEntry() { Content = "foobar", Title = "foobar" },
       };
-      var editor = new EntryEditor("baz", "bar");
+      var editor = new EntryEditor("baz", "bar", new EntryContentModifier());
 
       EditAllEntry(
         entries,
@@ -81,7 +81,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       var entries = new List<PostedEntry>() {
         new PostedEntry() { Content = "foobar", Title = "foobar" },
       };
-      var editor = new RegexEntryEditor(@"fo{2}", "bar");
+      var editor = new RegexEntryEditor(@"fo{2}", "bar", new EntryContentModifier());
 
       EditAllEntry(
         entries,
@@ -101,7 +101,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       var entries = new List<PostedEntry>() {
         new PostedEntry() { Content = "foobar", Title = "foobar" },
       };
-      var editor = new RegexEntryEditor(@"fo{3}", "bar");
+      var editor = new RegexEntryEditor(@"fo{3}", "bar", new EntryContentModifier());
 
       EditAllEntry(
         entries,
@@ -122,7 +122,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       var entries = new List<PostedEntry>() {
         new PostedEntry() { Content = "foobar", Title = "foobar" },
       };
-      var editor = new RegexEntryEditor(@"(o+)", "<$1>");
+      var editor = new RegexEntryEditor(@"(o+)", "<$1>", new EntryContentModifier());
 
       EditAllEntry(
         entries,
@@ -134,6 +134,91 @@ namespace Smdn.Applications.HatenaBlogTools {
       Assert.AreEqual(1, modifiedEntries.Count);
       Assert.AreEqual("f<oo>bar", modifiedEntries[0].Content);
       Assert.AreEqual("foobar", modifiedEntries[0].Title);
+    }
+
+
+
+
+    [Test]
+    public void TestReplaceTitle()
+    {
+      var entries = new List<PostedEntry>() {
+        new PostedEntry() { Content = "foobar", Title = "foobar" },
+      };
+      var editor = new EntryEditor("foo", "bar", new EntryTitleModifier());
+
+      EditAllEntry(
+        entries,
+        editor,
+        out _,
+        out var modifiedEntries
+      );
+
+      Assert.AreEqual(1, modifiedEntries.Count);
+      Assert.AreEqual("foobar", modifiedEntries[0].Content);
+      Assert.AreEqual("barbar", modifiedEntries[0].Title);
+    }
+
+    [Test]
+    public void TestReplaceTitle_NotModified()
+    {
+      var entries = new List<PostedEntry>() {
+        new PostedEntry() { Content = "foobar", Title = "foobar" },
+      };
+      var editor = new EntryEditor("baz", "bar", new EntryTitleModifier());
+
+      EditAllEntry(
+        entries,
+        editor,
+        out _,
+        out var modifiedEntries
+      );
+
+      Assert.AreEqual(0, modifiedEntries.Count);
+
+      Assert.AreEqual("foobar", entries[0].Content);
+      Assert.AreEqual("foobar", entries[0].Title);
+    }
+
+    [Test]
+    public void TestReplaceTitleRegex()
+    {
+      var entries = new List<PostedEntry>() {
+        new PostedEntry() { Content = "foobar", Title = "foobar" },
+      };
+      var editor = new RegexEntryEditor(@"fo{2}", "bar", new EntryTitleModifier());
+
+      EditAllEntry(
+        entries,
+        editor,
+        out _,
+        out var modifiedEntries
+      );
+
+      Assert.AreEqual(1, modifiedEntries.Count);
+      Assert.AreEqual("foobar", modifiedEntries[0].Content);
+      Assert.AreEqual("barbar", modifiedEntries[0].Title);
+    }
+
+    [Test]
+    public void TestReplaceTitleRegex_NotModified()
+    {
+      var entries = new List<PostedEntry>() {
+        new PostedEntry() { Content = "foobar", Title = "foobar" },
+      };
+      var editor = new RegexEntryEditor(@"fo{3}", "bar", new EntryTitleModifier());
+
+      EditAllEntry(
+        entries,
+        editor,
+        out _,
+        out var modifiedEntries
+      );
+
+      Assert.AreEqual(0, modifiedEntries.Count);
+
+      Assert.AreEqual("foobar", entries[0].Content);
+      Assert.AreEqual("foobar", entries[0].Title);
     }
 #endif
   }

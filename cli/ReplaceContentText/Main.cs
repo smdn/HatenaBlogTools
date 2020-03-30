@@ -38,6 +38,8 @@ namespace Smdn.Applications.HatenaBlogTools {
       yield return "--from <置換前の文字列>    : 置換したい文字列を指定します";
       yield return "--to <置換後の文字列>      : 置換後の文字列を指定します";
       yield return "--regex                    : --fromおよび--toで指定された文字列を正規表現として解釈します";
+      yield return "--replace-title-only       : 記事のタイトルのみを置換します";
+      yield return "                             (デフォルトでは本文のみを置換します)";
       yield return "-n, --dry-run              : 置換結果の確認だけ行い、再投稿を行いません";
       yield return "-i, --interactive          : 置換結果の再投稿を行う前に確認を行います";
       yield return "";
@@ -59,6 +61,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       string replaceFromText = null;
       string replaceToText = null;
       bool replaceAsRegex = false;
+      bool replaceTitleInsteadOfContent = false;
       string diffCommand = null;
       string diffCommandArgs = null;
       bool testDiffCommand = false;
@@ -94,6 +97,10 @@ namespace Smdn.Applications.HatenaBlogTools {
             testDiffCommand = true;
             break;
 
+          case "--replace-title-only":
+            replaceTitleInsteadOfContent = true;
+            break;
+
           case "--dry-run":
           case "-n":
             dryrun = true;
@@ -106,11 +113,15 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
+      var descriptionOfReplacementTarget = replaceTitleInsteadOfContent
+        ? "タイトル"
+        : "本文";
+
       var diffGenerator = DiffGenerator.Create(false,
                                                diffCommand,
                                                diffCommandArgs,
-                                               "置換前の本文",
-                                               "置換後の本文");
+                                               $"置換前の{descriptionOfReplacementTarget}",
+                                               $"置換前の{descriptionOfReplacementTarget}");
 
       if (testDiffCommand) {
         DiffGenerator.Test(diffGenerator);
@@ -125,9 +136,13 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (replaceToText == null)
         replaceToText = string.Empty; // delete
 
+      var modifier = replaceTitleInsteadOfContent
+        ? (EntryTextModifier)new EntryTitleModifier()
+        : (EntryTextModifier)new EntryContentModifier();
+
       var editor = replaceAsRegex
-        ? (IHatenaBlogEntryEditor)new RegexEntryEditor(replaceFromText, replaceToText)
-        : (IHatenaBlogEntryEditor)new EntryEditor(replaceFromText, replaceToText);
+        ? (IHatenaBlogEntryEditor)new RegexEntryEditor(replaceFromText, replaceToText, modifier)
+        : (IHatenaBlogEntryEditor)new EntryEditor(replaceFromText, replaceToText, modifier);
 
       var postMode = dryrun
         ? HatenaBlogFunctions.PostMode.PostNever

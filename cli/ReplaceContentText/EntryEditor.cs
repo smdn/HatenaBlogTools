@@ -31,57 +31,46 @@ namespace Smdn.Applications.HatenaBlogTools {
   class EntryEditor : IHatenaBlogEntryEditor {
     private readonly string replaceFrom;
     private readonly string replaceTo;
+    private readonly EntryTextModifier entryTextModifier;
 
-    public EntryEditor(string replaceFrom, string replaceTo)
+    public EntryEditor(string replaceFrom, string replaceTo, EntryTextModifier entryTextModifier)
     {
       this.replaceFrom = replaceFrom;
       this.replaceTo = replaceTo;
+      this.entryTextModifier = entryTextModifier ?? throw new ArgumentNullException(nameof(entryTextModifier));
     }
 
     public bool Edit(PostedEntry entry, out string originalText, out string modifiedText)
     {
-      originalText = entry.Content;
-      modifiedText = originalText.Replace(replaceFrom, replaceTo);
-
-      if (originalText.Length == modifiedText.Length &&
-          string.Equals(originalText, modifiedText, StringComparison.Ordinal)) {
-        // not modified
-        return false;
-      }
-      else {
-        entry.Content = modifiedText;
-
-        return true;
-      }
+      return entryTextModifier.Modify(
+        entry: entry,
+        modifier: original => original.Replace(replaceFrom, replaceTo),
+        out originalText,
+        out modifiedText
+      );
     }
   }
 
   class RegexEntryEditor : IHatenaBlogEntryEditor {
     private readonly Regex regexToReplace;
     private readonly string replacement;
+    private readonly EntryTextModifier entryTextModifier;
 
-    public RegexEntryEditor(string regexToReplace, string replacement)
+    public RegexEntryEditor(string regexToReplace, string replacement, EntryTextModifier entryTextModifier)
     {
       this.regexToReplace = new Regex(regexToReplace, RegexOptions.Multiline);
       this.replacement = replacement;
+      this.entryTextModifier = entryTextModifier ?? throw new ArgumentNullException(nameof(entryTextModifier));
     }
 
     public bool Edit(PostedEntry entry, out string originalText, out string modifiedText)
     {
-      var modified = false;
-
-      originalText = entry.Content;
-
-      modifiedText = regexToReplace.Replace(originalText, (match) => {
-        modified |= true;
-
-        return match.Result(replacement);
-      });
-
-      if (modified)
-        entry.Content = modifiedText;
-
-      return modified;
+      return entryTextModifier.Modify(
+        entry: entry,
+        modifier: original => regexToReplace.Replace(original, match => match.Result(replacement)),
+        out originalText,
+        out modifiedText
+      );
     }
   }
 }
