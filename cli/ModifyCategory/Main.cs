@@ -38,8 +38,8 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public CategoryModification(CategorySet old, CategorySet @new)
     {
-      this.Old = old;
-      this.New = @new;
+      this.Old = old ?? throw new ArgumentNullException(nameof(old));
+      this.New = @new ?? throw new ArgumentNullException(nameof(old));
     }
 
     public void Apply(CategorySet categories)
