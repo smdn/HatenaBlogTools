@@ -14,7 +14,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       );
       Assert.AreEqual(
         "03/31/2020 01:01:02 AM",
-        MovableTypeFormats.ToDateString(new DateTime(2020, 3, 31, 1, 1, 2)))
+        MovableTypeFormats.ToDateString(new DateTime(2020, 3, 31, 1, 1, 2))
       );
       Assert.AreEqual(
         "03/31/2020 11:01:02 AM",
