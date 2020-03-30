@@ -37,7 +37,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [Test]
     public void TestReplaceContent()
     {
-      var entries = new List<PostedEntry>() {
+      var entries = new [] {
         new PostedEntry() { Content = "foobar", Title = "foobar" },
       };
       var editor = new EntryEditor("foo", "bar", new EntryContentModifier());
@@ -57,7 +57,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [Test]
     public void TestReplaceContent_NotModified()
     {
-      var entries = new List<PostedEntry>() {
+      var entries = new [] {
         new PostedEntry() { Content = "foobar", Title = "foobar" },
       };
       var editor = new EntryEditor("baz", "bar", new EntryContentModifier());
@@ -78,7 +78,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [Test]
     public void TestReplaceContentRegex()
     {
-      var entries = new List<PostedEntry>() {
+      var entries = new [] {
         new PostedEntry() { Content = "foobar", Title = "foobar" },
       };
       var editor = new RegexEntryEditor(@"fo{2}", "bar", new EntryContentModifier());
@@ -98,7 +98,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [Test]
     public void TestReplaceContentRegex_NotModified()
     {
-      var entries = new List<PostedEntry>() {
+      var entries = new [] {
         new PostedEntry() { Content = "foobar", Title = "foobar" },
       };
       var editor = new RegexEntryEditor(@"fo{3}", "bar", new EntryContentModifier());
@@ -119,7 +119,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [Test]
     public void TestReplaceContentRegex_WithReplaceString()
     {
-      var entries = new List<PostedEntry>() {
+      var entries = new [] {
         new PostedEntry() { Content = "foobar", Title = "foobar" },
       };
       var editor = new RegexEntryEditor(@"(o+)", "<$1>", new EntryContentModifier());
@@ -142,7 +142,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [Test]
     public void TestReplaceTitle()
     {
-      var entries = new List<PostedEntry>() {
+      var entries = new [] {
         new PostedEntry() { Content = "foobar", Title = "foobar" },
       };
       var editor = new EntryEditor("foo", "bar", new EntryTitleModifier());
@@ -162,7 +162,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [Test]
     public void TestReplaceTitle_NotModified()
     {
-      var entries = new List<PostedEntry>() {
+      var entries = new [] {
         new PostedEntry() { Content = "foobar", Title = "foobar" },
       };
       var editor = new EntryEditor("baz", "bar", new EntryTitleModifier());
@@ -183,7 +183,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [Test]
     public void TestReplaceTitleRegex()
     {
-      var entries = new List<PostedEntry>() {
+      var entries = new [] {
         new PostedEntry() { Content = "foobar", Title = "foobar" },
       };
       var editor = new RegexEntryEditor(@"fo{2}", "bar", new EntryTitleModifier());
@@ -203,7 +203,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     [Test]
     public void TestReplaceTitleRegex_NotModified()
     {
-      var entries = new List<PostedEntry>() {
+      var entries = new [] {
         new PostedEntry() { Content = "foobar", Title = "foobar" },
       };
       var editor = new RegexEntryEditor(@"fo{3}", "bar", new EntryTitleModifier());
