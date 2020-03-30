@@ -45,12 +45,12 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       IDiffGenerator diff,
       Uri entryUrlSkipTo,
       Func<bool> confirmBeforePosting,
-      ref IList<PostedEntry> updatedEntries,
-      ref IList<PostedEntry> modifiedEntries
+      out IReadOnlyList<PostedEntry> updatedEntries,
+      out IReadOnlyList<PostedEntry> modifiedEntries
     )
     {
-      updatedEntries = new List<PostedEntry>();
-      modifiedEntries = new List<PostedEntry>();
+      var entriesUpdated = new List<PostedEntry>();
+      var entriesModified = new List<PostedEntry>();
 
       foreach (var entry in hatenaBlog.EnumerateEntries()) {
         if (entryUrlSkipTo != null) {
@@ -79,14 +79,17 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
         );
 
         if (statusCode == HttpStatusCode.OK) {
-          updatedEntries.Add(entry);
+          entriesUpdated.Add(entry);
 
           if (isModified)
-            modifiedEntries.Add(entry);
+            entriesModified.Add(entry);
         }
 
         hatenaBlog.WaitForCinnamon();
       }
+
+      updatedEntries = entriesUpdated;
+      modifiedEntries = entriesModified;
     }
 
     public static HttpStatusCode EditEntry(

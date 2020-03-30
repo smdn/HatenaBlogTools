@@ -156,8 +156,6 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (!Login(credential, out var hatenaBlog))
         return;
 
-      IList<PostedEntry> updatedEntries = null;
-      IList<PostedEntry> modifiedEntries = null;
       var success = true;
 
       try {
@@ -168,8 +166,8 @@ namespace Smdn.Applications.HatenaBlogTools {
           diffGenerator,
           entryUrlSkipTo: null,
           confirmBeforePosting,
-          ref updatedEntries,
-          ref modifiedEntries
+          out _,
+          out _
         );
       }
       catch (PostEntryFailedException ex) {

@@ -11,13 +11,11 @@ namespace Smdn.Applications.HatenaBlogTools {
     private static void EditAllEntry(
       IReadOnlyList<PostedEntry> entries,
       IHatenaBlogEntryEditor editor,
-      out IList<PostedEntry> updatedEntries,
-      out IList<PostedEntry> modifiedEntries
+      out IReadOnlyList<PostedEntry> updatedEntries,
+      out IReadOnlyList<PostedEntry> modifiedEntries
     )
     {
       var hatenaBlog = HatenaBlogAtomPubClient.Create(entries);
-      IList<PostedEntry> updated = null;
-      IList<PostedEntry> modified = null;
 
       HatenaBlogFunctions.EditAllEntry(
         hatenaBlog,
@@ -26,12 +24,9 @@ namespace Smdn.Applications.HatenaBlogTools {
         DiffGenerator.Create(silent: true, null, null, null, null),
         null,
         null,
-        ref updated,
-        ref modified
+        out updatedEntries,
+        out modifiedEntries
       );
-
-      updatedEntries = updated;
-      modifiedEntries = modified;
     }
 
     [Test]
