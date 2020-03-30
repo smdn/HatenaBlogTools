@@ -271,14 +271,6 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     private static void SaveAsMovableType(IEnumerable<PostedEntry> entries, Stream outputStream, string blogId, bool retrieveComments)
     {
-      /*
-       * http://www.movabletype.jp/documentation/appendices/import-export-format.html
-       */
-      string ToMovableTypeDateString(DateTime dateTime)
-      {
-        return dateTime.ToString("MM/dd/yyyy hh\\:mm\\:ss tt", System.Globalization.CultureInfo.InvariantCulture);
-      }
-
       var writer = new StreamWriter(outputStream, Encoding.UTF8);
 
       writer.NewLine = "\n"; // ???
@@ -299,7 +291,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         writer.WriteLine("CONVERT BREAKS: 0");
 
         if (entry.Updated.HasValue)
-          writer.WriteLine(string.Concat("DATE: ", ToMovableTypeDateString(entry.Updated.Value.LocalDateTime)));
+          writer.WriteLine(string.Concat("DATE: ", MovableTypeFormats.ToDateString(entry.Updated.Value.LocalDateTime)));
 
         var tags = entry.Categories
                         .Select(tag => tag.Contains(" ") ? string.Concat("\"", tag, "\"") : tag);
