@@ -33,8 +33,8 @@ using CategorySet = System.Collections.Generic.HashSet<string>;
 
 namespace Smdn.Applications.HatenaBlogTools {
   class CategoryModification {
-    public CategorySet Old { get; private set; }
-    public CategorySet New { get; private set; }
+    public CategorySet Old { get; }
+    public CategorySet New { get; }
 
     public CategoryModification(CategorySet old, CategorySet @new)
     {

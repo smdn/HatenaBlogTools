@@ -84,10 +84,10 @@ namespace Smdn.Applications.HatenaBlogTools.Html {
   }
 
   public class HtmlElement : HtmlNode {
-    public string LocalName { get; private set; }
-    public IReadOnlyList<HtmlAttribute> Attributes { get; private set; }
+    public string LocalName { get; }
+    public IReadOnlyList<HtmlAttribute> Attributes { get; }
 
-    internal Match Match { get; private set; }
+    internal Match Match { get; }
     private readonly string elementClose;
 
     internal HtmlElement(string localName, Match match, List<HtmlAttribute> attributes, string elementClose)

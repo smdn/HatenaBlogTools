@@ -82,9 +82,9 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
   }
 
   public class HatenaBlogAtomPubCredential {
-    public string HatenaId { get; private set; }
-    public string BlogId { get; private set; }
-    public string ApiKey { get; private set; }
+    public string HatenaId { get; }
+    public string BlogId { get; }
+    public string ApiKey { get; }
 
     public HatenaBlogAtomPubCredential(string hatenaId, string blogId, string apiKey)
     {
@@ -102,7 +102,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
   }
 
   public class PostEntryFailedException : Exception {
-    public Entry CausedEntry { get; private set; }
+    public Entry CausedEntry { get; }
 
     public PostEntryFailedException(Entry causedEntry, Exception innerException)
       : base("exception occured while posting entry", innerException)
