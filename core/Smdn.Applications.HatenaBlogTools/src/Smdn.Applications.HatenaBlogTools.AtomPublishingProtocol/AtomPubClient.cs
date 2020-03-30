@@ -40,7 +40,7 @@ namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
       get { return timeout; }
       set {
         if (value < -1)
-          throw new ArgumentOutOfRangeException("Timeout", value, "must be greater than or equals to -1");
+          throw ExceptionUtils.CreateArgumentMustBeGreaterThanOrEqualTo(-1, nameof(Timeout), value);
 
         timeout = value;
       }
