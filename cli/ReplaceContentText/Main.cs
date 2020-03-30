@@ -24,7 +24,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 
@@ -52,7 +51,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     public void Run(string[] args)
     {
       if (!ParseCommonCommandLineArgs(ref args,
-                                      new[] {"-diff-test"},
+                                      new[] { "-diff-test" },
                                       out var credential)) {
         return;
       }
@@ -180,63 +179,6 @@ namespace Smdn.Applications.HatenaBlogTools {
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("エラーにより中断しました");
         Console.ResetColor();
-      }
-    }
-
-    private class EntryEditor : IHatenaBlogEntryEditor {
-      private readonly string replaceFrom;
-      private readonly string replaceTo;
-
-      public EntryEditor(string replaceFrom, string replaceTo)
-      {
-        this.replaceFrom = replaceFrom;
-        this.replaceTo = replaceTo;
-      }
-
-      public bool Edit(PostedEntry entry, out string originalText, out string modifiedText)
-      {
-        originalText = entry.Content;
-        modifiedText = originalText.Replace(replaceFrom, replaceTo);
-
-        if (originalText.Length == modifiedText.Length &&
-            string.Equals(originalText, modifiedText, StringComparison.Ordinal)) {
-          // not modified
-          return false;
-        }
-        else {
-          entry.Content = modifiedText;
-
-          return true;
-        }
-      }
-    }
-
-    private class RegexEntryEditor : IHatenaBlogEntryEditor {
-      private readonly Regex regexToReplace;
-      private readonly string replacement;
-
-      public RegexEntryEditor(string regexToReplace, string replacement)
-      {
-        this.regexToReplace = new Regex(regexToReplace, RegexOptions.Multiline);
-        this.replacement = replacement;
-      }
-
-      public bool Edit(PostedEntry entry, out string originalText, out string modifiedText)
-      {
-        var modified = false;
-
-        originalText = entry.Content;
-
-        modifiedText = regexToReplace.Replace(originalText, (match) => {
-          modified |= true;
-
-          return match.Result(replacement);
-        });
-
-        if (modified)
-          entry.Content = modifiedText;
-
-        return modified;
       }
     }
   }
