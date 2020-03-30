@@ -72,7 +72,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
                                           editor,
                                           diff,
                                           confirmBeforePosting,
-                                          out bool modified);
+                                          out var modified);
 
         if (statusCode == HttpStatusCode.OK) {
           updatedEntries.Add(entry);
@@ -97,7 +97,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
 
       modified = false;
 
-      if (editor.Edit(entry, out string originalText, out string modifiedText)) {
+      if (editor.Edit(entry, out var originalText, out var modifiedText)) {
         modified = true;
 
         Console.ForegroundColor = ConsoleColor.Red;

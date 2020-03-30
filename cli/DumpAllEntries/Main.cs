@@ -84,7 +84,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public void Run(string[] args)
     {
-      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubCredential credential))
+      if (!ParseCommonCommandLineArgs(ref args, out var credential))
         return;
 
       bool retrieveComments = false;
@@ -162,10 +162,10 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
-      if (!Login(credential, out HatenaBlogAtomPubClient hatenaBlog))
+      if (!Login(credential, out var hatenaBlog))
         return;
 
-      var outputDocument = DumpEntries(hatenaBlog, (outputFormat == OutputFormat.AtomPostData), filterMode, categoriesToFilter, out List<PostedEntry> entries);
+      var outputDocument = DumpEntries(hatenaBlog, (outputFormat == OutputFormat.AtomPostData), filterMode, categoriesToFilter, out var entries);
 
       if (outputDocument == null)
         return;

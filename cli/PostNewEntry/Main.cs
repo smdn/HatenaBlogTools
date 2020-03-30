@@ -60,7 +60,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public void Run(string[] args)
     {
-      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubCredential credential))
+      if (!ParseCommonCommandLineArgs(ref args, out var credential))
         return;
 
       var entry = new Entry();
@@ -131,7 +131,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         postingEntries.Sort((e1, e2) => DateTimeOffset.Compare(e1.Updated ?? DateTimeOffset.MinValue, e2.Updated ?? DateTimeOffset.MinValue));
       }
 
-      if (!Login(credential, out HatenaBlogAtomPubClient hatenaBlog))
+      if (!Login(credential, out var hatenaBlog))
         return;
 
       var failedEntries = new List<Entry>();

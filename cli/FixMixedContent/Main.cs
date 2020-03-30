@@ -79,7 +79,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     {
       if (!ParseCommonCommandLineArgs(ref args,
                                       new[] { "--diff-test", "--input-content", "--output-content" },
-                                      out HatenaBlogAtomPubCredential credential)) {
+                                      out var credential)) {
         return;
       }
 
@@ -231,7 +231,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (confirm)
         confirmBeforePosting = () => ConsoleUtils.AskYesNo(false, "更新しますか");
 
-      if (!Login(credential, out HatenaBlogAtomPubClient hatenaBlog))
+      if (!Login(credential, out var hatenaBlog))
         return;
 
       IList<PostedEntry> updatedEntries = null;
@@ -300,8 +300,8 @@ namespace Smdn.Applications.HatenaBlogTools {
       using (var inputStream = IsStdIO(input) ? Console.OpenStandardInput() : File.OpenRead(input)) {
         var reader = new StreamReader(inputStream, false);
         var modified = editor.Edit(new PostedEntry() { Content = reader.ReadToEnd() },
-                                   out string originalText,
-                                   out string modifiedText);
+                                   out var originalText,
+                                   out var modifiedText);
 
         using (var outputStream = IsStdIO(output) ? Console.OpenStandardOutput() : File.Create(output)) {
           var writer = new StreamWriter(outputStream, encoding);

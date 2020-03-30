@@ -96,7 +96,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public void Run(string[] args)
     {
-      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubCredential credential))
+      if (!ParseCommonCommandLineArgs(ref args, out var credential))
         return;
 
       bool dryrun = false;
@@ -142,7 +142,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       Console.WriteLine();
 
-      if (!Login(credential, out HatenaBlogAtomPubClient hatenaBlog))
+      if (!Login(credential, out var hatenaBlog))
         return;
 
       Console.WriteLine("エントリを取得中 ...");

@@ -42,7 +42,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     public void Run(string[] args)
     {
-      if (!ParseCommonCommandLineArgs(ref args, out HatenaBlogAtomPubCredential credential))
+      if (!ParseCommonCommandLineArgs(ref args, out var credential))
         return;
 
       bool verbose = false;
@@ -58,7 +58,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       var hatenaBlog = CreateClient(credential);
 
-      var statusCode = hatenaBlog.Login(out XDocument serviceDocument);
+      var statusCode = hatenaBlog.Login(out var serviceDocument);
 
       if (statusCode == HttpStatusCode.OK) {
         Console.ForegroundColor = ConsoleColor.Green;

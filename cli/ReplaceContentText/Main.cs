@@ -53,7 +53,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     {
       if (!ParseCommonCommandLineArgs(ref args,
                                       new[] {"-diff-test"},
-                                      out HatenaBlogAtomPubCredential credential)) {
+                                      out var credential)) {
         return;
       }
 
@@ -139,7 +139,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (confirm)
         confirmBeforePosting = () => ConsoleUtils.AskYesNo(false, "更新しますか");
 
-      if (!Login(credential, out HatenaBlogAtomPubClient hatenaBlog))
+      if (!Login(credential, out var hatenaBlog))
         return;
 
       IList<PostedEntry> updatedEntries = null;
