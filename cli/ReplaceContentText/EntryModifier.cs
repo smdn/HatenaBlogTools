@@ -34,6 +34,22 @@ namespace Smdn.Applications.HatenaBlogTools {
       out string originalText,
       out string modifiedText
     );
+
+    protected bool Modify(
+      string input,
+      Converter<string, string> modifier,
+      out string original,
+      out string modified
+    )
+    {
+      original = input;
+      modified = modifier(input);
+
+      return !(
+        original.Length == modified.Length &&
+        string.Equals(original, modified, StringComparison.Ordinal)
+      );
+    }
   }
 
   class EntryTitleModifier : EntryTextModifier {
@@ -44,20 +60,12 @@ namespace Smdn.Applications.HatenaBlogTools {
       out string modifiedText
     )
     {
-      originalText = entry.Title;
-      modifiedText = modifier(originalText);
-
-      if (
-        originalText.Length == modifiedText.Length &&
-        string.Equals(originalText, modifiedText, StringComparison.Ordinal)
-      ) {
-        // not modified
-        return false;
+      if (Modify(entry.Title, modifier, out originalText, out modifiedText)) {
+        entry.Title = modifiedText;
+        return true;
       }
 
-      entry.Title = modifiedText;
-
-      return true;
+      return false;
     }
   }
 
@@ -69,20 +77,12 @@ namespace Smdn.Applications.HatenaBlogTools {
       out string modifiedText
     )
     {
-      originalText = entry.Content;
-      modifiedText = modifier(originalText);
-
-      if (
-        originalText.Length == modifiedText.Length &&
-        string.Equals(originalText, modifiedText, StringComparison.Ordinal)
-      ) {
-        // not modified
-        return false;
+      if (Modify(entry.Content, modifier, out originalText, out modifiedText)) {
+        entry.Content = modifiedText;
+        return true;
       }
 
-      entry.Content = modifiedText;
-
-      return true;
+      return false;
     }
   }
 }
