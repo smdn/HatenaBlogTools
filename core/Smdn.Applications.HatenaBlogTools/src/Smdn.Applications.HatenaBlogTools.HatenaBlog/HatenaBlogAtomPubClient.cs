@@ -114,7 +114,8 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
   public abstract class HatenaBlogAtomPubClient {
     public static void InitializeHttpsServicePoint()
     {
-      ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+      ServicePointManager.SecurityProtocol = SecurityProtocolType.SystemDefault;
+
 #if false
       // Unhandled Exception: System.PlatformNotSupportedException?: The handler does not support custom handling of certificates with this combination of libcurl (7.58.0) and its SSL backend ("OpenSSL/1.1.0g").
 
