@@ -220,6 +220,12 @@ namespace Smdn.Applications.HatenaBlogTools {
       Assert.AreEqual("foobar", entries[0].Content);
       Assert.AreEqual("foobar", entries[0].Title);
     }
+#else // if DEBUG
+    [Test]
+    public void Test()
+    {
+      Assert.Warn("some test cases are available only with configuration of DEBUG");
+    }
 #endif
   }
 }
