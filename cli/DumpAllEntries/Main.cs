@@ -81,7 +81,9 @@ namespace Smdn.Applications.HatenaBlogTools {
       if (!ParseCommonCommandLineArgs(ref args, out var credential))
         return;
 
+#if RETRIEVE_COMMENTS
       bool retrieveComments = false;
+#endif
       var categoriesToExclude = new HashSet<string>(StringComparer.Ordinal);
       var categoriesToInclude = new HashSet<string>(StringComparer.Ordinal);
       OutputFormat outputFormat = OutputFormat.Default;
