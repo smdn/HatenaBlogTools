@@ -45,7 +45,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       public static string TargetFramework => _Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()?.FirstOrDefault(meta => meta.Key == "TargetFramework")?.Value;
     }
 
-    private static string UserAgent => $"{AssemblyInfo.Title?.Replace(' ', '-')}/{AssemblyInfo.VersionMajorMinorString} ({AssemblyInfo.TargetFramework}; {Environment.OSVersion.VersionString})";
+    internal static string UserAgent => $"{AssemblyInfo.Title?.Replace(' ', '-')}/{AssemblyInfo.VersionMajorMinorString} ({AssemblyInfo.TargetFramework}; {Environment.OSVersion.VersionString})";
 
     protected bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPubCredential credential)
     {
