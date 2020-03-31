@@ -274,28 +274,23 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
 
       PostedEntry ConvertEntry(XElement entry)
       {
-        var e = new PostedEntry();
-
-        e.MemberUri = entry
+        /*
+         * read-only propeties
+         */
+        var memberUri = entry
           .Elements(AtomPub.Namespaces.Atom + "link")
           .FirstOrDefault(link => link.HasAttributeWithValue("rel", "edit"))
           ?.GetAttributeValue("href", StringConversion.ToUriNullable);
-
-        e.EntryUri = entry
+        var entryUri = entry
           .Elements(AtomPub.Namespaces.Atom + "link")
           .FirstOrDefault(link => link.HasAttributeWithValue("rel", "alternate") && link.HasAttributeWithValue("type", "text/html"))
           ?.GetAttributeValue("href", StringConversion.ToUriNullable);
-
-        e.Id = StringConversion.ToUriNullable(entry.Element(AtomPub.Namespaces.Atom + "id")?.Value);
-        e.Title = entry.Element(AtomPub.Namespaces.Atom + "title")?.Value;
-        e.Author = entry.Element(AtomPub.Namespaces.Atom + "author")?.Element(AtomPub.Namespaces.Atom + "name")?.Value;
-        e.Summary = entry.Element(AtomPub.Namespaces.Atom + "summary")?.Value;
-        e.Content = entry.Element(AtomPub.Namespaces.Atom + "content")?.Value;
-        e.ContentType = entry.Element(AtomPub.Namespaces.Atom + "content")?.GetAttributeValue("type");
-        e.FormattedContent = entry.Element(AtomPub.Namespaces.Hatena + "formatted-content")?.Value;
+        var id = StringConversion.ToUriNullable(entry.Element(AtomPub.Namespaces.Atom + "id")?.Value);
+        var formattedContent = entry.Element(AtomPub.Namespaces.Hatena + "formatted-content")?.Value;
+        var datePublished = DateTimeOffset.MinValue;
 
         try {
-          e.Published = DateTimeOffset.Parse(entry.Element(AtomPub.Namespaces.Atom + "published")?.Value);
+          datePublished = DateTimeOffset.Parse(entry.Element(AtomPub.Namespaces.Atom + "published")?.Value);
         }
         catch (ArgumentNullException) {
           // ignore exception
@@ -303,6 +298,23 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
         catch (FormatException) {
           // ignore exception
         }
+
+        var e = new PostedEntry(
+          id: id,
+          memberUri: memberUri,
+          entryUri: entryUri,
+          published: datePublished,
+          formattedContent: formattedContent
+        );
+
+        /*
+         * read-write propeties
+         */
+        e.Title = entry.Element(AtomPub.Namespaces.Atom + "title")?.Value;
+        e.Author = entry.Element(AtomPub.Namespaces.Atom + "author")?.Element(AtomPub.Namespaces.Atom + "name")?.Value;
+        e.Summary = entry.Element(AtomPub.Namespaces.Atom + "summary")?.Value;
+        e.Content = entry.Element(AtomPub.Namespaces.Atom + "content")?.Value;
+        e.ContentType = entry.Element(AtomPub.Namespaces.Atom + "content")?.GetAttributeValue("type");
 
         try {
           e.Updated = DateTimeOffset.Parse(entry.Element(AtomPub.Namespaces.Atom + "updated")?.Value);

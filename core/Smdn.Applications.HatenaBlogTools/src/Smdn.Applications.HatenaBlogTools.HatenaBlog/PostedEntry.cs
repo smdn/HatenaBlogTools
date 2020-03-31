@@ -27,11 +27,33 @@ using System.Collections.Generic;
 
 namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
   public class PostedEntry : Entry {
-    public Uri Id;
-    public Uri MemberUri;
-    public Uri EntryUri;
-    public string Author;
-    public DateTimeOffset Published;
-    public string FormattedContent;
+    /* read-only properties */
+    public Uri Id { get; }
+    public Uri MemberUri { get; }
+    public Uri EntryUri { get; }
+    public DateTimeOffset Published { get; }
+    public string FormattedContent { get; }
+
+    /* read-write properties */
+    public string Author { get; set; }
+
+    internal protected PostedEntry(
+      Uri id,
+      Uri memberUri,
+      Uri entryUri,
+      DateTimeOffset published,
+      string formattedContent,
+      IEnumerable<string> categories = null
+    )
+      : base(
+        categories: categories
+      )
+    {
+      this.Id = id;
+      this.MemberUri = memberUri;
+      this.EntryUri = entryUri;
+      this.Published = published;
+      this.FormattedContent = formattedContent;
+    }
   }
 }

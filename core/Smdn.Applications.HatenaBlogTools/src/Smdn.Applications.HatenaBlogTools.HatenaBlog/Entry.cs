@@ -24,16 +24,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
   public class Entry {
-    public string Title;
-    public HashSet<string> Categories = new HashSet<string>(StringComparer.Ordinal);
-    public DateTimeOffset? Updated;
-    public bool IsDraft;
-    public string Summary;
-    public string Content;
-    public string ContentType;
+    public string Title { get; set; }
+    public HashSet<string> Categories { get; } = new HashSet<string>(StringComparer.Ordinal);
+    public DateTimeOffset? Updated { get; set; }
+    public bool IsDraft { get; set; } = false;
+    public string Summary { get; set; }
+    public string Content { get; set; }
+    public string ContentType { get; set; }
 
     // default constructor
     public Entry()
@@ -42,17 +43,35 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
 
     // copy constructor
     public Entry(Entry baseEntry)
+      : this(
+        title: baseEntry == null ? throw new ArgumentNullException(nameof(baseEntry)) : baseEntry.Title,
+        categories: baseEntry.Categories,
+        updated: baseEntry.Updated,
+        isDraft: baseEntry.IsDraft,
+        summary: baseEntry.Summary,
+        content: baseEntry.Content,
+        contentType: baseEntry.ContentType
+      )
     {
-      if (baseEntry == null)
-        throw new ArgumentNullException(nameof(baseEntry));
+    }
 
-      this.Title = baseEntry.Title;
-      this.Categories = new HashSet<string>(baseEntry.Categories, StringComparer.Ordinal);
-      this.Updated = baseEntry.Updated;
-      this.IsDraft = baseEntry.IsDraft;
-      this.Summary = baseEntry.Summary;
-      this.Content = baseEntry.Content;
-      this.ContentType = baseEntry.ContentType;
+    public Entry(
+      string title = null,
+      IEnumerable<string> categories = null,
+      DateTimeOffset? updated = null,
+      bool isDraft = false,
+      string summary = null,
+      string content = null,
+      string contentType = null
+    )
+    {
+      this.Title = title;
+      this.Categories = new HashSet<string>(categories ?? Enumerable.Empty<string>(), StringComparer.Ordinal);
+      this.Updated = updated;
+      this.IsDraft = isDraft;
+      this.Summary = summary;
+      this.Content = content;
+      this.ContentType = contentType;
     }
   }
 }

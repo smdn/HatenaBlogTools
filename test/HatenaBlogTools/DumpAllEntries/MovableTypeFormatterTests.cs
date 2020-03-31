@@ -55,20 +55,21 @@ namespace Smdn.Applications.HatenaBlogTools {
     [Test]
     public void TestFormat_SingleEntry()
     {
-      var entry = new PostedEntry() {
+      var entry = new PseudoPostedEntry(
+        id: new Uri("tag:blog.example.com,2020:entry0"),
+        memberUri: new Uri("https://blog.example.com/atom/entry/0/"),
+        entryUri: new Uri("https://example.com/entry/0/"),
+        datePublished: new DateTimeOffset(2020, 3, 31, 0, 0, 0, TimeSpan.FromHours(0)),
+        categories: new[] {"entry0-category0", "entry0-category1", "entry0-category2"},
+        formattedContent: "entry0-formatted-content"
+      ) {
         Title = "entry0",
-        Id = new Uri("tag:blog.example.com,2020:entry0"),
-        Categories = new HashSet<string>(StringComparer.Ordinal) {"entry0-category0", "entry0-category1", "entry0-category2"},
         Updated = new DateTimeOffset(2020, 3, 31, 0, 0, 0, TimeSpan.FromHours(+9)),
         IsDraft = false,
         Summary = "entry0-summary",
         Content = "entry0-content",
         ContentType = "text/x-hatena-syntax",
-        MemberUri = new Uri("https://blog.example.com/atom/entry/0/"),
-        EntryUri = new Uri("https://example.com/entry/0/"),
         Author = "entry0-author",
-        Published = new DateTimeOffset(2020, 3, 31, 0, 0, 0, TimeSpan.FromHours(0)),
-        FormattedContent = "entry0-formatted-content"
       };
 
       const string expectedResult = @"AUTHOR: entry0-author
@@ -96,16 +97,18 @@ entry0-formatted-content
     public void TestFormat_MultipleEntries()
     {
       var entries = new[] {
-        new PostedEntry() {
+        new PseudoPostedEntry(
+          formattedContent: "entry0-formatted-content"
+        ) {
           Title = "entry0",
           Content = "entry0-content",
-          FormattedContent = "entry0-formatted-content",
           IsDraft = false,
         },
-        new PostedEntry() {
+        new PseudoPostedEntry(
+          formattedContent: "entry1-formatted-content"
+        ) {
           Title = "entry1",
           Content = "entry1-content",
-          FormattedContent = "entry1-formatted-content",
           IsDraft = true,
         },
       };
