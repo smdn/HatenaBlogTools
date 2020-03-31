@@ -40,5 +40,14 @@
     <Compile Include="..\..\cli\DumpAllEntries\MovableTypeFormats.cs">
       <Link>DumpAllEntries\MovableTypeFormats.cs</Link>
     </Compile>
+    <Compile Include="..\..\cli\DumpAllEntries\FormatterBase.cs">
+      <Link>DumpAllEntries\FormatterBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\cli\DumpAllEntries\HatenaDiaryFormatter.cs">
+      <Link>DumpAllEntries\HatenaDiaryFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\cli\DumpAllEntries\MovableTypeFormatter.cs">
+      <Link>DumpAllEntries\MovableTypeFormatter.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>

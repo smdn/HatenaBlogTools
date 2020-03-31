@@ -178,11 +178,11 @@ namespace Smdn.Applications.HatenaBlogTools {
              : new FileStream(outputFile, FileMode.Create, FileAccess.Write)) {
         switch (outputFormat) {
           case OutputFormat.HatenaDiary:
-            SaveAsHatenaDiary(entries, outputStream, retrieveComments);
+            new HatenaDiaryFormatter(/*retrieveComments*/).Format(entries, outputStream);
             break;
 
           case OutputFormat.MovableType:
-            SaveAsMovableType(entries, outputStream, hatenaBlog.BlogId, retrieveComments);
+            new MovableTypeFormatter(/*retrieveComments*/).Format(entries, outputStream);
             break;
 
           case OutputFormat.Atom:
@@ -267,142 +267,6 @@ namespace Smdn.Applications.HatenaBlogTools {
       entries = filteredEntries;
 
       return outputDocument;
-    }
-
-    private static void SaveAsMovableType(IEnumerable<PostedEntry> entries, Stream outputStream, string blogId, bool retrieveComments)
-    {
-      var writer = new StreamWriter(outputStream, Encoding.UTF8);
-
-      writer.NewLine = "\n"; // ???
-
-      foreach (var entry in entries) {
-        /*
-         * metadata seciton
-         */
-        writer.WriteLine(string.Concat("AUTHOR: ", entry.Author));
-        writer.WriteLine(string.Concat("TITLE: ", entry.Title));
-
-        var entryLocation = entry.EntryUri?.LocalPath;
-
-        if (entryLocation != null)
-          writer.WriteLine(string.Concat("BASENAME: ", entryLocation.Substring(7))); // remove prefix '/entry/'
-
-        writer.WriteLine(string.Concat("STATUS: ", entry.IsDraft ? "Draft" : "Publish"));
-        writer.WriteLine("CONVERT BREAKS: 0");
-
-        if (entry.Updated.HasValue)
-          writer.WriteLine(string.Concat("DATE: ", MovableTypeFormats.ToDateString(entry.Updated.Value.LocalDateTime)));
-
-        var tags = entry.Categories
-                        .Select(tag => tag.Contains(" ") ? string.Concat("\"", tag, "\"") : tag);
-
-        writer.WriteLine(string.Concat("TAGS: ", string.Join(",", tags)));
-
-        /*
-         * multiline field seciton
-         */
-        const string multilineFieldDelimiter = "-----";
-
-        writer.WriteLine(multilineFieldDelimiter);
-
-        writer.WriteLine("BODY:");
-        //writer.WriteLine(entry.Content);
-        writer.WriteLine(entry.FormattedContent);
-        writer.WriteLine(multilineFieldDelimiter);
-
-#if RETRIEVE_COMMENTS
-        if (retrieveComments) {
-          var entryUrl = entry.GetSingleNodeValueOf("atom:link[@rel='alternate' and @type='text/html']/@href", nsmgr);
-
-          foreach (var comment in RetrieveComments(entryUrl)) {
-            writer.WriteLine("COMMENT:");
-            writer.WriteLine(string.Concat("AUTHOR: ", comment.Author));
-            writer.WriteLine(string.Concat("DATE: ", ToMovableTypeDateString(comment.Date)));
-            writer.WriteLine(string.Concat("URL: ", comment.Url));
-            writer.WriteLine(comment.Content);
-
-            writer.WriteLine(multilineFieldDelimiter);
-          }
-        }
-#endif
-
-        // end of entry
-        const string entryDelimiter = "--------";
-
-        writer.WriteLine(entryDelimiter);
-      }
-
-      writer.Flush();
-    }
-
-    private static void SaveAsHatenaDiary(IEnumerable<PostedEntry> entries, Stream outputStream, bool retrieveComments)
-    {
-      var diaryElement = new XElement("diary");
-      var dayElements = new Dictionary<string, XElement>();
-      var defaultUpdatedDate = DateTimeOffset.FromUnixTimeSeconds(0L);
-
-      foreach (var entry in entries) {
-        var updatedDate = entry.Updated ?? defaultUpdatedDate;
-        var date = updatedDate.ToLocalTime()
-                              .DateTime
-                              .ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
-
-        XElement dayElement, bodyElement;
-
-        if (dayElements.TryGetValue(date, out dayElement)) {
-          bodyElement = dayElement.Element("body");
-        }
-        else {
-          bodyElement = new XElement("body");
-
-          dayElement = new XElement(
-            "day",
-            new XAttribute("date", date),
-            new XAttribute("title", string.Empty),
-            bodyElement
-          );
-
-          diaryElement.Add(dayElement);
-
-          dayElements[date] = dayElement;
-        }
-
-        var body = new StringBuilder();
-
-        body.AppendFormat("*{0}*", updatedDate.ToUnixTimeSeconds());
-
-        var joinedCategory = string.Join("][", entry.Categories);
-
-        if (0 < joinedCategory.Length)
-          body.AppendFormat("[{0}]", joinedCategory);
-
-        body.AppendLine(entry.Title);
-
-        body.AppendLine(entry.Content);
-        body.AppendLine();
-
-        bodyElement.Add(new XText(body.ToString()));
-
-#if RETRIEVE_COMMENTS
-        if (retrieveComments) {
-          var entryUrl = entry.GetSingleNodeValueOf("atom:link[@rel='alternate' and @type='text/html']/@href", nsmgr);
-          var commentsElement = dayElement.AppendElement("comments");
-
-          foreach (var comment in RetrieveComments(entryUrl)) {
-            var commentElement = commentsElement.AppendElement("comment");
-
-            commentElement.AppendElement("username").AppendText(comment.Author);
-            commentElement.AppendElement("body").AppendText(comment.Content);
-            commentElement.AppendElement("timestamp").AppendText(XmlConvert.ToString(comment.Date.ToUnixTimeSeconds()));
-          }
-        }
-#endif
-      }
-
-      var outputDocument = new XDocument(new XDeclaration("1.0", "utf-8", null),
-                                         diaryElement);
-
-      outputDocument.Save(outputStream);
     }
 
 #if RETRIEVE_COMMENTS
