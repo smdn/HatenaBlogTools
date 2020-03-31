@@ -31,7 +31,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
     public Uri Id { get; }
     public Uri MemberUri { get; }
     public Uri EntryUri { get; }
-    public DateTimeOffset Published { get; }
+    public DateTimeOffset DatePublished { get; }
     public string FormattedContent { get; }
 
     /* read-write properties */
@@ -41,7 +41,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       Uri id,
       Uri memberUri,
       Uri entryUri,
-      DateTimeOffset published,
+      DateTimeOffset datePublished,
       string formattedContent,
       IEnumerable<string> categories = null
     )
@@ -52,7 +52,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       this.Id = id;
       this.MemberUri = memberUri;
       this.EntryUri = entryUri;
-      this.Published = published;
+      this.DatePublished = datePublished;
       this.FormattedContent = formattedContent;
     }
   }

@@ -128,7 +128,7 @@ namespace Smdn.Applications.HatenaBlogTools {
           }
         }
 
-        postingEntries.Sort((e1, e2) => DateTimeOffset.Compare(e1.Updated ?? DateTimeOffset.MinValue, e2.Updated ?? DateTimeOffset.MinValue));
+        postingEntries.Sort((e1, e2) => DateTimeOffset.Compare(e1.DateUpdated ?? DateTimeOffset.MinValue, e2.DateUpdated ?? DateTimeOffset.MinValue));
       }
 
       if (!Login(credential, out var hatenaBlog))

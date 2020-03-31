@@ -15,7 +15,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
         id: id,
         memberUri: memberUri,
         entryUri: entryUri,
-        published: datePublished,
+        datePublished: datePublished,
         categories: categories,
         formattedContent: formattedContent
       )

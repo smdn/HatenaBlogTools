@@ -197,7 +197,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       foreach (var entry in modifiedEntries) {
         Console.Write("変更を更新中: {0} \"{1}\" [{2}] ... ",
-                      entry.Published,
+                      entry.DatePublished,
                       entry.Title,
                       string.Join("][", entry.Categories));
 

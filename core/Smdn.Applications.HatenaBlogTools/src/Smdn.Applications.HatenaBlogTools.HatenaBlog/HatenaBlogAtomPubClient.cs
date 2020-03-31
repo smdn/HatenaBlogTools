@@ -303,7 +303,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
           id: id,
           memberUri: memberUri,
           entryUri: entryUri,
-          published: datePublished,
+          datePublished: datePublished,
           formattedContent: formattedContent
         );
 
@@ -317,7 +317,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
         e.ContentType = entry.Element(AtomPub.Namespaces.Atom + "content")?.GetAttributeValue("type");
 
         try {
-          e.Updated = DateTimeOffset.Parse(entry.Element(AtomPub.Namespaces.Atom + "updated")?.Value);
+          e.DateUpdated = DateTimeOffset.Parse(entry.Element(AtomPub.Namespaces.Atom + "updated")?.Value);
         }
         catch (ArgumentNullException) {
           // ignore exception
@@ -389,10 +389,10 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
           AtomPub.Namespaces.Atom + "title",
           new XText(postEntry.Title)
         ),
-        postEntry.Updated.HasValue
+        postEntry.DateUpdated.HasValue
           ? new XElement(
             AtomPub.Namespaces.Atom + "updated",
-            new XText(XmlConvert.ToString(postEntry.Updated.Value))
+            new XText(XmlConvert.ToString(postEntry.DateUpdated.Value))
           )
           : null,
         postEntry.Summary == null

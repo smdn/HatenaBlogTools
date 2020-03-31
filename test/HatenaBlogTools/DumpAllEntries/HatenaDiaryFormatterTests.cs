@@ -23,7 +23,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         formattedContent: "entry0-formatted-content"
       ) {
         Title = "entry0",
-        Updated = new DateTimeOffset(2020, 3, 31, 0, 0, 0, TimeSpan.FromHours(+9)),
+        DateUpdated = new DateTimeOffset(2020, 3, 31, 0, 0, 0, TimeSpan.FromHours(+9)),
         IsDraft = false,
         Summary = "entry0-summary",
         Content = "entry0-content",
@@ -70,12 +70,12 @@ namespace Smdn.Applications.HatenaBlogTools {
         new PseudoPostedEntry() {
           Title = "entry0",
           Content = "entry0-content",
-          Updated = new DateTimeOffset(2020, 3, 31, 15, 0, 0, TimeSpan.FromHours(+9)),
+          DateUpdated = new DateTimeOffset(2020, 3, 31, 15, 0, 0, TimeSpan.FromHours(+9)),
         },
         new PseudoPostedEntry() {
           Title = "entry1",
           Content = "entry1-content",
-          Updated = new DateTimeOffset(2020, 3, 31, 16, 0, 0, TimeSpan.FromHours(+9)),
+          DateUpdated = new DateTimeOffset(2020, 3, 31, 16, 0, 0, TimeSpan.FromHours(+9)),
         },
       };
 
@@ -95,12 +95,12 @@ namespace Smdn.Applications.HatenaBlogTools {
         new PseudoPostedEntry() {
           Title = "entry0",
           Content = "entry0-content",
-          Updated = new DateTimeOffset(2020, 3, 31, 15, 0, 0, TimeSpan.FromHours(+9)),
+          DateUpdated = new DateTimeOffset(2020, 3, 31, 15, 0, 0, TimeSpan.FromHours(+9)),
         },
         new PseudoPostedEntry() {
           Title = "entry1",
           Content = "entry1-content",
-          Updated = new DateTimeOffset(2020, 4, 1, 15, 0, 0, TimeSpan.FromHours(+9)),
+          DateUpdated = new DateTimeOffset(2020, 4, 1, 15, 0, 0, TimeSpan.FromHours(+9)),
         },
       };
 

@@ -67,8 +67,8 @@ namespace Smdn.Applications.HatenaBlogTools {
         writer.WriteLine(string.Concat("STATUS: ", entry.IsDraft ? "Draft" : "Publish"));
         writer.WriteLine("CONVERT BREAKS: 0");
 
-        if (entry.Updated.HasValue)
-          writer.WriteLine(string.Concat("DATE: ", ToDateString(entry.Updated.Value.LocalDateTime)));
+        if (entry.DateUpdated.HasValue)
+          writer.WriteLine(string.Concat("DATE: ", ToDateString(entry.DateUpdated.Value.LocalDateTime)));
 
         var tags = entry
           .Categories

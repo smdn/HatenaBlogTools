@@ -47,7 +47,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       var defaultUpdatedDate = DateTimeOffset.FromUnixTimeSeconds(0L);
 
       foreach (var entry in entries) {
-        var updatedDate = entry.Updated ?? defaultUpdatedDate;
+        var updatedDate = entry.DateUpdated ?? defaultUpdatedDate;
         var date = updatedDate
           .ToLocalTime()
           .DateTime

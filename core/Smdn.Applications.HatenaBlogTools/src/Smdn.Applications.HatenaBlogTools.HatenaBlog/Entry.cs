@@ -30,7 +30,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
   public class Entry {
     public string Title { get; set; }
     public HashSet<string> Categories { get; } = new HashSet<string>(StringComparer.Ordinal);
-    public DateTimeOffset? Updated { get; set; }
+    public DateTimeOffset? DateUpdated { get; set; }
     public bool IsDraft { get; set; } = false;
     public string Summary { get; set; }
     public string Content { get; set; }
@@ -46,7 +46,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       : this(
         title: baseEntry == null ? throw new ArgumentNullException(nameof(baseEntry)) : baseEntry.Title,
         categories: baseEntry.Categories,
-        updated: baseEntry.Updated,
+        dateUpdated: baseEntry.DateUpdated,
         isDraft: baseEntry.IsDraft,
         summary: baseEntry.Summary,
         content: baseEntry.Content,
@@ -58,7 +58,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
     public Entry(
       string title = null,
       IEnumerable<string> categories = null,
-      DateTimeOffset? updated = null,
+      DateTimeOffset? dateUpdated = null,
       bool isDraft = false,
       string summary = null,
       string content = null,
@@ -67,7 +67,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
     {
       this.Title = title;
       this.Categories = new HashSet<string>(categories ?? Enumerable.Empty<string>(), StringComparer.Ordinal);
-      this.Updated = updated;
+      this.DateUpdated = dateUpdated;
       this.IsDraft = isDraft;
       this.Summary = summary;
       this.Content = content;

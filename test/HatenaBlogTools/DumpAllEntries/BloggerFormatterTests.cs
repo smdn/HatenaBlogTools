@@ -23,7 +23,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         formattedContent: "entry0-formatted-content"
       ) {
         Title = "entry0",
-        Updated = new DateTimeOffset(2020, 3, 31, 0, 0, 0, TimeSpan.FromHours(+9)),
+        DateUpdated = new DateTimeOffset(2020, 3, 31, 0, 0, 0, TimeSpan.FromHours(+9)),
         IsDraft = false,
         Summary = "entry0-summary",
         Content = "entry0-content",
@@ -75,13 +75,13 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       // /feed/entry/published
       Assert.AreEqual(
-        entry.Published,
+        entry.DatePublished,
         DateTimeOffset.Parse(elementEntry.Element(AtomPub.Namespaces.Atom + "published")?.Value)
       );
 
       // /feed/entry/updated
       Assert.AreEqual(
-        entry.Updated,
+        entry.DateUpdated,
         DateTimeOffset.Parse(elementEntry.Element(AtomPub.Namespaces.Atom + "updated")?.Value)
       );
 
