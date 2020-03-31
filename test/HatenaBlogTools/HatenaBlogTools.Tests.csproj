@@ -37,9 +37,6 @@
     <Compile Include="..\..\cli\ReplaceContentText\EntryModifier.cs">
       <Link>ReplaceContentText\EntryModifier.cs</Link>
     </Compile>
-    <Compile Include="..\..\cli\DumpAllEntries\MovableTypeFormats.cs">
-      <Link>DumpAllEntries\MovableTypeFormats.cs</Link>
-    </Compile>
     <Compile Include="..\..\cli\DumpAllEntries\FormatterBase.cs">
       <Link>DumpAllEntries\FormatterBase.cs</Link>
     </Compile>

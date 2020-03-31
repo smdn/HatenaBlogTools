@@ -7,6 +7,9 @@ using System.Text;
 using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.Applications.HatenaBlogTools {
+  /*
+   * ref: http://www.movabletype.jp/documentation/appendices/import-export-format.html
+   */
   class MovableTypeFormatter : FormatterBase {
     public MovableTypeFormatter(
 #if RETRIEVE_COMMENTS
@@ -15,6 +18,9 @@ namespace Smdn.Applications.HatenaBlogTools {
     )
     {
     }
+
+    internal static string ToDateString(DateTime dateTime)
+      => dateTime.ToString("MM/dd/yyyy hh\\:mm\\:ss tt", System.Globalization.CultureInfo.InvariantCulture);
 
     public override void Format(IEnumerable<PostedEntry> entries, Stream outputStream)
     {
@@ -38,7 +44,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         writer.WriteLine("CONVERT BREAKS: 0");
 
         if (entry.Updated.HasValue)
-          writer.WriteLine(string.Concat("DATE: ", MovableTypeFormats.ToDateString(entry.Updated.Value.LocalDateTime)));
+          writer.WriteLine(string.Concat("DATE: ", ToDateString(entry.Updated.Value.LocalDateTime)));
 
         var tags = entry
           .Categories
