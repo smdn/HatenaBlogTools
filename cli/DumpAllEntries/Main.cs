@@ -46,12 +46,6 @@ namespace Smdn.Applications.HatenaBlogTools {
       Default = Atom,
     }
 
-    private enum CategoryFilterMode {
-      None,
-      Exclude,
-      Include,
-    }
-
 #if RETRIEVE_COMMENTS
     private class Comment {
       public string Content;
@@ -144,28 +138,52 @@ namespace Smdn.Applications.HatenaBlogTools {
         }
       }
 
-      var filterMode = CategoryFilterMode.None;
-      HashSet<string> categoriesToFilter = null;
-
       if (0 < categoriesToExclude.Count && 0 < categoriesToInclude.Count) {
         Usage("--exclude-categoryと--include-categoryを同時に指定することはできません");
         return;
-      }
-      else {
-        if (0 < categoriesToExclude.Count) {
-          filterMode = CategoryFilterMode.Exclude;
-          categoriesToFilter = categoriesToExclude;
-        }
-        else if (0 < categoriesToInclude.Count) {
-          filterMode = CategoryFilterMode.Include;
-          categoriesToFilter = categoriesToInclude;
-        }
       }
 
       if (!Login(credential, out var hatenaBlog))
         return;
 
-      var outputDocument = DumpEntries(hatenaBlog, (outputFormat == OutputFormat.AtomPostData), filterMode, categoriesToFilter, out var entries);
+      Predicate<PostedEntry> entryPredicate;
+
+      if (0 < categoriesToExclude.Count) {
+        entryPredicate = entry => {
+          Console.Error.Write($"{entry.EntryUri} \"{entry.Title}\" : ");
+
+          if (entry.Categories.Overlaps(categoriesToExclude)) {
+            Console.Error.WriteLine("対象カテゴリを含むため除外します: ({0})", string.Join(", ", entry.Categories));
+            return false;
+          }
+          else {
+            Console.Error.WriteLine("完了");
+            return true;
+          }
+        };
+      }
+      else if (0 < categoriesToInclude.Count)
+        entryPredicate = entry => {
+          Console.Error.Write($"{entry.EntryUri} \"{entry.Title}\" : ");
+
+          if (entry.Categories.Overlaps(categoriesToInclude)) {
+            Console.Error.WriteLine("完了");
+            return true;
+          }
+          else {
+            Console.Error.WriteLine("対象カテゴリを含まないため除外します ({0})", string.Join(", ", entry.Categories));
+            return false;
+          }
+        };
+      else {
+        entryPredicate = entry => {
+          Console.Error.Write($"{entry.EntryUri} \"{entry.Title}\" : ");
+          Console.Error.WriteLine("完了");
+          return true;
+        };
+      }
+
+      var outputDocument = DumpEntries(hatenaBlog, entryPredicate, out var entries);
 
       if (outputDocument == null)
         return;
@@ -185,8 +203,17 @@ namespace Smdn.Applications.HatenaBlogTools {
             new MovableTypeFormatter(/*retrieveComments*/).Format(entries, outputStream);
             break;
 
-          case OutputFormat.Atom:
           case OutputFormat.AtomPostData:
+            var elementsEntry = outputDocument.Root.Elements(AtomPub.Namespaces.Atom + "entry");
+
+            elementsEntry.Elements(AtomPub.Namespaces.Atom + "id").Remove();
+            elementsEntry.Elements(AtomPub.Namespaces.Atom + "link").Remove();
+            elementsEntry.Elements(AtomPub.Namespaces.App + "edited").Remove();
+            elementsEntry.Elements(AtomPub.Namespaces.Hatena + "formatted-content").Remove();
+
+            goto case OutputFormat.Atom;
+
+          case OutputFormat.Atom:
             outputDocument.Save(outputStream);
             break;
 
@@ -198,11 +225,11 @@ namespace Smdn.Applications.HatenaBlogTools {
       Console.Error.WriteLine("完了");
     }
 
-    private static XDocument DumpEntries(HatenaBlogAtomPubClient hatenaBlog,
-                                         bool removeNonPostData,
-                                         CategoryFilterMode filterMode,
-                                         HashSet<string> categoriesToFilter,
-                                         out List<PostedEntry> entries)
+    private static XDocument DumpEntries(
+      HatenaBlogAtomPubClient hatenaBlog,
+      Predicate<PostedEntry> entryPredicate,
+      out IReadOnlyList<PostedEntry> entries
+    )
     {
       var filteredEntries = new List<PostedEntry>();
 
@@ -215,53 +242,24 @@ namespace Smdn.Applications.HatenaBlogTools {
           // オリジナルのレスポンス文書からlink[@rel=first/next], entry以外の要素をコピーしてヘッダ部を構築する
           outputDocument = new XDocument(entryElement.Document);
 
-          outputDocument.Root
-                        .Elements(AtomPub.Namespaces.Atom + "entry")
-                        .Remove();
+          outputDocument
+            .Root
+            .Elements(AtomPub.Namespaces.Atom + "entry")
+            .Remove();
 
-          outputDocument.Root
-                        .Elements(AtomPub.Namespaces.Atom + "link")
-                        .Where(e => e.HasAttributeWithValue("rel", "first") || e.HasAttributeWithValue("rel", "next"))
-                        .Remove();
+          outputDocument
+            .Root
+            .Elements(AtomPub.Namespaces.Atom + "link")
+            .Where(e => e.HasAttributeWithValue("rel", "first") || e.HasAttributeWithValue("rel", "next"))
+            .Remove();
         }
 
-        Console.Error.Write("{0} \"{1}\" : ",
-                            postedEntry.EntryUri,
-                            postedEntry.Title);
+        if (!entryPredicate(postedEntry))
+          return; // continue
 
-        switch (filterMode) {
-          case CategoryFilterMode.Include:
-            if (!postedEntry.Categories.Overlaps(categoriesToFilter)) {
-              Console.Error.WriteLine("対象カテゴリを含まないため除外します ({0})", string.Join(", ", postedEntry.Categories));
-              return; // continue
-            }
-            break;
-
-          case CategoryFilterMode.Exclude:
-            if (postedEntry.Categories.Overlaps(categoriesToFilter)) {
-              Console.Error.WriteLine("対象カテゴリを含むため除外します: ({0})", string.Join(", ", postedEntry.Categories));
-              return; // continue
-            }
-            break;
-
-          default:
-            break; // do nothing
-        }
-
-        var modifiedEntryElement = new XElement(entryElement);
-
-        if (removeNonPostData) {
-          modifiedEntryElement.Elements(AtomPub.Namespaces.Atom + "id").Remove();
-          modifiedEntryElement.Elements(AtomPub.Namespaces.Atom + "link").Remove();
-          modifiedEntryElement.Elements(AtomPub.Namespaces.App + "edited").Remove();
-          modifiedEntryElement.Elements(AtomPub.Namespaces.Hatena + "formatted-content").Remove();
-        }
-
-        outputDocument.Root.Add(modifiedEntryElement);
+        outputDocument.Root.Add(new XElement(entryElement));
 
         filteredEntries.Add(postedEntry);
-
-        Console.Error.WriteLine("ダンプしました");
       });
 
       entries = filteredEntries;
