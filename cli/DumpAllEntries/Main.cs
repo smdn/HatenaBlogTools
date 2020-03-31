@@ -40,6 +40,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     private enum OutputFormat {
       Atom,
       AtomPostData,
+      AtomBlogger,
       MovableType,
       HatenaDiary,
 
@@ -64,14 +65,17 @@ namespace Smdn.Applications.HatenaBlogTools {
 #if RETRIEVE_COMMENTS
       yield return "-comment : dump comments posted on entry"
 #endif
-      yield return "--format [hatena|mt|atom|atom-post]  : 出力形式を指定します";
-      yield return "                                       hatena     : はてなダイアリー日記データ形式";
-      yield return "                                       mt         : Movable Type形式";
-      yield return "                                       atom       : Atomフィード形式(取得できる全内容)";
-      yield return "                                       atom-post  : Atomフィード形式(投稿データのみ)";
-      yield return "　                                     省略した場合は'atom'と同じ形式になります";
+      yield return "--format [hatena|mt|atom|atom-post|atom-blogger] : 出力形式を指定します";
+      yield return "  --format hatena       : はてなダイアリー日記データ形式";
+      yield return "  --format mt           : Movable Type形式";
+      yield return "  --format atom         : Atomフィード形式(はてなブログAPIで取得できる全内容)";
+      yield return "  --format atom-post    : Atomフィード形式(はてなブログAPIで取得できる内容のうち、投稿データのみ抽出)";
+      yield return "  --format atom-blogger : Atomフィード形式(Blogger用フォーマット)";
+      yield return "　(省略した場合は、'--format atom'を指定した場合と同じ形式で出力します)";
+      yield return "";
       yield return "--exclude-category <カテゴリ>  : 指定された<カテゴリ>を除外してダンプします(複数指定可)";
       yield return "--include-category <カテゴリ>  : 指定された<カテゴリ>のみを抽出してダンプします(複数指定可)";
+      yield return "";
       yield return "[出力ファイル名|-]             : ダンプした内容を保存するファイル名を指定します";
       yield return "                                 省略した場合、- を指定した場合は標準出力に書き込みます";
     }
@@ -110,6 +114,10 @@ namespace Smdn.Applications.HatenaBlogTools {
 
               case "atom-post":
                 outputFormat = OutputFormat.AtomPostData;
+                break;
+
+              case "atom-blogger":
+                outputFormat = OutputFormat.AtomBlogger;
                 break;
 
               default:
@@ -203,6 +211,10 @@ namespace Smdn.Applications.HatenaBlogTools {
 
           case OutputFormat.MovableType:
             new MovableTypeFormatter(/*retrieveComments*/).Format(entries, outputStream);
+            break;
+
+          case OutputFormat.AtomBlogger:
+            new BloggerFormatter(hatenaBlog.BlogTitle /*, retrieveComments*/).Format(entries, outputStream);
             break;
 
           case OutputFormat.AtomPostData:

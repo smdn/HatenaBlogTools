@@ -46,5 +46,8 @@
     <Compile Include="..\..\cli\DumpAllEntries\MovableTypeFormatter.cs">
       <Link>DumpAllEntries\MovableTypeFormatter.cs</Link>
     </Compile>
+    <Compile Include="..\..\cli\DumpAllEntries\BloggerFormatter.cs">
+      <Link>DumpAllEntries\BloggerFormatter.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>
