@@ -57,6 +57,7 @@ namespace Smdn.Applications.HatenaBlogTools {
     {
       var entry = new PostedEntry() {
         Title = "entry0",
+        Id = new Uri("tag:blog.example.com,2020:entry0"),
         Categories = new HashSet<string>(StringComparer.Ordinal) {"entry0-category0", "entry0-category1", "entry0-category2"},
         Updated = new DateTimeOffset(2020, 3, 31, 0, 0, 0, TimeSpan.FromHours(+9)),
         IsDraft = false,

@@ -74,6 +74,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
   }
 
   public class PostedEntry : Entry {
+    public Uri Id;
     public Uri MemberUri;
     public Uri EntryUri;
     public string Author;
@@ -324,6 +325,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
           .FirstOrDefault(link => link.HasAttributeWithValue("rel", "alternate") && link.HasAttributeWithValue("type", "text/html"))
           ?.GetAttributeValue("href", StringConversion.ToUriNullable);
 
+        e.Id = StringConversion.ToUriNullable(entry.Element(AtomPub.Namespaces.Atom + "id")?.Value);
         e.Title = entry.Element(AtomPub.Namespaces.Atom + "title")?.Value;
         e.Author = entry.Element(AtomPub.Namespaces.Atom + "author")?.Element(AtomPub.Namespaces.Atom + "name")?.Value;
         e.Summary = entry.Element(AtomPub.Namespaces.Atom + "summary")?.Value;
