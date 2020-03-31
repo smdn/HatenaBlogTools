@@ -40,7 +40,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       this.entryTextModifier = entryTextModifier ?? throw new ArgumentNullException(nameof(entryTextModifier));
     }
 
-    public bool Edit(PostedEntry entry, out string originalText, out string modifiedText)
+    public bool Edit(Entry entry, out string originalText, out string modifiedText)
     {
       return entryTextModifier.Modify(
         entry: entry,
@@ -63,7 +63,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       this.entryTextModifier = entryTextModifier ?? throw new ArgumentNullException(nameof(entryTextModifier));
     }
 
-    public bool Edit(PostedEntry entry, out string originalText, out string modifiedText)
+    public bool Edit(Entry entry, out string originalText, out string modifiedText)
     {
       return entryTextModifier.Modify(
         entry: entry,

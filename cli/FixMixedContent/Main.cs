@@ -301,7 +301,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       using (var inputStream = IsStdIO(input) ? Console.OpenStandardInput() : File.OpenRead(input)) {
         var reader = new StreamReader(inputStream, false);
-        var modified = editor.Edit(new PostedEntry() { Content = reader.ReadToEnd() },
+        var modified = editor.Edit(new Entry { Content = reader.ReadToEnd() },
                                    out var originalText,
                                    out var modifiedText);
 
@@ -342,7 +342,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         this.replaceBlogUrl = replaceBlogUrl;
       }
 
-      public bool Edit(PostedEntry entry, out string originalText, out string modifiedText)
+      public bool Edit(Entry entry, out string originalText, out string modifiedText)
       {
         originalText = entry.Content;
         modifiedText = null;

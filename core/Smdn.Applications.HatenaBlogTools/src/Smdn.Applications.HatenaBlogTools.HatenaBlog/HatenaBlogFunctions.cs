@@ -28,7 +28,7 @@ using System.Net;
 
 namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
   public interface IHatenaBlogEntryEditor {
-    bool Edit(PostedEntry entry, out string originalText, out string modifiedText);
+    bool Edit(Entry entry, out string originalText, out string modifiedText);
   }
 
   public static class HatenaBlogFunctions {

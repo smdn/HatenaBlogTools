@@ -29,7 +29,7 @@ using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 namespace Smdn.Applications.HatenaBlogTools {
   abstract class EntryTextModifier {
     public abstract bool Modify(
-      PostedEntry entry,
+      Entry entry,
       Converter<string, string> modifier,
       out string originalText,
       out string modifiedText
@@ -54,7 +54,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
   class EntryTitleModifier : EntryTextModifier {
     public override bool Modify(
-      PostedEntry entry,
+      Entry entry,
       Converter<string, string> modifier,
       out string originalText,
       out string modifiedText
@@ -71,7 +71,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
   class EntryContentModifier : EntryTextModifier {
     public override bool Modify(
-      PostedEntry entry,
+      Entry entry,
       Converter<string, string> modifier,
       out string originalText,
       out string modifiedText
