@@ -22,20 +22,6 @@ namespace Smdn.Applications.HatenaBlogTools {
         // ./entry
         new XElement(
           AtomPub.Namespaces.Atom + "entry",
-          // ./entry/link[@rel='self']
-          new XElement(
-            AtomPub.Namespaces.Atom + "link",
-            new XAttribute("href", "http://www.blogger.com/"),
-            new XAttribute("rel", "self"),
-            new XAttribute("type", "application/atom+xml")
-          ),
-          // ./entry/link[@rel='alternate']
-          new XElement(
-            AtomPub.Namespaces.Atom + "link",
-            new XAttribute("href", "http://www.blogger.com/"),
-            new XAttribute("rel", "alternate"),
-            new XAttribute("type", "text/html")
-          ),
           // ./entry/id
           entry.Id == null
             ? null
@@ -70,6 +56,7 @@ namespace Smdn.Applications.HatenaBlogTools {
           // ./entry/title
           new XElement(
             AtomPub.Namespaces.Atom + "title",
+            new XAttribute("type", "text"),
             entry.Title
           ),
           // ./entry/control
@@ -99,7 +86,7 @@ namespace Smdn.Applications.HatenaBlogTools {
           // ./entry/content
           new XElement(
             AtomPub.Namespaces.Atom + "content",
-            new XAttribute("type", "text/html"),
+            new XAttribute("type", "html"),
             entry.FormattedContent
           )
         )
@@ -112,20 +99,6 @@ namespace Smdn.Applications.HatenaBlogTools {
           AtomPub.Namespaces.Atom + "feed",
           //new XAttribute(XNamespace.Xmlns + string.Empty, AtomPub.Namespaces.Atom),
           new XAttribute(XNamespace.Xmlns + "app", AtomPub.Namespaces.App),
-          // /feed/link[@rel='self']
-          new XElement(
-            AtomPub.Namespaces.Atom + "link",
-            new XAttribute("href", "http://www.blogger.com/"),
-            new XAttribute("rel", "self"),
-            new XAttribute("type", "application/atom+xml")
-          ),
-          // /feed/link[@rel='alternate']
-          new XElement(
-            AtomPub.Namespaces.Atom + "link",
-            new XAttribute("href", "http://www.blogger.com/"),
-            new XAttribute("rel", "alternate"),
-            new XAttribute("type", "text/html")
-          ),
           // /feed/title
           string.IsNullOrEmpty(blogTitle)
             ? null
@@ -136,12 +109,7 @@ namespace Smdn.Applications.HatenaBlogTools {
           // /feed/generator
           new XElement(
             AtomPub.Namespaces.Atom + "generator",
-            CliBase.UserAgent
-          ),
-          // /feed/updated
-          new XElement(
-            AtomPub.Namespaces.Atom + "updated",
-            DateTimeOffset.Now
+            "Blogger"
           ),
           // /feed/entry
           elementListEntry

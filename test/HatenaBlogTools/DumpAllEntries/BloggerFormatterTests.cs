@@ -41,25 +41,6 @@ namespace Smdn.Applications.HatenaBlogTools {
         elementFeed.Name
       );
 
-      // /feed/link
-      Assert.AreEqual(
-        "http://www.blogger.com/",
-        elementFeed.Elements(AtomPub.Namespaces.Atom + "link").FirstOrDefault(e => e.HasAttributeWithValue("rel", "self"))?.GetAttributeValue("href")
-      );
-      Assert.AreEqual(
-        "application/atom+xml",
-        elementFeed.Elements(AtomPub.Namespaces.Atom + "link").FirstOrDefault(e => e.HasAttributeWithValue("rel", "self"))?.GetAttributeValue("type")
-      );
-
-      Assert.AreEqual(
-        "http://www.blogger.com/",
-        elementFeed.Elements(AtomPub.Namespaces.Atom + "link").FirstOrDefault(e => e.HasAttributeWithValue("rel", "alternate"))?.GetAttributeValue("href")
-      );
-      Assert.AreEqual(
-        "text/html",
-        elementFeed.Elements(AtomPub.Namespaces.Atom + "link").FirstOrDefault(e => e.HasAttributeWithValue("rel", "alternate"))?.GetAttributeValue("type")
-      );
-
       // /feed/title
       Assert.AreEqual(
         blogTitle,
@@ -67,12 +48,10 @@ namespace Smdn.Applications.HatenaBlogTools {
       );
 
       // /feed/generator
-      Assert.IsNotEmpty(elementFeed.Element(AtomPub.Namespaces.Atom + "generator")?.Value);
-
-      // /feed/updated
-      Assert.DoesNotThrow(() => {
-        DateTimeOffset.Parse(elementFeed.Element(AtomPub.Namespaces.Atom + "updated")?.Value);
-      });
+      Assert.AreEqual(
+        "Blogger",
+        elementFeed.Element(AtomPub.Namespaces.Atom + "generator")?.Value
+      );
 
       // /feed/entry
       Assert.AreEqual(
@@ -81,25 +60,6 @@ namespace Smdn.Applications.HatenaBlogTools {
       );
 
       var elementEntry = elementFeed.Element(AtomPub.Namespaces.Atom + "entry");
-
-      // /feed/entry/link
-      Assert.AreEqual(
-        "http://www.blogger.com/",
-        elementEntry.Elements(AtomPub.Namespaces.Atom + "link").FirstOrDefault(e => e.HasAttributeWithValue("rel", "self"))?.GetAttributeValue("href")
-      );
-      Assert.AreEqual(
-        "application/atom+xml",
-        elementEntry.Elements(AtomPub.Namespaces.Atom + "link").FirstOrDefault(e => e.HasAttributeWithValue("rel", "self"))?.GetAttributeValue("type")
-      );
-
-      Assert.AreEqual(
-        "http://www.blogger.com/",
-        elementEntry.Elements(AtomPub.Namespaces.Atom + "link").FirstOrDefault(e => e.HasAttributeWithValue("rel", "alternate"))?.GetAttributeValue("href")
-      );
-      Assert.AreEqual(
-        "text/html",
-        elementEntry.Elements(AtomPub.Namespaces.Atom + "link").FirstOrDefault(e => e.HasAttributeWithValue("rel", "alternate"))?.GetAttributeValue("type")
-      );
 
       // /feed/entry/id
       Assert.AreEqual(
@@ -155,7 +115,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       // /feed/entry/content
       Assert.AreEqual(
-        "text/html",
+        "html",
         elementEntry.Element(AtomPub.Namespaces.Atom + "content")?.GetAttributeValue("type")
       );
 
