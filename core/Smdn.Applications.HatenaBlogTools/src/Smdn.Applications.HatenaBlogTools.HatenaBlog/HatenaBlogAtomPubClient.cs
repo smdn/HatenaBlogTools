@@ -43,45 +43,6 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
     public static readonly string Html = "text/html";
   }
 
-  public class Entry {
-    public string Title;
-    public HashSet<string> Categories = new HashSet<string>(StringComparer.Ordinal);
-    public DateTimeOffset? Updated;
-    public bool IsDraft;
-    public string Summary;
-    public string Content;
-    public string ContentType;
-
-    // default constructor
-    public Entry()
-    {
-    }
-
-    // copy constructor
-    public Entry(Entry baseEntry)
-    {
-      if (baseEntry == null)
-        throw new ArgumentNullException(nameof(baseEntry));
-
-      this.Title = baseEntry.Title;
-      this.Categories = new HashSet<string>(baseEntry.Categories, StringComparer.Ordinal);
-      this.Updated = baseEntry.Updated;
-      this.IsDraft = baseEntry.IsDraft;
-      this.Summary = baseEntry.Summary;
-      this.Content = baseEntry.Content;
-      this.ContentType = baseEntry.ContentType;
-    }
-  }
-
-  public class PostedEntry : Entry {
-    public Uri Id;
-    public Uri MemberUri;
-    public Uri EntryUri;
-    public string Author;
-    public DateTimeOffset Published;
-    public string FormattedContent;
-  }
-
   public class HatenaBlogAtomPubCredential {
     public string HatenaId { get; }
     public string BlogId { get; }
