@@ -60,6 +60,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         memberUri: new Uri("https://blog.example.com/atom/entry/0/"),
         entryUri: new Uri("https://example.com/entry/0/"),
         datePublished: new DateTimeOffset(2020, 3, 31, 0, 0, 0, TimeSpan.FromHours(0)),
+        authors: new[] {"entry0-author0", "entry0-author1"},
         categories: new[] {"entry0-category0", "entry0-category1", "entry0-category2"},
         formattedContent: "entry0-formatted-content"
       ) {
@@ -69,10 +70,9 @@ namespace Smdn.Applications.HatenaBlogTools {
         Summary = "entry0-summary",
         Content = "entry0-content",
         ContentType = "text/x-hatena-syntax",
-        Author = "entry0-author",
       };
 
-      const string expectedResult = @"AUTHOR: entry0-author
+      const string expectedResult = @"AUTHOR: entry0-author0 entry0-author1
 TITLE: entry0
 BASENAME: 0/
 STATUS: Publish

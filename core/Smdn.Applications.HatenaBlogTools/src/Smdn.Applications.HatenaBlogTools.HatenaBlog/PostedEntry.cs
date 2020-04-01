@@ -24,6 +24,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
   public class PostedEntry : Entry {
@@ -35,13 +36,14 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
     public string FormattedContent { get; }
 
     /* read-write properties */
-    public string Author { get; set; }
+    public HashSet<string> Authors { get; }
 
     internal protected PostedEntry(
       Uri id,
       Uri memberUri,
       Uri entryUri,
       DateTimeOffset datePublished,
+      IEnumerable<string> authors,
       string formattedContent,
       IEnumerable<string> categories = null
     )
@@ -54,6 +56,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       this.EntryUri = entryUri;
       this.DatePublished = datePublished;
       this.FormattedContent = formattedContent;
+      this.Authors = new HashSet<string>(authors ?? Enumerable.Empty<string>(), StringComparer.Ordinal);
     }
   }
 }

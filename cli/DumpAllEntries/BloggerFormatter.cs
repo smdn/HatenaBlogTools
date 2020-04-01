@@ -54,15 +54,17 @@ namespace Smdn.Applications.HatenaBlogTools {
                 entry.Id
               ),
           // ./entry/author
-          string.IsNullOrEmpty(entry.Author)
-            ? null
-            : new XElement(
-                AtomPub.Namespaces.Atom + "author",
-                new XElement(
-                  AtomPub.Namespaces.Atom + "name",
-                  entry.Author
+          entry.Authors.Select(author =>
+            string.IsNullOrEmpty(author)
+              ? null
+              : new XElement(
+                  AtomPub.Namespaces.Atom + "author",
+                  new XElement(
+                    AtomPub.Namespaces.Atom + "name",
+                    author
+                  )
                 )
-              ),
+          ),
           // ./entry/published
           entry.DatePublished == null
             ? null

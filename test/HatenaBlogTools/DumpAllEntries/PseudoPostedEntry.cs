@@ -8,6 +8,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       Uri memberUri = null,
       Uri entryUri = null,
       DateTimeOffset datePublished = default,
+      IEnumerable<string> authors = null,
       IEnumerable<string> categories = null,
       string formattedContent = null
     )
@@ -16,6 +17,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
         memberUri: memberUri,
         entryUri: entryUri,
         datePublished: datePublished,
+        authors: authors,
         categories: categories,
         formattedContent: formattedContent
       )

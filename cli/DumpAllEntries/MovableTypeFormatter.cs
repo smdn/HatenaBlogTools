@@ -56,7 +56,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         /*
          * metadata seciton
          */
-        writer.WriteLine(string.Concat("AUTHOR: ", entry.Author));
+        writer.WriteLine(string.Concat("AUTHOR: ", string.Join(" ", entry.Authors)));
         writer.WriteLine(string.Concat("TITLE: ", entry.Title));
 
         var entryLocation = entry.EntryUri?.LocalPath;

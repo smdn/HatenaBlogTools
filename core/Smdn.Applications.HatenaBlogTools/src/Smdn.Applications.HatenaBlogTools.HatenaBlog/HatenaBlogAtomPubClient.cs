@@ -275,7 +275,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       PostedEntry ConvertEntry(XElement entry)
       {
         /*
-         * read-only propeties
+         * posted-entry only propeties
          */
         var memberUri = entry
           .Elements(AtomPub.Namespaces.Atom + "link")
@@ -287,6 +287,9 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
           ?.GetAttributeValue("href", StringConversion.ToUriNullable);
         var id = StringConversion.ToUriNullable(entry.Element(AtomPub.Namespaces.Atom + "id")?.Value);
         var formattedContent = entry.Element(AtomPub.Namespaces.Hatena + "formatted-content")?.Value;
+        var authors = entry
+          .Elements(AtomPub.Namespaces.Atom + "author")
+          .Select(elementAuthor => elementAuthor.Element(AtomPub.Namespaces.Atom + "name")?.Value);
         var datePublished = DateTimeOffset.MinValue;
 
         try {
@@ -304,14 +307,14 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
           memberUri: memberUri,
           entryUri: entryUri,
           datePublished: datePublished,
+          authors: authors,
           formattedContent: formattedContent
         );
 
         /*
-         * read-write propeties
+         * basic propeties
          */
         e.Title = entry.Element(AtomPub.Namespaces.Atom + "title")?.Value;
-        e.Author = entry.Element(AtomPub.Namespaces.Atom + "author")?.Element(AtomPub.Namespaces.Atom + "name")?.Value;
         e.Summary = entry.Element(AtomPub.Namespaces.Atom + "summary")?.Value;
         e.Content = entry.Element(AtomPub.Namespaces.Atom + "content")?.Value;
         e.ContentType = entry.Element(AtomPub.Namespaces.Atom + "content")?.GetAttributeValue("type");
@@ -351,15 +354,19 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
       try {
         var putDocument = CreatePostDocument(updatingEntry);
 
-        if (updatingEntry.Author != null) {
-          putDocument.Root.Add(new XElement(
-            AtomPub.Namespaces.Atom + "author",
-            new XElement(
-              AtomPub.Namespaces.Atom + "name",
-              new XText(updatingEntry.Author)
-            )
-          ));
-        }
+        putDocument.Root.Add(
+          updatingEntry.Authors.Select(author =>
+            string.IsNullOrEmpty(author)
+              ? null
+              : new XElement(
+                  AtomPub.Namespaces.Atom + "author",
+                  new XElement(
+                    AtomPub.Namespaces.Atom + "name",
+                    author
+                  )
+                )
+          )
+        );
 
         return atom.Put(updatingEntry.MemberUri, putDocument, out responseDocument);
       }
