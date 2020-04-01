@@ -190,7 +190,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
     {
       var editor = new HatenaBlogContentEditor(input);
 
-      editor.ReplaceBlogUrlToHttps(new[] {"example.com", "example.net"});
+      editor.ReplaceBlogUrlToHttps(new[] { "example.com", "example.net" });
 
       Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
     }

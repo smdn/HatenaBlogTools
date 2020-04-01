@@ -163,7 +163,7 @@ namespace Smdn {
 
       var password = new StringBuilder();
 
-      for (;;) {
+      for (; ; ) {
         if (!Console.KeyAvailable) {
           Thread.Sleep(50);
           continue;

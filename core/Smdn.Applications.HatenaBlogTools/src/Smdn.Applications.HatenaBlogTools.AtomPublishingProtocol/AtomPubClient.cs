@@ -104,7 +104,7 @@ namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
     {
       responseDocument = null;
 
-      for (var timeoutRetryCount = maxTimeoutRetryCount;;) {
+      for (var timeoutRetryCount = maxTimeoutRetryCount; ;) {
         try {
           using (var response = GetResponseCore(createRequest())) {
             if (2 == ((int)response.StatusCode) / 100) { // 2XX

@@ -39,7 +39,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
 
     private static string ReplaceSchemeToHttps(string input, Regex regex, ref bool modified)
     {
-      for (;;) {
+      for (; ; ) {
         var match = regex.Match(input);
 
         if (!match.Success)

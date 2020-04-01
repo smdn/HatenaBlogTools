@@ -257,7 +257,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
 
       var nextUri = CollectionUri;
 
-      for (;;) {
+      for (; ; ) {
         var statusCode = atom.Get(nextUri, out XDocument collectionDocument);
 
         if (statusCode != HttpStatusCode.OK)

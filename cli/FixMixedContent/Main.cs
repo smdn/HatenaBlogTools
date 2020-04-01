@@ -288,7 +288,8 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     private static void EditContent(IHatenaBlogEntryEditor editor, string input, string output)
     {
-      bool IsStdIO(string io) {
+      bool IsStdIO(string io)
+      {
         if (string.IsNullOrEmpty(io))
           return true;
         if (string.Equals(io, "-", StringComparison.Ordinal))
