@@ -33,6 +33,7 @@ using System.Xml.Linq;
 
 using Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol;
 using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+using Smdn.IO;
 using Smdn.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
@@ -43,6 +44,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       AtomBlogger,
       MovableType,
       HatenaDiary,
+      EntryFile,
 
       Default = Atom,
     }
@@ -58,7 +60,7 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     protected override string GetDescription() => "すべてのブロク記事をダンプします。";
 
-    protected override string GetUsageExtraMandatoryOptions() => "[--format [hatena|mt|atom]] [出力ファイル名|-]";
+    protected override string GetUsageExtraMandatoryOptions() => "[--format [hatena|mt|atom]] [出力ファイル名|出力ディレクトリ名|-]";
 
     protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
     {
@@ -71,19 +73,22 @@ namespace Smdn.Applications.HatenaBlogTools {
       yield return "  --format atom         : Atomフィード形式(はてなブログAPIで取得できる全内容)";
       yield return "  --format atom-post    : Atomフィード形式(はてなブログAPIで取得できる内容のうち、投稿データのみ抽出)";
       yield return "  --format atom-blogger : Atomフィード形式(Blogger用フォーマット)";
+      yield return "  --format entry-file   : 記事ごとに個別のファイルに出力";
       yield return "　(省略した場合は、'--format atom'を指定した場合と同じ形式で出力します)";
       yield return "";
       yield return "--exclude-category <カテゴリ>  : 指定された<カテゴリ>を除外してダンプします(複数指定可)";
       yield return "--include-category <カテゴリ>  : 指定された<カテゴリ>のみを抽出してダンプします(複数指定可)";
       yield return "";
-      yield return "Blogger用フォーマットのオプション:";
+      yield return "Blogger用フォーマット(atom-blogger)のオプション:";
       yield return "  --blogger-domain <ドメイン> : Bloggerのブログドメイン(***.blogspot.com)を指定します(省略可)";
       yield return "  --blogger-id <ブログID>     : BloggerのブログIDを指定します(省略可)";
       yield return "                                ブログドメインとIDを指定した場合は、各記事に指定されているカスタムURLと";
       yield return "                                はてなブログの設定の一部をBloggerの設定に変換します";
       yield return "";
-      yield return "[出力ファイル名|-]             : ダンプした内容を保存するファイル名を指定します";
-      yield return "                                 省略した場合、- を指定した場合は標準出力に書き込みます";
+      yield return "[出力ファイル名|出力ディレクトリ名|-]";
+      yield return "                          : ダンプした内容の保存先ファイル名/ディレクトリ名を指定します";
+      yield return "                            省略した場合、- を指定した場合は標準出力に書き込みます";
+      yield return "                            --formatにentry-fileを指定した場合、出力ディレクトリ名は省略できません";
     }
 
     public void Run(string[] args)
@@ -96,8 +101,8 @@ namespace Smdn.Applications.HatenaBlogTools {
 #endif
       var categoriesToExclude = new HashSet<string>(StringComparer.Ordinal);
       var categoriesToInclude = new HashSet<string>(StringComparer.Ordinal);
-      OutputFormat outputFormat = OutputFormat.Default;
-      string outputFile = "-";
+      var outputFormat = OutputFormat.Default;
+      string outputPath = "-";
       string bloggerDomain = null;
       string bloggerId = null;
 
@@ -126,6 +131,10 @@ namespace Smdn.Applications.HatenaBlogTools {
 
               case "atom-blogger":
                 outputFormat = OutputFormat.AtomBlogger;
+                break;
+
+              case "entry-file":
+                outputFormat = OutputFormat.EntryFile;
                 break;
 
               default:
@@ -159,8 +168,19 @@ namespace Smdn.Applications.HatenaBlogTools {
 #endif
 
           default:
-            outputFile = args[i];
+            outputPath = args[i];
             break;
+        }
+      }
+
+      if (outputFormat == OutputFormat.EntryFile) {
+        if (outputPath == null) {
+          Usage("--format entry-fileでは、出力先ディレクトリが指定されている必要があります");
+          return;
+        }
+        if (outputPath == "-") {
+          Usage("--format entry-fileでは、出力先に標準出力を指定することはできません");
+          return;
         }
       }
 
@@ -217,47 +237,151 @@ namespace Smdn.Applications.HatenaBlogTools {
       // 結果を保存
       Console.Error.WriteLine("結果を保存しています");
 
-      using (var outputStream = outputFile == "-"
-             ? Console.OpenStandardOutput()
-             : new FileStream(outputFile, FileMode.Create, FileAccess.Write)) {
-        switch (outputFormat) {
-          case OutputFormat.HatenaDiary:
-            new HatenaDiaryFormatter(/*retrieveComments*/).Format(entries, outputStream);
-            break;
+      if (outputFormat == OutputFormat.EntryFile) {
+        OutputEntriesToIndividualFiles(
+          outputDocument,
+          entries,
+          hatenaBlog.BlogId,
+          outputPath
+        );
+      }
+      else {
+        using (var outputStream = outputPath == "-"
+          ? Console.OpenStandardOutput()
+          : new FileStream(outputPath, FileMode.Create, FileAccess.Write)
+        ) {
+          void OutputWithFormatter(FormatterBase _formatter) => _formatter.Format(entries, outputStream);
 
-          case OutputFormat.MovableType:
-            new MovableTypeFormatter(/*retrieveComments*/).Format(entries, outputStream);
-            break;
+          switch (outputFormat) {
+            case OutputFormat.Atom:
+            case OutputFormat.AtomPostData:
+              OutputDocument(outputDocument, outputFormat, outputStream);
+              break;
 
-          case OutputFormat.AtomBlogger:
-            new BloggerFormatter(
-              blogTitle: hatenaBlog.BlogTitle,
-              blogDomain: bloggerDomain,
-              blogId: bloggerId
-              /*, retrieveComments*/
-            ).Format(entries, outputStream);
-            break;
+            case OutputFormat.HatenaDiary:
+              OutputWithFormatter(new HatenaDiaryFormatter(/*retrieveComments*/));
+              break;
 
-          case OutputFormat.AtomPostData:
-            var elementsEntry = outputDocument.Root.Elements(AtomPub.Namespaces.Atom + "entry");
+            case OutputFormat.MovableType:
+              OutputWithFormatter(new MovableTypeFormatter(/*retrieveComments*/));
+              break;
 
-            elementsEntry.Elements(AtomPub.Namespaces.Atom + "id").Remove();
-            elementsEntry.Elements(AtomPub.Namespaces.Atom + "link").Remove();
-            elementsEntry.Elements(AtomPub.Namespaces.App + "edited").Remove();
-            elementsEntry.Elements(AtomPub.Namespaces.Hatena + "formatted-content").Remove();
+            case OutputFormat.AtomBlogger:
+              OutputWithFormatter(
+                new BloggerFormatter(
+                  blogTitle: hatenaBlog.BlogTitle,
+                  blogDomain: bloggerDomain,
+                  blogId: bloggerId
+                /*, retrieveComments*/
+                )
+              );
+              break;
 
-            goto case OutputFormat.Atom;
-
-          case OutputFormat.Atom:
-            outputDocument.Save(outputStream);
-            break;
-
-          default:
-            throw new NotSupportedException($"unsupported format: {outputFormat}");
+            default:
+              throw new NotSupportedException($"unsupported format: {outputFormat}");
+          }
         }
       }
 
       Console.Error.WriteLine("完了");
+    }
+
+    private static readonly XNamespace nsXLink = "http://www.w3.org/1999/xlink";
+
+    private void OutputEntriesToIndividualFiles(
+      XDocument document,
+      IReadOnlyList<PostedEntry> entries,
+      string blogId,
+      string outputDirectory
+    )
+    {
+      Directory.CreateDirectory(outputDirectory);
+
+      foreach (var entry in entries) {
+        var fileName =
+          $"{entry.DatePublished.Year:D4}{entry.DatePublished.Month:D2}{entry.DatePublished.Day:D2}_" +
+          // replace: '/' -> '-', invalid chars -> '_'
+          string.Join(
+            "-",
+            entry.EntryUri.LocalPath.Substring(1).Split('/').Select(seg => PathUtils.ReplaceInvalidFileNameChars(seg, "_"))
+          );
+        var fileExtension = EntryContentType.GetFileExtension(entry.ContentType) ?? ".txt";
+
+        var entryFilePath = Path.Combine(
+          outputDirectory,
+          Path.ChangeExtension(fileName, fileExtension)
+        );
+
+        File.WriteAllText(entryFilePath, entry.Content);
+
+        // set file timestamp
+        File.SetCreationTimeUtc(entryFilePath, entry.DatePublished.UtcDateTime);
+        File.SetLastWriteTimeUtc(entryFilePath, (entry.DateUpdated ?? DateTimeOffset.Now).UtcDateTime);
+
+        // edit metadata
+        var elementEntry = document
+          .Root
+          .Elements(AtomPub.Namespaces.Atom + "entry")
+          .FirstOrDefault(e =>
+            e.Element(AtomPub.Namespaces.Atom + "id")?.Value == entry.Id.AbsoluteUri
+          );
+
+        if (elementEntry != null) {
+          // replace atom:content
+          var elementEntryContent = elementEntry.Element(AtomPub.Namespaces.Atom + "content");
+
+          elementEntryContent.AddAfterSelf(
+            new XElement(
+              AtomPub.Namespaces.Atom + "content",
+              new XAttribute("type", entry.ContentType),
+              new XAttribute(nsXLink + "type", "simple"),
+              new XAttribute(nsXLink + "href", new Uri("file://" + Path.GetFullPath(entryFilePath)))
+            )
+          );
+
+          elementEntryContent.Remove();
+
+          // remove hatena:formatted-content
+          elementEntry.Element(AtomPub.Namespaces.Hatena + "formatted-content")?.Remove();
+        }
+      }
+
+      document.Root.Add(
+        new XAttribute(XNamespace.Xmlns + "xlink", nsXLink.NamespaceName)
+      );
+
+      var metadataFilePath = Path.Combine(
+        outputDirectory,
+        $"entry-metadata.{blogId}.xml"
+      );
+
+      document.Save(metadataFilePath);
+    }
+
+    private static void OutputDocument(
+      XDocument document,
+      OutputFormat outputFormat,
+      Stream outputStream
+    )
+    {
+      switch (outputFormat) {
+        case OutputFormat.AtomPostData:
+          var elementsEntry = document.Root.Elements(AtomPub.Namespaces.Atom + "entry");
+
+          elementsEntry.Elements(AtomPub.Namespaces.Atom + "id").Remove();
+          elementsEntry.Elements(AtomPub.Namespaces.Atom + "link").Remove();
+          elementsEntry.Elements(AtomPub.Namespaces.App + "edited").Remove();
+          elementsEntry.Elements(AtomPub.Namespaces.Hatena + "formatted-content").Remove();
+
+          goto case OutputFormat.Atom;
+
+        case OutputFormat.Atom:
+          document.Save(outputStream);
+          break;
+
+        default:
+          throw new NotSupportedException($"unsupported format: {outputFormat}");
+      }
     }
 
     private static XDocument DumpEntries(
