@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 using Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol;
+using Smdn.Text;
 using Smdn.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
@@ -197,6 +198,81 @@ namespace Smdn.Applications.HatenaBlogTools {
           elementListEntries[index].Element(AtomPub.Namespaces.Atom + "content")?.Value
         );
       }
+    }
+
+    [TestCase("/entry/2011/11/07/161845", "/161845.html")] // hatena blog standard
+    [TestCase("/entry/20111107/1320650325", "/1320650325.html")] // hatena diary
+    [TestCase("/entry/2011/11/07/週末は川に行きました", "/週末は川に行きました.html")] // title
+    [TestCase("/entry/2011/11/07/went_to_the_river_on_the_weekend", "/went_to_the_river_on_the_weekend.html")] // title
+    public void TestFormat_CustomPermalink(string entryUriLocalPath, string expectedCustomPermalinkLocalPath)
+    {
+      const string blogDomain = "blogger.example.com";
+      var datePublished = new DateTimeOffset(2020, 04, 01, 0, 0, 0, TimeSpan.FromHours(+9));
+
+      expectedCustomPermalinkLocalPath = $"/{datePublished.Year:D4}/{datePublished.Month:D2}" + expectedCustomPermalinkLocalPath;
+
+      var entry = new PseudoPostedEntry(
+        id: new Uri("tag:blog.example.com,2020:entry0"),
+        entryUri: new Uri($"https://blog.example.com{entryUriLocalPath}"),
+        datePublished: datePublished,
+        formattedContent: "entry0-formatted-content"
+      ) {
+        Title = "entry",
+      };
+
+      var doc = XDocument.Load(new BloggerFormatter(blogDomain: blogDomain).ToStream(new[] { entry }));
+      var linkRelAlternate = doc
+        .Root
+        .Element(AtomPub.Namespaces.Atom + "entry")
+        .Elements(AtomPub.Namespaces.Atom + "link")
+        .FirstOrDefault(e => e.HasAttributeWithValue("rel", "alternate"));
+
+      Assert.AreEqual(
+        "text/html",
+        linkRelAlternate?.GetAttributeValue("type")
+      );
+
+      Assert.AreEqual(
+        entry.Title,
+        linkRelAlternate?.GetAttributeValue("title")
+      );
+
+      var href = StringConversion.ToUriNullable(linkRelAlternate?.GetAttributeValue("href"));
+
+      Assert.AreEqual(
+        blogDomain,
+        href.Host
+      );
+
+      Assert.AreEqual(
+        expectedCustomPermalinkLocalPath,
+        href.LocalPath
+      );
+    }
+
+    [TestCase("/entry/2011/11/07/161845")] // hatena blog standard
+    [TestCase("/entry/20111107/1320650325")] // hatena diary
+    [TestCase("/entry/2011/11/07/週末は川に行きました")] // title
+    [TestCase("/entry/2011/11/07/went_to_the_river_on_the_weekend")] // title
+    public void TestFormat_CustomPermalink_BlogDomainNotProvided(string entryUriLocalPath)
+    {
+      var entry = new PseudoPostedEntry(
+        id: new Uri("tag:blog.example.com,2020:entry0"),
+        entryUri: new Uri($"https://blog.example.com{entryUriLocalPath}"),
+        datePublished: new DateTimeOffset(2020, 04, 01, 0, 0, 0, TimeSpan.FromHours(+9)),
+        formattedContent: "entry0-formatted-content"
+      ) {
+        Title = "entry",
+      };
+
+      var doc = XDocument.Load(new BloggerFormatter(blogDomain: null).ToStream(new[] { entry }));
+      var linkRelAlternate = doc
+        .Root
+        .Element(AtomPub.Namespaces.Atom + "entry")
+        .Elements(AtomPub.Namespaces.Atom + "link")
+        .FirstOrDefault(e => e.HasAttributeWithValue("rel", "alternate"));
+
+      Assert.IsNull(linkRelAlternate);
     }
   }
 }

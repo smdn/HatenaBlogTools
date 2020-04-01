@@ -34,14 +34,22 @@ using Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol;
 namespace Smdn.Applications.HatenaBlogTools {
   class BloggerFormatter : FormatterBase {
     private readonly string blogTitle;
+    private readonly string blogDomain;
 
-    public BloggerFormatter(string blogTitle = null)
+    public BloggerFormatter(
+      string blogTitle = null,
+      string blogDomain = null
+    )
     {
       this.blogTitle = blogTitle;
+      this.blogDomain = blogDomain;
     }
 
     public override void Format(IEnumerable<PostedEntry> entries, Stream outputStream)
     {
+      static string GetSegmentForCustomPermalinkLocalPath(PostedEntry entry)
+        => entry.EntryUri.Segments.Last();
+
       var elementListEntry = entries.Select(entry =>
         // ./entry
         new XElement(
@@ -52,6 +60,16 @@ namespace Smdn.Applications.HatenaBlogTools {
             : new XElement(
                 AtomPub.Namespaces.Atom + "id",
                 entry.Id
+              ),
+          // ./entry/link[@rel='alternate']
+          string.IsNullOrEmpty(blogDomain)
+            ? null
+            : new XElement(
+                AtomPub.Namespaces.Atom + "link",
+                new XAttribute("rel", "alternate"),
+                new XAttribute("type", "text/html"),
+                new XAttribute("title", entry.Title),
+                new XAttribute("href", $"https://{blogDomain}/{entry.DatePublished.Year:D4}/{entry.DatePublished.Month:D2}/{GetSegmentForCustomPermalinkLocalPath(entry)}.html")
               ),
           // ./entry/author
           entry.Authors.Select(author =>

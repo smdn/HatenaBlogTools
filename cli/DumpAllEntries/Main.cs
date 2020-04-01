@@ -76,6 +76,10 @@ namespace Smdn.Applications.HatenaBlogTools {
       yield return "--exclude-category <カテゴリ>  : 指定された<カテゴリ>を除外してダンプします(複数指定可)";
       yield return "--include-category <カテゴリ>  : 指定された<カテゴリ>のみを抽出してダンプします(複数指定可)";
       yield return "";
+      yield return "Blogger用フォーマットのオプション:";
+      yield return "  --blogger-domain <ドメイン> : Bloggerのブログドメイン(***.blogspot.com)を指定します(省略可)";
+      yield return "                                指定した場合は、はてなブログのカスタムURLをBloggerのパーマリンク形式に変換します";
+      yield return "";
       yield return "[出力ファイル名|-]             : ダンプした内容を保存するファイル名を指定します";
       yield return "                                 省略した場合、- を指定した場合は標準出力に書き込みます";
     }
@@ -92,6 +96,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       var categoriesToInclude = new HashSet<string>(StringComparer.Ordinal);
       OutputFormat outputFormat = OutputFormat.Default;
       string outputFile = "-";
+      string bloggerDomain = null;
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
@@ -134,6 +139,10 @@ namespace Smdn.Applications.HatenaBlogTools {
           case "--include-category":
           case "-incat":
             categoriesToInclude.Add(args[++i]);
+            break;
+
+          case "--blogger-domain":
+            bloggerDomain = args[++i];
             break;
 
 #if RETRIEVE_COMMENTS
@@ -214,7 +223,11 @@ namespace Smdn.Applications.HatenaBlogTools {
             break;
 
           case OutputFormat.AtomBlogger:
-            new BloggerFormatter(hatenaBlog.BlogTitle /*, retrieveComments*/).Format(entries, outputStream);
+            new BloggerFormatter(
+              blogTitle: hatenaBlog.BlogTitle,
+              blogDomain: bloggerDomain
+              /*, retrieveComments*/
+            ).Format(entries, outputStream);
             break;
 
           case OutputFormat.AtomPostData:
