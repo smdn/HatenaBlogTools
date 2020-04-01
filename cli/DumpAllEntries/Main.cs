@@ -82,12 +82,14 @@ namespace Smdn.Applications.HatenaBlogTools {
       yield return "--exclude-notation [hatena|md|html] : 指定された記法の記事を除外してダンプします(複数指定可)";
       yield return "--include-notation [hatena|md|html] : 指定された記法の記事のみを抽出してダンプします(複数指定可)";
       yield return "";
+#if false
       yield return "Blogger用フォーマット(atom-blogger)のオプション:";
       yield return "  --blogger-domain <ドメイン> : Bloggerのブログドメイン(***.blogspot.com)を指定します(省略可)";
       yield return "  --blogger-id <ブログID>     : BloggerのブログIDを指定します(省略可)";
       yield return "                                ブログドメインとIDを指定した場合は、各記事に指定されているカスタムURLと";
       yield return "                                はてなブログの設定の一部をBloggerの設定に変換します";
       yield return "";
+#endif
       yield return "[出力ファイル名|出力ディレクトリ名|-]";
       yield return "                          : ダンプした内容の保存先ファイル名/ディレクトリ名を指定します";
       yield return "                            省略した場合、- を指定した場合は標準出力に書き込みます";
@@ -108,8 +110,10 @@ namespace Smdn.Applications.HatenaBlogTools {
       var notationsToInclude = new HashSet<string>(StringComparer.Ordinal);
       var outputFormat = OutputFormat.Default;
       string outputPath = "-";
+#if false
       string bloggerDomain = null;
       string bloggerId = null;
+#endif
 
       string NotationNameToContentType(string notation)
       {
@@ -178,6 +182,7 @@ namespace Smdn.Applications.HatenaBlogTools {
             notationsToInclude.Add(NotationNameToContentType(args[++i]));
             break;
 
+#if false
           case "--blogger-domain":
             bloggerDomain = args[++i];
             break;
@@ -185,6 +190,7 @@ namespace Smdn.Applications.HatenaBlogTools {
           case "--blogger-id":
             bloggerId = args[++i];
             break;
+#endif
 
 #if RETRIEVE_COMMENTS
           case "-comment":
@@ -299,10 +305,12 @@ namespace Smdn.Applications.HatenaBlogTools {
             case OutputFormat.AtomBlogger:
               OutputWithFormatter(
                 new BloggerFormatter(
-                  blogTitle: hatenaBlog.BlogTitle,
+                  blogTitle: hatenaBlog.BlogTitle
+#if false
                   blogDomain: bloggerDomain,
                   blogId: bloggerId
                 /*, retrieveComments*/
+#endif
                 )
               );
               break;

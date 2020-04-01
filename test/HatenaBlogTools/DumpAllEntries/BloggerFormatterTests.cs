@@ -217,6 +217,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
     }
 
+#if false
     [Test]
     public void TestFormat_BlogSettings_Title()
     {
@@ -331,5 +332,6 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       Assert.IsNull(linkRelAlternate);
     }
+#endif
   }
 }

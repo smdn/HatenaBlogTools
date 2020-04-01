@@ -34,8 +34,10 @@ using Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol;
 namespace Smdn.Applications.HatenaBlogTools {
   class BloggerFormatter : FormatterBase {
     private readonly string blogTitle;
+#if false
     private readonly string blogDomain;
     private readonly string blogId;
+#endif
 
     public BloggerFormatter(
       string blogTitle = null,
@@ -44,14 +46,18 @@ namespace Smdn.Applications.HatenaBlogTools {
     )
     {
       this.blogTitle = blogTitle;
+#if false
       this.blogDomain = blogDomain;
       this.blogId = blogId;
+#endif
     }
 
     public override void Format(IEnumerable<PostedEntry> entries, Stream outputStream)
     {
+#if false
       static string GetSegmentForCustomPermalinkLocalPath(PostedEntry entry)
         => entry.EntryUri.Segments.Last();
+#endif
 
       var elementListPost = entries.Select(entry =>
         // ./entry
@@ -64,6 +70,7 @@ namespace Smdn.Applications.HatenaBlogTools {
                 AtomPub.Namespaces.Atom + "id",
                 entry.Id
               ),
+#if false
           // ./entry/link[@rel='alternate']
           string.IsNullOrEmpty(blogDomain)
             ? null
@@ -74,6 +81,7 @@ namespace Smdn.Applications.HatenaBlogTools {
                 new XAttribute("title", entry.Title),
                 new XAttribute("href", $"https://{blogDomain}/{entry.DatePublished.Year:D4}/{entry.DatePublished.Month:D2}/{GetSegmentForCustomPermalinkLocalPath(entry)}.html")
               ),
+#endif
           // ./entry/author
           entry.Authors.Select(author =>
             string.IsNullOrEmpty(author)
@@ -137,6 +145,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         )
       );
 
+#if false // not works
       var elementListSettings = new[] {
         // ./entry
         new XElement(
@@ -173,6 +182,7 @@ namespace Smdn.Applications.HatenaBlogTools {
           )
         )
       };
+#endif
 
       var document = new XDocument(
         new XDeclaration("1.0", "utf-8", null),
@@ -193,8 +203,10 @@ namespace Smdn.Applications.HatenaBlogTools {
             AtomPub.Namespaces.Atom + "generator",
             "Blogger"
           ),
+#if false
           // /feed/entry (http://schemas.google.com/blogger/2008/kind#settings)
           elementListSettings,
+#endif
           // /feed/entry (http://schemas.google.com/blogger/2008/kind#post)
           elementListPost
         )
