@@ -79,6 +79,9 @@ namespace Smdn.Applications.HatenaBlogTools {
       yield return "--exclude-category <カテゴリ>  : 指定された<カテゴリ>を除外してダンプします(複数指定可)";
       yield return "--include-category <カテゴリ>  : 指定された<カテゴリ>のみを抽出してダンプします(複数指定可)";
       yield return "";
+      yield return "--exclude-notation [hatena|md|html] : 指定された記法の記事を除外してダンプします(複数指定可)";
+      yield return "--include-notation [hatena|md|html] : 指定された記法の記事のみを抽出してダンプします(複数指定可)";
+      yield return "";
       yield return "Blogger用フォーマット(atom-blogger)のオプション:";
       yield return "  --blogger-domain <ドメイン> : Bloggerのブログドメイン(***.blogspot.com)を指定します(省略可)";
       yield return "  --blogger-id <ブログID>     : BloggerのブログIDを指定します(省略可)";
@@ -101,10 +104,24 @@ namespace Smdn.Applications.HatenaBlogTools {
 #endif
       var categoriesToExclude = new HashSet<string>(StringComparer.Ordinal);
       var categoriesToInclude = new HashSet<string>(StringComparer.Ordinal);
+      var notationsToExclude = new HashSet<string>(StringComparer.Ordinal);
+      var notationsToInclude = new HashSet<string>(StringComparer.Ordinal);
       var outputFormat = OutputFormat.Default;
       string outputPath = "-";
       string bloggerDomain = null;
       string bloggerId = null;
+
+      string NotationNameToContentType(string notation)
+      {
+        switch (notation) {
+          case "hatena": return EntryContentType.HatenaSyntax;
+          case "md": return EntryContentType.Markdown;
+          case "html": return EntryContentType.Html;
+          default:
+            Usage("unsupported notation: {0}", notation);
+            throw new AbortCommandException();
+        }
+      }
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
@@ -153,6 +170,14 @@ namespace Smdn.Applications.HatenaBlogTools {
             categoriesToInclude.Add(args[++i]);
             break;
 
+          case "--exclude-notation":
+            notationsToExclude.Add(NotationNameToContentType(args[++i]));
+            break;
+
+          case "--include-notation":
+            notationsToInclude.Add(NotationNameToContentType(args[++i]));
+            break;
+
           case "--blogger-domain":
             bloggerDomain = args[++i];
             break;
@@ -189,45 +214,50 @@ namespace Smdn.Applications.HatenaBlogTools {
         return;
       }
 
+      if (0 < notationsToExclude.Count && 0 < notationsToInclude.Count) {
+        Usage("--exclude-notationと--include-notationを同時に指定することはできません");
+        return;
+      }
+
       if (!Login(credential, out var hatenaBlog))
         return;
 
-      Predicate<PostedEntry> entryPredicate;
+      Predicate<PostedEntry> entryCategoryPredicate = entry => {
+        if (0 < categoriesToExclude.Count && entry.Categories.Overlaps(categoriesToExclude)) {
+          Console.Error.WriteLine("対象カテゴリを含むため除外します: ({0})", string.Join(", ", entry.Categories));
+          return false;
+        }
+        if (0 < categoriesToInclude.Count && !entry.Categories.Overlaps(categoriesToInclude)) {
+          Console.Error.WriteLine("対象カテゴリを含まないため除外します ({0})", string.Join(", ", entry.Categories));
+          return false;
+        }
 
-      if (0 < categoriesToExclude.Count) {
-        entryPredicate = entry => {
-          Console.Error.Write($"{entry.EntryUri} \"{entry.Title}\" : ");
+        return true;
+      };
 
-          if (entry.Categories.Overlaps(categoriesToExclude)) {
-            Console.Error.WriteLine("対象カテゴリを含むため除外します: ({0})", string.Join(", ", entry.Categories));
-            return false;
-          }
-          else {
-            Console.Error.WriteLine("完了");
-            return true;
-          }
-        };
-      }
-      else if (0 < categoriesToInclude.Count)
-        entryPredicate = entry => {
-          Console.Error.Write($"{entry.EntryUri} \"{entry.Title}\" : ");
+      Predicate<PostedEntry> entryNotationPredicate = entry => {
+        if (0 < notationsToExclude.Count && notationsToExclude.Contains(entry.ContentType)) {
+          Console.Error.WriteLine("対象外の記法で記述されているため除外します: ({0})", entry.ContentType);
+          return false;
+        }
+        if (0 < notationsToInclude.Count && !notationsToInclude.Contains(entry.ContentType)) {
+          Console.Error.WriteLine("対象の記法で記述されていないため除外します: ({0})", entry.ContentType);
+          return false;
+        }
 
-          if (entry.Categories.Overlaps(categoriesToInclude)) {
-            Console.Error.WriteLine("完了");
-            return true;
-          }
-          else {
-            Console.Error.WriteLine("対象カテゴリを含まないため除外します ({0})", string.Join(", ", entry.Categories));
-            return false;
-          }
-        };
-      else {
-        entryPredicate = entry => {
-          Console.Error.Write($"{entry.EntryUri} \"{entry.Title}\" : ");
+        return true;
+      };
+
+      Predicate<PostedEntry> entryPredicate = entry => {
+        Console.Error.Write($"{entry.EntryUri} \"{entry.Title}\" : ");
+
+        if (entryCategoryPredicate(entry) && entryNotationPredicate(entry)) {
           Console.Error.WriteLine("完了");
           return true;
-        };
-      }
+        }
+
+        return false;
+      };
 
       var outputDocument = DumpEntries(hatenaBlog, entryPredicate, out var entries);
 
