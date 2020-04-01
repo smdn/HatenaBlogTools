@@ -87,12 +87,10 @@ namespace Smdn.Applications.HatenaBlogTools {
                 )
           ),
           // ./entry/published
-          entry.DatePublished == null
-            ? null
-            : new XElement(
-                AtomPub.Namespaces.Atom + "published",
-                entry.DatePublished
-              ),
+          new XElement(
+            AtomPub.Namespaces.Atom + "published",
+            entry.DatePublished
+          ),
           // ./entry/updated
           entry.DateUpdated == null
             ? null
