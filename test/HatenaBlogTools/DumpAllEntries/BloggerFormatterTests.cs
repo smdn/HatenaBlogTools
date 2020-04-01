@@ -55,12 +55,18 @@ namespace Smdn.Applications.HatenaBlogTools {
       );
 
       // /feed/entry
+      var elementsEntryOfPost = elementFeed
+        .Elements(AtomPub.Namespaces.Atom + "entry")
+        .Where(e =>
+          e.Element(AtomPub.Namespaces.Atom + "category")?.HasAttributeWithValue("term", "http://schemas.google.com/blogger/2008/kind#post") ?? false
+        ).ToList();
+
       Assert.AreEqual(
         1,
-        elementFeed.Elements(AtomPub.Namespaces.Atom + "entry").Count()
+        elementsEntryOfPost.Count
       );
 
-      var elementEntry = elementFeed.Element(AtomPub.Namespaces.Atom + "entry");
+      var elementEntry = elementsEntryOfPost.First();
 
       // /feed/entry/id
       Assert.AreEqual(
@@ -140,8 +146,13 @@ namespace Smdn.Applications.HatenaBlogTools {
 
       var doc = XDocument.Load(new BloggerFormatter(blogTitle).ToStream(new[] { entry }));
 
-      // /feed
-      var elementEntry = doc.Root.Element(AtomPub.Namespaces.Atom + "entry");
+      // /feed/entry
+      var elementEntry = doc
+        .Root
+        .Elements(AtomPub.Namespaces.Atom + "entry")
+        .First(e =>
+          e.Element(AtomPub.Namespaces.Atom + "category")?.HasAttributeWithValue("term", "http://schemas.google.com/blogger/2008/kind#post") ?? false
+        );
 
       // /feed/entry/app:control/app:draft
       Assert.IsNotNull(elementEntry.Element(AtomPub.Namespaces.App + "control"));
@@ -175,7 +186,13 @@ namespace Smdn.Applications.HatenaBlogTools {
       var doc = XDocument.Load(new BloggerFormatter().ToStream(entries));
 
       // /feed/entry
-      var elementListEntries = doc.Root.Elements(AtomPub.Namespaces.Atom + "entry").ToList();
+      var elementListEntries = doc
+        .Root
+        .Elements(AtomPub.Namespaces.Atom + "entry")
+        .Where(e =>
+          e.Element(AtomPub.Namespaces.Atom + "category")?.HasAttributeWithValue("term", "http://schemas.google.com/blogger/2008/kind#post") ?? false
+        )
+        .ToList();
 
       Assert.AreEqual(2, elementListEntries.Count);
 
@@ -200,6 +217,39 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
     }
 
+    [Test]
+    public void TestFormat_BlogSettings_Title()
+    {
+      const string blogTitle = "my test blog";
+      const string blogId = "pseudo-blog-id";
+
+      var doc = XDocument.Load(new BloggerFormatter(blogTitle: blogTitle, blogId: blogId).ToStream(Enumerable.Empty<PostedEntry>()));
+
+      var entrySetting = doc
+        .Root
+        .Elements(AtomPub.Namespaces.Atom + "entry")
+        .FirstOrDefault(e =>
+          e.Element(AtomPub.Namespaces.Atom + "category")?.HasAttributeWithValue("term", "http://schemas.google.com/blogger/2008/kind#settings") ?? false
+        );
+
+      Assert.IsNotNull(entrySetting);
+
+      Assert.AreEqual(
+        $"tag:blogger.com,1999:blog-{blogId}.settings.BLOG_NAME",
+        entrySetting.Element(AtomPub.Namespaces.Atom + "id")?.Value
+      );
+
+      Assert.AreEqual(
+        $"https://www.blogger.com/feeds/{blogId}/settings/BLOG_NAME",
+        entrySetting.Elements(AtomPub.Namespaces.Atom + "link").FirstOrDefault(e => e.HasAttributeWithValue("rel", "edit"))?.Attribute("href")?.Value
+      );
+
+      Assert.AreEqual(
+        $"https://www.blogger.com/feeds/{blogId}/settings/BLOG_NAME",
+        entrySetting.Elements(AtomPub.Namespaces.Atom + "link").FirstOrDefault(e => e.HasAttributeWithValue("rel", "self"))?.Attribute("href")?.Value
+      );
+    }
+
     [TestCase("/entry/2011/11/07/161845", "/161845.html")] // hatena blog standard
     [TestCase("/entry/20111107/1320650325", "/1320650325.html")] // hatena diary
     [TestCase("/entry/2011/11/07/週末は川に行きました", "/週末は川に行きました.html")] // title
@@ -221,9 +271,13 @@ namespace Smdn.Applications.HatenaBlogTools {
       };
 
       var doc = XDocument.Load(new BloggerFormatter(blogDomain: blogDomain).ToStream(new[] { entry }));
+
       var linkRelAlternate = doc
         .Root
-        .Element(AtomPub.Namespaces.Atom + "entry")
+        .Elements(AtomPub.Namespaces.Atom + "entry")
+        .First(e =>
+          e.Element(AtomPub.Namespaces.Atom + "category")?.HasAttributeWithValue("term", "http://schemas.google.com/blogger/2008/kind#post") ?? false
+        )
         .Elements(AtomPub.Namespaces.Atom + "link")
         .FirstOrDefault(e => e.HasAttributeWithValue("rel", "alternate"));
 
@@ -268,7 +322,10 @@ namespace Smdn.Applications.HatenaBlogTools {
       var doc = XDocument.Load(new BloggerFormatter(blogDomain: null).ToStream(new[] { entry }));
       var linkRelAlternate = doc
         .Root
-        .Element(AtomPub.Namespaces.Atom + "entry")
+        .Elements(AtomPub.Namespaces.Atom + "entry")
+        .First(e =>
+          e.Element(AtomPub.Namespaces.Atom + "category")?.HasAttributeWithValue("term", "http://schemas.google.com/blogger/2008/kind#post") ?? false
+        )
         .Elements(AtomPub.Namespaces.Atom + "link")
         .FirstOrDefault(e => e.HasAttributeWithValue("rel", "alternate"));
 

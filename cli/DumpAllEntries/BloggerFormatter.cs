@@ -35,14 +35,17 @@ namespace Smdn.Applications.HatenaBlogTools {
   class BloggerFormatter : FormatterBase {
     private readonly string blogTitle;
     private readonly string blogDomain;
+    private readonly string blogId;
 
     public BloggerFormatter(
       string blogTitle = null,
-      string blogDomain = null
+      string blogDomain = null,
+      string blogId = null
     )
     {
       this.blogTitle = blogTitle;
       this.blogDomain = blogDomain;
+      this.blogId = blogId;
     }
 
     public override void Format(IEnumerable<PostedEntry> entries, Stream outputStream)
@@ -50,7 +53,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       static string GetSegmentForCustomPermalinkLocalPath(PostedEntry entry)
         => entry.EntryUri.Segments.Last();
 
-      var elementListEntry = entries.Select(entry =>
+      var elementListPost = entries.Select(entry =>
         // ./entry
         new XElement(
           AtomPub.Namespaces.Atom + "entry",
@@ -136,6 +139,43 @@ namespace Smdn.Applications.HatenaBlogTools {
         )
       );
 
+      var elementListSettings = new[] {
+        // ./entry
+        new XElement(
+          AtomPub.Namespaces.Atom + "entry",
+          // ./entry/id
+          new XElement(
+            AtomPub.Namespaces.Atom + "id",
+            $"tag:blogger.com,1999:blog-{blogId}.settings.BLOG_NAME"
+          ),
+          // ./entry/category
+          new XElement(
+            AtomPub.Namespaces.Atom + "category",
+            new XAttribute("scheme", "http://schemas.google.com/g/2005#kind"),
+            new XAttribute("term", "http://schemas.google.com/blogger/2008/kind#settings")
+          ),
+          // ./entry/link
+          new XElement(
+            AtomPub.Namespaces.Atom + "link",
+            new XAttribute("rel", "edit"),
+            new XAttribute("type", "application/atom+xml"),
+            new XAttribute("href", $"https://www.blogger.com/feeds/{blogId}/settings/BLOG_NAME")
+          ),
+          new XElement(
+            AtomPub.Namespaces.Atom + "link",
+            new XAttribute("rel", "self"),
+            new XAttribute("type", "application/atom+xml"),
+            new XAttribute("href", $"https://www.blogger.com/feeds/{blogId}/settings/BLOG_NAME")
+          ),
+          // ./entry/content
+          new XElement(
+            AtomPub.Namespaces.Atom + "content",
+            new XAttribute("type", "text"),
+            blogTitle
+          )
+        )
+      };
+
       var document = new XDocument(
         new XDeclaration("1.0", "utf-8", null),
         // /feed
@@ -155,8 +195,10 @@ namespace Smdn.Applications.HatenaBlogTools {
             AtomPub.Namespaces.Atom + "generator",
             "Blogger"
           ),
-          // /feed/entry
-          elementListEntry
+          // /feed/entry (http://schemas.google.com/blogger/2008/kind#settings)
+          elementListSettings,
+          // /feed/entry (http://schemas.google.com/blogger/2008/kind#post)
+          elementListPost
         )
       );
 

@@ -78,7 +78,9 @@ namespace Smdn.Applications.HatenaBlogTools {
       yield return "";
       yield return "Blogger用フォーマットのオプション:";
       yield return "  --blogger-domain <ドメイン> : Bloggerのブログドメイン(***.blogspot.com)を指定します(省略可)";
-      yield return "                                指定した場合は、はてなブログのカスタムURLをBloggerのパーマリンク形式に変換します";
+      yield return "  --blogger-id <ブログID>     : BloggerのブログIDを指定します(省略可)";
+      yield return "                                ブログドメインとIDを指定した場合は、各記事に指定されているカスタムURLと";
+      yield return "                                はてなブログの設定の一部をBloggerの設定に変換します";
       yield return "";
       yield return "[出力ファイル名|-]             : ダンプした内容を保存するファイル名を指定します";
       yield return "                                 省略した場合、- を指定した場合は標準出力に書き込みます";
@@ -97,6 +99,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       OutputFormat outputFormat = OutputFormat.Default;
       string outputFile = "-";
       string bloggerDomain = null;
+      string bloggerId = null;
 
       for (var i = 0; i < args.Length; i++) {
         switch (args[i]) {
@@ -143,6 +146,10 @@ namespace Smdn.Applications.HatenaBlogTools {
 
           case "--blogger-domain":
             bloggerDomain = args[++i];
+            break;
+
+          case "--blogger-id":
+            bloggerId = args[++i];
             break;
 
 #if RETRIEVE_COMMENTS
@@ -225,7 +232,8 @@ namespace Smdn.Applications.HatenaBlogTools {
           case OutputFormat.AtomBlogger:
             new BloggerFormatter(
               blogTitle: hatenaBlog.BlogTitle,
-              blogDomain: bloggerDomain
+              blogDomain: bloggerDomain,
+              blogId: bloggerId
               /*, retrieveComments*/
             ).Format(entries, outputStream);
             break;
