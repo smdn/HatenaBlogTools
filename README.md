@@ -15,7 +15,7 @@ Requires one of the following .NET runtimes.
 - .NET Framework 4.7 or over
 
 # Install & How to use
-see https://smdn.jp/smdn.jp/works/tools/HatenaBlogTools/
+see https://smdn.jp/works/tools/HatenaBlogTools/
 
 # How to build and run from source
 The instructions of using 'Login' command is shown in below.
