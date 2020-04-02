@@ -10,7 +10,7 @@ This software is released under the MIT License, see [LICENSE](/LICENSE).
 # Requirements
 Requires one of the following .NET runtimes.
 
-- [.NET Core Runtime](https://www.microsoft.com/net/download/all) 2.0.7 or over
+- [.NET Core Runtime](https://www.microsoft.com/net/download/all) 3.1 or over
 - [Mono](http://www.go-mono.com/mono-downloads/download.html) 6.6 or over
 - .NET Framework 4.7 or over
 
