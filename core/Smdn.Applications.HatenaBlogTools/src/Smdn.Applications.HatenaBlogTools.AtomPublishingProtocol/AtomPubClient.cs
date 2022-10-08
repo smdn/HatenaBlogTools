@@ -132,8 +132,8 @@ namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
                                       response.ResponseUri);
 
 #if false
-              foreach (string h in resp.Headers.Keys) {
-                Console.Error.WriteLine("{0}: {1}", h, resp.Headers[h]);
+              foreach (string h in response.Headers.Keys) {
+                Console.Error.WriteLine("{0}: {1}", h, response.Headers[h]);
               }
 #endif
               // try read response body
