@@ -132,6 +132,7 @@ namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
                                       response.ResponseUri);
 
 #if false
+              Console.Error.WriteLine("[response headers]");
               foreach (string h in response.Headers.Keys) {
                 Console.Error.WriteLine("{0}: {1}", h, response.Headers[h]);
               }
@@ -170,6 +171,13 @@ namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
 
       HttpWebResponse GetResponseCore(HttpWebRequest req)
       {
+#if false
+        Console.Error.WriteLine("[request headers]");
+        foreach (string h in req.Headers.Keys) {
+          Console.Error.WriteLine("{0}: {1}", h, req.Headers[h]);
+        }
+#endif
+
         try {
           return req.GetResponse() as HttpWebResponse;
         }
