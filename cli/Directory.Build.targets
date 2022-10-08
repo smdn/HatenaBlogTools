@@ -1,6 +1,6 @@
 <Project>
   <ItemGroup>
-    <PackageReference Include="Smdn" Version="3.0.0-beta*" />
+    <PackageReference Include="Smdn" Version="3.0.0-beta4" />
   </ItemGroup>
 
   <ItemGroup>
