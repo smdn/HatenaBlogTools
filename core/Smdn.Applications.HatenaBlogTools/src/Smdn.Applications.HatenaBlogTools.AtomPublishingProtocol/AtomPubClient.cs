@@ -26,6 +26,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 
 using Smdn.Net;
@@ -76,8 +77,19 @@ namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
 
         req.ContentType = "application/atom+xml";
 
+        var settings = new XmlWriterSettings() {
+          Encoding = new UTF8Encoding(false), // Hatena blog AtomPub API's XML parser does not accept XML documents with BOM
+          NewLineChars = "\n",
+          ConformanceLevel = ConformanceLevel.Document,
+          Indent = true,
+          IndentChars = " ",
+          CloseOutput = false,
+        };
+
         using (var reqStream = req.GetRequestStream()) {
-          requestDocument.Save(reqStream);
+          using (var writer = XmlWriter.Create(reqStream, settings)) {
+            requestDocument.Save(writer);
+          }
         }
 
         return req;
