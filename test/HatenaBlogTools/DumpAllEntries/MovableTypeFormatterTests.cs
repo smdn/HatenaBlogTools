@@ -113,21 +113,21 @@ entry0-formatted-content
         },
       };
 
-      const string expectedResult = @"AUTHOR: 
+      const string expectedResult = @"AUTHOR:
 TITLE: entry0
 STATUS: Publish
 CONVERT BREAKS: 0
-TAGS: 
+TAGS:
 -----
 BODY:
 entry0-formatted-content
 -----
 --------
-AUTHOR: 
+AUTHOR:
 TITLE: entry1
 STATUS: Draft
 CONVERT BREAKS: 0
-TAGS: 
+TAGS:
 -----
 BODY:
 entry1-formatted-content
@@ -138,7 +138,7 @@ entry1-formatted-content
 
       Assert.AreEqual(
         expectedResult.Replace("\r", string.Empty),
-        formattedText
+        formattedText.Replace(" \n", "\n") // trim line endings
       );
     }
   }
