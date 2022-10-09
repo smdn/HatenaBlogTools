@@ -1,6 +1,6 @@
 <Project>
   <ItemGroup>
-    <PackageReference Include="Smdn" Version="3.0.0-beta4" />
+    <PackageReference Include="Smdn.Fundamental.RuntimeInformation" Version="[3.*,4.0)" />
   </ItemGroup>
 
   <ItemGroup>

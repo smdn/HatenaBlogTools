@@ -32,7 +32,6 @@ using System.Xml;
 using System.Xml.Linq;
 
 using Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol;
-using Smdn.Text;
 using Smdn.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
@@ -162,6 +161,8 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
   }
 
   internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
+    private static Uri ToUriNullable(string val) => (val == null) ? null : new Uri(val);
+
     private readonly HatenaBlogAtomPubCredential credential;
 
     public override string HatenaId => credential.HatenaId;
@@ -245,7 +246,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
                                           .Element(AtomPub.ElementNames.AppWorkspace)
                                           ?.Elements(AtomPub.ElementNames.AppCollection)
                                           ?.FirstOrDefault(e => e.Element(AtomPub.ElementNames.AppAccept).Value.Contains("type=entry"))
-                                          ?.GetAttributeValue("href", StringConversion.ToUri);
+                                          ?.GetAttributeValue("href", static val => new Uri(val));
 
       return statusCode;
     }
@@ -271,7 +272,7 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
         nextUri = collectionDocument.Element(AtomPub.Namespaces.Atom + "feed")
                                     ?.Elements(AtomPub.Namespaces.Atom + "link")
                                     ?.FirstOrDefault(e => e.HasAttributeWithValue("rel", "next"))
-                                    ?.GetAttributeValue("href", StringConversion.ToUriNullable);
+                                    ?.GetAttributeValue("href", ToUriNullable);
 
         if (nextUri == null)
           break;
@@ -294,12 +295,12 @@ namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
         var memberUri = entry
           .Elements(AtomPub.Namespaces.Atom + "link")
           .FirstOrDefault(link => link.HasAttributeWithValue("rel", "edit"))
-          ?.GetAttributeValue("href", StringConversion.ToUriNullable);
+          ?.GetAttributeValue("href", ToUriNullable);
         var entryUri = entry
           .Elements(AtomPub.Namespaces.Atom + "link")
           .FirstOrDefault(link => link.HasAttributeWithValue("rel", "alternate") && link.HasAttributeWithValue("type", "text/html"))
-          ?.GetAttributeValue("href", StringConversion.ToUriNullable);
-        var id = StringConversion.ToUriNullable(entry.Element(AtomPub.Namespaces.Atom + "id")?.Value);
+          ?.GetAttributeValue("href", ToUriNullable);
+        var id = ToUriNullable(entry.Element(AtomPub.Namespaces.Atom + "id")?.Value);
         var formattedContent = entry.Element(AtomPub.Namespaces.Hatena + "formatted-content")?.Value;
         var authors = entry
           .Elements(AtomPub.Namespaces.Atom + "author")

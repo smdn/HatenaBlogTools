@@ -39,7 +39,12 @@ namespace Smdn.Net {
       if (credential == null)
         throw new ArgumentNullException(nameof(credential));
 
-      var nonce = MathUtils.GetRandomBytes(40);
+      const int nonceLength = 40;
+      var nonce = new byte[nonceLength];
+      var rng = RandomNumberGenerator.Create();
+
+      rng.GetBytes(nonce);
+
       var createdDateTimeString = createdDateTime.ToString("o");
 
       string passwordDigest;

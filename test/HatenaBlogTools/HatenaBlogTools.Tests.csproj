@@ -10,6 +10,8 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2"/>
     <PackageReference Include="Smdn.Test.NUnit.Utils" Version="1.0.0" />
+    <PackageReference Include="Smdn.Fundamental.RuntimeInformation" Version="[3.*,4.0)" />
+    <PackageReference Include="Smdn.Fundamental.Stream.TextReader" Version="[3.*,4.0)" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\core\Smdn.Applications.HatenaBlogTools\src\Smdn.Applications.HatenaBlogTools.csproj" />

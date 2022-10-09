@@ -48,7 +48,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       Assert.AreEqual(1, day.Elements("body").Count());
 
       var body = day.Element("body");
-      var bodyLines = new StringReader(body.Value).ReadLines().ToList();
+      var bodyLines = new StringReader(body.Value).ReadAllLines();
       var firstLine = bodyLines.FirstOrDefault();
 
       Assert.IsNotNull(firstLine);

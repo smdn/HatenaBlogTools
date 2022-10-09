@@ -33,7 +33,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Smdn" Version="3.0.0-beta4" />
+    <PackageReference Include="Smdn.Fundamental.Exception" Version="[3.*,4.0)" />
+    <PackageReference Include="Smdn.Fundamental.Xml.Linq" Version="[3.*,4.0)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,9 +43,6 @@
     </Compile>
     <Compile Include="..\..\Smdn\Smdn.Core.Miscellaneous\src\Smdn.Net\WsseClient.cs">
       <Link>WsseClient.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Smdn\Smdn.Xml.Xhtml\src\Smdn.Xml.Linq\Extensions.cs">
-      <Link>Extensions.cs</Link>
     </Compile>
   </ItemGroup>
 </Project>

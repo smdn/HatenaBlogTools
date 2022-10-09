@@ -5,7 +5,6 @@ using NUnit.Framework;
 
 using Smdn.Applications.HatenaBlogTools.HatenaBlog;
 using Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol;
-using Smdn.Text;
 using Smdn.Xml.Linq;
 
 namespace Smdn.Applications.HatenaBlogTools {
@@ -292,7 +291,11 @@ namespace Smdn.Applications.HatenaBlogTools {
         linkRelAlternate?.GetAttributeValue("title")
       );
 
-      var href = StringConversion.ToUriNullable(linkRelAlternate?.GetAttributeValue("href"));
+      var hrefString = linkRelAlternate?.GetAttributeValue("href");
+
+      Assert.IsNotNull(hrefString);
+
+      var href = new Uri(hrefString);
 
       Assert.AreEqual(
         blogDomain,

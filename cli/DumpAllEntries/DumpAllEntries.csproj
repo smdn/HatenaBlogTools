@@ -2,4 +2,8 @@
   <PropertyGroup>
     <AssemblyName>DumpAllEntries</AssemblyName>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Smdn.Fundamental.FileSystem" Version="[3.*,4.0)" />
+    <PackageReference Include="Smdn.Fundamental.Stream.TextReader" Version="[3.*,4.0)" />
+  </ItemGroup>
 </Project>
