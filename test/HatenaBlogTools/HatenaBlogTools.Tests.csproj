@@ -9,9 +9,7 @@
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2"/>
-  </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework.StartsWith('netcoreapp'))">
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.0" />
+    <PackageReference Include="Smdn.Test.NUnit.Utils" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\core\Smdn.Applications.HatenaBlogTools\src\Smdn.Applications.HatenaBlogTools.csproj" />
@@ -23,8 +21,6 @@
     <Compile Include="..\..\cli\FixMixedContent\Main.cs">
       <Link>FixMixedContent\Main.cs</Link>
     </Compile>
-    <Compile Include="..\..\core\Smdn\NUnit\NUnitTestUtils.cs" Link="NUnitTestUtils.cs" />
-    <Compile Include="..\..\core\Smdn\NUnit\NUnitTestUtils.Encodings.cs" Link="NUnitTestUtils.Encodings.cs" />
     <Compile Include="..\..\cli\ReplaceContentText\EntryEditor.cs">
       <Link>ReplaceContentText\EntryEditor.cs</Link>
     </Compile>
