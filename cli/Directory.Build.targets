@@ -1,12 +1,4 @@
 <Project>
-  <ItemGroup>
-    <PackageReference Include="Smdn.Fundamental.RuntimeInformation" Version="[3.*,4.0)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\core\Smdn.Applications.HatenaBlogTools\src\Smdn.Applications.HatenaBlogTools.csproj" />
-  </ItemGroup>
-
   <PropertyGroup Label="metadata">
     <AssemblyTitle>HatenaBlogTools $(AssemblyName)</AssemblyTitle>
     <Title>HatenaBlogTools $(AssemblyName)</Title>
