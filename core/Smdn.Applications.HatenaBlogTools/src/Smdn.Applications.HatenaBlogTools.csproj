@@ -13,7 +13,7 @@
   <PropertyGroup Label="metadata">
     <Title>Smdn.Applications.HatenaBlogTools</Title>
     <Description>A library for HatenaBlogTools.</Description>
-    <Company>smdn:総武ソフトウェア推進所</Company>
+    <Company>smdn.jp (https://smdn.jp)</Company>
     <Copyright>Copyright © 2018 smdn</Copyright>
 
     <!-- AssemblyInfo -->
