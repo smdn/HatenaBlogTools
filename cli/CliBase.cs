@@ -65,6 +65,7 @@ namespace Smdn.Applications.HatenaBlogTools {
         "/help",
         "-h",
         "--help",
+        "--version",
       };
 
       _argsNotRequireHatenaBlogClient.AddRange(argsNotRequireHatenaBlogClient);
