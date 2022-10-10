@@ -4,7 +4,7 @@
     <TargetFrameworks>net6.0;net47;netcoreapp3.1</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <RootNamespace>Smdn.Applications.HatenaBlogTools</RootNamespace>
-    <VersionPrefix>3.0</VersionPrefix>
+    <VersionPrefix>3.1</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <BaseOutputPath>..\..\build\bin\</BaseOutputPath>
     <DebugType Condition=" '$(Configuration)' == 'Release' ">None</DebugType>
