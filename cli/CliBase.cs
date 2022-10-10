@@ -93,6 +93,10 @@ namespace Smdn.Applications.HatenaBlogTools {
             apiKey = args[++i];
             break;
 
+          case "--version":
+            Version();
+            break;
+
           case "/?":
           case "/help":
           case "-h":
@@ -173,6 +177,13 @@ namespace Smdn.Applications.HatenaBlogTools {
 
     protected abstract IEnumerable<string> GetUsageExtraOptionDescriptions();
 
+    private void Version()
+    {
+      Console.WriteLine(AssemblyInfo.InformationalVersion);
+
+      Environment.Exit(0);
+    }
+
     protected void Usage(string format, params string[] args)
     {
       if (format != null) {
@@ -217,6 +228,7 @@ namespace Smdn.Applications.HatenaBlogTools {
       }
 
       Console.Error.WriteLine();
+      Console.Error.WriteLine("  --version               : バージョン情報を表示します");
       Console.Error.WriteLine("  -h, --help, /help, /?   : 使い方を表示します");
 
       throw new AbortCommandException();
