@@ -6,7 +6,8 @@ $PublishTargetFramework = 'netcoreapp3.1'
 $PathToProjectToGetVersion = $([System.IO.Path]::Combine(${PSScriptRoot}, 'Login', 'Login.csproj'))
 
 # get CLI version
-$InformationalVersion = dotnet run --framework net6.0 --project $PathToProjectToGetVersion -- --version
+dotnet build --framework net6.0 $PathToProjectToGetVersion
+$InformationalVersion = dotnet run --no-build --framework net6.0 --project $PathToProjectToGetVersion -- --version
 $InformationalVersion = $InformationalVersion -replace '\(.+\)', ''
 $Version = New-Object -TypeName System.Version -ArgumentList $InformationalVersion
 
