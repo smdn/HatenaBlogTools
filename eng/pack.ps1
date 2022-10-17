@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 $PublishTargetFramework = 'netcoreapp3.1'
-$PathToProjectToGetVersion = $([System.IO.Path]::Combine(${PSScriptRoot}, 'Login', 'Login.csproj'))
+$PathToProjectToGetVersion = $([System.IO.Path]::Combine(${PSScriptRoot}, '../src/Smdn.HatenaBlogTools.Cli.Login/Smdn.HatenaBlogTools.Cli.Login.csproj'))
 
 # get CLI version
 dotnet build --framework net6.0 $PathToProjectToGetVersion
