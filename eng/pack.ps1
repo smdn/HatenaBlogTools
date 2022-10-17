@@ -11,17 +11,28 @@ $InformationalVersion = dotnet run --no-build --framework net6.0 --project $Path
 $InformationalVersion = $InformationalVersion -replace '\(.+\)', ''
 $Version = New-Object -TypeName System.Version -ArgumentList $InformationalVersion
 
+# generate a temporary solution file for build CLI assemblies
+$CliSolutionName = 'Smdn.HatenaBlogTools.Cli'
+$PathToCliSolutionDirectory = $PSScriptRoot
+$PathToCliSolutionFile = $([System.IO.Path]::Combine($PathToCliSolutionDirectory, $CliSolutionName + '.sln'))
+
+dotnet new sln --name $CliSolutionName --output $PathToCliSolutionDirectory
+dotnet sln $PathToCliSolutionFile add $([System.IO.Path]::Combine(${PSScriptRoot}, '../src/Smdn.HatenaBlogTools.Cli.*/Smdn.HatenaBlogTools.Cli.*.csproj'))
+
 # determine package name and output directory
 $PackageName = "HatenaBlogTools-${Version}"
 $PathToPublishOutputDirectory = $([System.IO.Path]::Combine(${PSScriptRoot}, $PackageName))
 
-# determine CLI solution file path
-$PathToCliSolution = $([System.IO.Path]::Combine(${PSScriptRoot}, 'HatenaBlogTools-CLI.sln'))
-
 # build and publish CLI executables
-dotnet publish --configuration Release --framework $PublishTargetFramework --no-self-contained --output $PathToPublishOutputDirectory $PathToCliSolution
+dotnet publish --configuration Release --framework $PublishTargetFramework --no-self-contained --output $PathToPublishOutputDirectory $PathToCliSolutionFile
 
 # create ZIP archive
 $PathToArchive = $([System.IO.Path]::Combine(${PSScriptRoot}, $PackageName + ".zip"))
 
 Compress-Archive -CompressionLevel Optimal -Path ${PathToPublishOutputDirectory} -DestinationPath $PathToArchive
+
+# delete the temporary output directory
+Remove-Item -Recurse -Path $PathToPublishOutputDirectory
+
+# delete the temporary solution file
+Remove-Item -Path $PathToCliSolutionFile
