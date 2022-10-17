@@ -23,7 +23,10 @@ The instructions of using 'Login' command is shown in below.
 
 ```sh
 # change directory to 'Login' command
-cd cli/Login/
+cd src/Smdn.HatenaBlogTools.Cli.Login/
+
+# restore the build and library dependencies (This is an essential step for a first time build)
+dotnet restore
 
 # build the command
 dotnet build -f net6.0
