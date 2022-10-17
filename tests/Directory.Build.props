@@ -1,0 +1,26 @@
+<!--
+SPDX-FileCopyrightText: 2021 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Project>
+  <ImportGroup Label="project assets">
+    <Import Project="$(MSBuildThisFileDirectory)..\src\ProjectAssets.props" />
+  </ImportGroup>
+
+  <PropertyGroup Condition=" '$(IsTestProject)' == 'true' ">
+    <Nullable>warnings</Nullable>
+
+    <SmdnTestTargetProjectDirectory
+      Condition=" '$(SmdnTestTargetProjectName)' != '' "
+    >$(MSBuildThisFileDirectory)..\src\$(SmdnTestTargetProjectName)\</SmdnTestTargetProjectDirectory>
+    <SmdnTestTargetProjectFullPath
+      Condition=" '$(SmdnTestTargetProjectName)' != '' "
+    >$(SmdnTestTargetProjectDirectory)$(SmdnTestTargetProjectName).csproj</SmdnTestTargetProjectFullPath>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(IsTestProject)' == 'true' ">
+    <PackageReference Include="NUnit" Version="3.13.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0"/>
+  </ItemGroup>
+</Project>
