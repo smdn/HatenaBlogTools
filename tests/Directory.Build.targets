@@ -8,6 +8,12 @@ SPDX-License-Identifier: MIT
       Condition=" '$(SmdnTestTargetProjectFullPath)' != '' and Exists('$(SmdnTestTargetProjectFullPath)') "
       Include="$(SmdnTestTargetProjectFullPath)"
     />
+    <!-- override the property to set OutputType to 'Library' -->
+    <ProjectReference
+      Condition="$(SmdnTestTargetProjectName.StartsWith('Smdn.HatenaBlogTools.Cli.'))"
+      Update="$(SmdnTestTargetProjectFullPath)"
+      AdditionalProperties="OutputType=Library"
+    />
   </ItemGroup>
 
   <ItemGroup>
