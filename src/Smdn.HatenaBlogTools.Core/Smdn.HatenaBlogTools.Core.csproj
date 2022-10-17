@@ -1,35 +1,22 @@
+<!--
+SPDX-FileCopyrightText: 2021 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net47;netstandard2.1</TargetFrameworks>
     <LangVersion>latest</LangVersion>
-    <AssemblyName>Smdn.Applications.HatenaBlogTools</AssemblyName>
-    <RootNamespace>Smdn.Applications.HatenaBlogTools</RootNamespace>
     <VersionPrefix>3.0</VersionPrefix>
     <VersionSuffix></VersionSuffix>
-    <BaseOutputPath>..\build\bin\</BaseOutputPath>
-    <DebugType Condition=" '$(Configuration)' == 'Release' ">None</DebugType>
   </PropertyGroup>
 
-  <PropertyGroup Label="metadata">
-    <Title>Smdn.Applications.HatenaBlogTools</Title>
-    <Description>A library for HatenaBlogTools.</Description>
-    <Company>smdn.jp (https://smdn.jp)</Company>
-    <Copyright>Copyright © 2018 smdn</Copyright>
+  <PropertyGroup Label="assembly attributes">
+    <Description>A core library for HatenaBlogTools, including Hatena Blog AtomPub API client and various utilities.</Description>
+    <CopyrightYear>2018</CopyrightYear>
+  </PropertyGroup>
 
-    <!-- AssemblyInfo -->
-    <AssemblyVersion>$(Version)</AssemblyVersion>
-    <InformationalVersion>$(VersionPrefix)$(VersionSuffix) ($(TargetFramework))</InformationalVersion>
-    <Product>$(AssemblyName)-$(InformationalVersion)</Product>
-
-    <!-- NuGet -->
-    <!--
-    <Authors>smdn</Authors>
-    <Owners>$(Authors)</Owners>
-    <PackageTags>smdn.jp;mono;netframework;dotnet-core;dotnet-standard</PackageTags>
-    <PackageProjectUrl>https://smdn.jp/works/tools/HatenaBlogTools/</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIconUrl>https://smdn.jp/works/libs/Smdn.dll/Smdn-3.0_64x64.png</PackageIconUrl>
-    -->
+  <PropertyGroup Label="package properties">
+    <PackageTags>Hatena;HatenaBlog;atom-pub;AtomPub</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,11 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\Smdn\Smdn.Core.Miscellaneous\src\Smdn\ConsoleUtils.cs">
-      <Link>ConsoleUtils.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Smdn\Smdn.Core.Miscellaneous\src\Smdn.Net\WsseClient.cs">
-      <Link>WsseClient.cs</Link>
-    </Compile>
+    <Compile Include="..\Smdn.Core.Miscellaneous\Smdn\ConsoleUtils.cs" Link="ConsoleUtils.cs" />
+    <Compile Include="..\Smdn.Core.Miscellaneous\Smdn.Net\WsseClient.cs" Link="WsseClient.cs" />
   </ItemGroup>
 </Project>
