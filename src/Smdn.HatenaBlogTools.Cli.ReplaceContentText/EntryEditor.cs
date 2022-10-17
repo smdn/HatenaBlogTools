@@ -28,7 +28,7 @@ using System.Text.RegularExpressions;
 using Smdn.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.HatenaBlogTools {
-  class EntryEditor : IHatenaBlogEntryEditor {
+  public class EntryEditor : IHatenaBlogEntryEditor {
     private readonly string replaceFrom;
     private readonly string replaceTo;
     private readonly EntryTextModifier entryTextModifier;
@@ -51,7 +51,7 @@ namespace Smdn.HatenaBlogTools {
     }
   }
 
-  class RegexEntryEditor : IHatenaBlogEntryEditor {
+  public class RegexEntryEditor : IHatenaBlogEntryEditor {
     private readonly Regex regexToReplace;
     private readonly string replacement;
     private readonly EntryTextModifier entryTextModifier;

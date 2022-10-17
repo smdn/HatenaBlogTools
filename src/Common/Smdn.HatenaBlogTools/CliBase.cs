@@ -33,7 +33,7 @@ using Smdn.HatenaBlogTools.HatenaBlog;
 namespace Smdn.HatenaBlogTools {
   public class AbortCommandException : Exception { }
 
-  abstract class CliBase {
+  public abstract class CliBase {
     internal static class AssemblyInfo {
       private static Assembly _Assembly { get; } = Assembly.GetEntryAssembly();
 

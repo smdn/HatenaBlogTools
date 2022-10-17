@@ -32,7 +32,7 @@ using Smdn.HatenaBlogTools.HatenaBlog;
 using Smdn.HatenaBlogTools.AtomPublishingProtocol;
 
 namespace Smdn.HatenaBlogTools {
-  class BloggerFormatter : FormatterBase {
+  public class BloggerFormatter : FormatterBase {
     private readonly string blogTitle;
 #if false
     private readonly string blogDomain;

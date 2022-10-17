@@ -29,7 +29,7 @@ using System.IO;
 using Smdn.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.HatenaBlogTools {
-  abstract class FormatterBase {
+  public abstract class FormatterBase {
     public FormatterBase(
 #if RETRIEVE_COMMENTS
       bool retrieveComments = false

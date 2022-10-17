@@ -31,7 +31,7 @@ using System.Xml.Linq;
 using Smdn.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.HatenaBlogTools {
-  class HatenaDiaryFormatter : FormatterBase {
+  public class HatenaDiaryFormatter : FormatterBase {
     public HatenaDiaryFormatter(
 #if RETRIEVE_COMMENTS
       bool retrieveComments = false

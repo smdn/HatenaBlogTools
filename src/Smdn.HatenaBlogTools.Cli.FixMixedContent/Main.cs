@@ -31,7 +31,7 @@ using System.Text;
 using Smdn.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.HatenaBlogTools {
-  partial class FixMixedContent : CliBase {
+  public partial class FixMixedContent : CliBase {
     protected override string GetDescription() => "ブログ記事の混在コンテンツとなりうるURL、および自ブログのリンクURLを修正します。";
 
     protected override string GetUsageExtraMandatoryOptions() => "[--fix-mixed-content] [--fix-blog-url] [--update-content]";

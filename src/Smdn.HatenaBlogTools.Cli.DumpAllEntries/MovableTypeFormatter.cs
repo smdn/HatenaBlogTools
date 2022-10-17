@@ -34,7 +34,7 @@ namespace Smdn.HatenaBlogTools {
   /*
    * ref: http://www.movabletype.jp/documentation/appendices/import-export-format.html
    */
-  class MovableTypeFormatter : FormatterBase {
+  public class MovableTypeFormatter : FormatterBase {
     public MovableTypeFormatter(
 #if RETRIEVE_COMMENTS
       bool retrieveComments = false
@@ -43,7 +43,7 @@ namespace Smdn.HatenaBlogTools {
     {
     }
 
-    internal static string ToDateString(DateTime dateTime)
+    public static string ToDateString(DateTime dateTime)
       => dateTime.ToString("MM/dd/yyyy hh\\:mm\\:ss tt", System.Globalization.CultureInfo.InvariantCulture);
 
     public override void Format(IEnumerable<PostedEntry> entries, Stream outputStream)
