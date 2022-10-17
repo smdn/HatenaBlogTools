@@ -20,4 +20,9 @@ SPDX-License-Identifier: MIT
     <RepositoryUrl>https://github.com/smdn/HatenaBlogTools</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+
+  <Import
+    Project="$(MSBuildThisFileDirectory)Smdn.HatenaBlogTools.Cli.props"
+    Condition="$(MSBuildProjectName.StartsWith('Smdn.HatenaBlogTools.Cli.'))"
+  />
 </Project>

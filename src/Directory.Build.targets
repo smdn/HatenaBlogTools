@@ -1,4 +1,13 @@
+<!--
+SPDX-FileCopyrightText: 2022 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
 <Project>
+  <Import
+    Project="$(MSBuildThisFileDirectory)Smdn.HatenaBlogTools.Cli.targets"
+    Condition="$(MSBuildProjectName.StartsWith('Smdn.HatenaBlogTools.Cli.'))"
+  />
+
   <ImportGroup Label="project assets">
     <Import Project="$(SmdnProjectAssets_TargetsImports)" />
   </ImportGroup>

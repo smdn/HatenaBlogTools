@@ -1,18 +1,17 @@
+<!--
+SPDX-FileCopyrightText: 2022 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
 <Project>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net6.0;net47;netcoreapp3.1</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
-    <RootNamespace>Smdn.Applications.HatenaBlogTools</RootNamespace>
     <VersionPrefix>3.1</VersionPrefix>
     <VersionSuffix></VersionSuffix>
-    <BaseOutputPath>..\..\build\bin\</BaseOutputPath>
-    <DebugType Condition=" '$(Configuration)' == 'Release' ">None</DebugType>
   </PropertyGroup>
 
-  <PropertyGroup Label="metadata">
-    <Company>smdn.jp (https://smdn.jp)</Company>
-    <Copyright>Copyright © 2013-2022 smdn</Copyright>
+  <PropertyGroup Label="assembly attributes">
+    <CopyrightYear>2013</CopyrightYear>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,12 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\core\Smdn.Applications.HatenaBlogTools\src\Smdn.Applications.HatenaBlogTools.csproj" />
+    <ProjectReference Include="..\Smdn.HatenaBlogTools.Core\Smdn.HatenaBlogTools.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\CliBase.cs">
-      <Link>CliBase.cs</Link>
-    </Compile>
+    <Compile Include="..\Common\Smdn.HatenaBlogTools\CliBase.cs" Link="CliBase.cs" />
   </ItemGroup>
 </Project>

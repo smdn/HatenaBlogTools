@@ -1,12 +1,11 @@
+<!--
+SPDX-FileCopyrightText: 2022 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
 <Project>
   <PropertyGroup Label="metadata">
     <AssemblyTitle>HatenaBlogTools $(AssemblyName)</AssemblyTitle>
     <Title>HatenaBlogTools $(AssemblyName)</Title>
     <Description>HatenaBlogTools $(AssemblyName).exe</Description>
-
-    <!-- AssemblyInfo -->
-    <AssemblyVersion>$(Version)</AssemblyVersion>
-    <InformationalVersion>$(VersionPrefix)$(VersionSuffix) ($(TargetFramework))</InformationalVersion>
-    <Product>$(AssemblyName)-$(InformationalVersion)</Product>
   </PropertyGroup>
 </Project>
