@@ -25,9 +25,9 @@
 using System;
 using System.Text.RegularExpressions;
 
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.HatenaBlog;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   class EntryEditor : IHatenaBlogEntryEditor {
     private readonly string replaceFrom;
     private readonly string replaceTo;

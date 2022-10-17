@@ -5,9 +5,9 @@ using System.Text;
 using NUnit.Framework;
 
 using Smdn.IO;
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.HatenaBlog;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   [TestFixture]
   public class MovableTypeFormatterTests {
     [Test]

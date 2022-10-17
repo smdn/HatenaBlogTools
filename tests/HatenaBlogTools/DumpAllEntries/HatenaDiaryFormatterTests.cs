@@ -6,9 +6,9 @@ using System.Xml.Linq;
 using NUnit.Framework;
 
 using Smdn.IO;
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.HatenaBlog;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   [TestFixture]
   public class HatenaDiaryFormatterTests {
     [Test]

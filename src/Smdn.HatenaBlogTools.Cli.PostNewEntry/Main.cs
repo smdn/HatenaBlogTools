@@ -29,11 +29,11 @@ using System.Linq;
 using System.Net;
 using System.Xml.Linq;
 
-using Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol;
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.AtomPublishingProtocol;
+using Smdn.HatenaBlogTools.HatenaBlog;
 using Smdn.Xml.Linq;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   partial class PostNewEntry : CliBase {
     protected override string GetDescription() => "指定された内容で新しい記事を投稿します。";
 

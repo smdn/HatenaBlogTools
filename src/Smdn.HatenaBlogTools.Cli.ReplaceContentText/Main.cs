@@ -25,9 +25,9 @@
 using System;
 using System.Collections.Generic;
 
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.HatenaBlog;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   partial class ReplaceContentText : CliBase {
     protected override string GetDescription() => "すべての記事に対して置換を行います。";
 

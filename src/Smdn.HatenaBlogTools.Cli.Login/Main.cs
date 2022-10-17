@@ -27,9 +27,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Xml.Linq;
 
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.HatenaBlog;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   partial class Login : CliBase {
     protected override string GetDescription() => "AtomPubによるはてなブログへのログインを行います。　記事の変更等は行いません。";
 

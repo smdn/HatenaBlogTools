@@ -27,11 +27,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.HatenaBlog;
 
 using CategorySet = System.Collections.Generic.HashSet<string>;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   class CategoryModification {
     public CategorySet Old { get; }
     public CategorySet New { get; }

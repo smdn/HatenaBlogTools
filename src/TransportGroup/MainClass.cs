@@ -31,7 +31,7 @@ using System.Xml;
 
 using Smdn.Xml;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   class MainClass {
     private class HatenaGroupEntry : Entry {
       public string OriginalDate;

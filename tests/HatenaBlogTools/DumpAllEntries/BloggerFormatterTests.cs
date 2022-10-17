@@ -3,11 +3,11 @@ using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
 
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
-using Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol;
+using Smdn.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.AtomPublishingProtocol;
 using Smdn.Xml.Linq;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   [TestFixture]
   public class BloggerFormatterTests {
     [Test]

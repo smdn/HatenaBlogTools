@@ -28,9 +28,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.HatenaBlog;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   /*
    * ref: http://www.movabletype.jp/documentation/appendices/import-export-format.html
    */

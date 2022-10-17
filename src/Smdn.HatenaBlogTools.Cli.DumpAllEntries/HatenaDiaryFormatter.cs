@@ -28,9 +28,9 @@ using System.IO;
 using System.Text;
 using System.Xml.Linq;
 
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.HatenaBlog;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   class HatenaDiaryFormatter : FormatterBase {
     public HatenaDiaryFormatter(
 #if RETRIEVE_COMMENTS

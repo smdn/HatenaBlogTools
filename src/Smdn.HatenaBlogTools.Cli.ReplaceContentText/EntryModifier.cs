@@ -24,9 +24,9 @@
 
 using System;
 
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.HatenaBlog;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   abstract class EntryTextModifier {
     public abstract bool Modify(
       Entry entry,

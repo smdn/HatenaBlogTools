@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
+namespace Smdn.HatenaBlogTools.HatenaBlog {
   class PseudoPostedEntry : PostedEntry {
     public PseudoPostedEntry(
       Uri id = null,

@@ -26,9 +26,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.HatenaBlog;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   abstract class FormatterBase {
     public FormatterBase(
 #if RETRIEVE_COMMENTS

@@ -28,9 +28,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.HatenaBlog;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   partial class FixMixedContent : CliBase {
     protected override string GetDescription() => "ブログ記事の混在コンテンツとなりうるURL、および自ブログのリンクURLを修正します。";
 

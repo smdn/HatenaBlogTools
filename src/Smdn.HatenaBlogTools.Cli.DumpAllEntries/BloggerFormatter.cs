@@ -28,10 +28,10 @@ using System.Linq;
 using System.IO;
 using System.Xml.Linq;
 
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
-using Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol;
+using Smdn.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.AtomPublishingProtocol;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   class BloggerFormatter : FormatterBase {
     private readonly string blogTitle;
 #if false
