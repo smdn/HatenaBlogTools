@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Smdn.Applications.HatenaBlogTools.Html {
+namespace Smdn.HatenaBlogTools.Html {
   [TestFixture]
   public class HtmlDocumentTests {
     [TestCase("")]

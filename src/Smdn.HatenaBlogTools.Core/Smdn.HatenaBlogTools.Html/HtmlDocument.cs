@@ -27,7 +27,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Smdn.Applications.HatenaBlogTools.Html {
+namespace Smdn.HatenaBlogTools.Html {
   public class HtmlDocument {
     private readonly List<HtmlNode> nodes;
 

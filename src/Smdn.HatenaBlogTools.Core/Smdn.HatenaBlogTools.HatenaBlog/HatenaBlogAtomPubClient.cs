@@ -31,10 +31,10 @@ using System.Security.Cryptography.X509Certificates;
 using System.Xml;
 using System.Xml.Linq;
 
-using Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol;
+using Smdn.HatenaBlogTools.AtomPublishingProtocol;
 using Smdn.Xml.Linq;
 
-namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
+namespace Smdn.HatenaBlogTools.HatenaBlog {
   public static class EntryContentType {
     public static readonly string Default = "text/plain";
     public static readonly string HatenaSyntax = "text/x-hatena-syntax";

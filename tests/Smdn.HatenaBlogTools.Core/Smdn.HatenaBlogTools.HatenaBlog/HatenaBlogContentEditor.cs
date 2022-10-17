@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
+namespace Smdn.HatenaBlogTools.HatenaBlog {
   [TestFixture]
   public class HatenaBlogContentEditorTests {
     [TestCase("<img src=\"http://example.com/test.dat\">",

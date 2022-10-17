@@ -24,7 +24,7 @@
 using System;
 using System.Xml.Linq;
 
-namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
+namespace Smdn.HatenaBlogTools.AtomPublishingProtocol {
   public static class AtomPub {
     public static class Namespaces {
       public static readonly XNamespace Atom = (XNamespace)"http://www.w3.org/2005/Atom";

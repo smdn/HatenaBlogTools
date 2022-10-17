@@ -25,7 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Smdn.Applications.HatenaBlogTools.Html {
+namespace Smdn.HatenaBlogTools.Html {
   public static class HtmlParser {
     private static readonly Regex regexElementStart = CreateElementStartRegex();
 

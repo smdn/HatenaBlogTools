@@ -26,9 +26,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-using Smdn.Applications.HatenaBlogTools.Html;
+using Smdn.HatenaBlogTools.Html;
 
-namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
+namespace Smdn.HatenaBlogTools.HatenaBlog {
   public class HatenaBlogContentEditor : HtmlDocument {
     public HatenaBlogContentEditor(string input)
       : base(input)

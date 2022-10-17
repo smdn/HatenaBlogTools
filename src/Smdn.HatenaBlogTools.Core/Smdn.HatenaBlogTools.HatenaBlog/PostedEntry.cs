@@ -26,7 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
+namespace Smdn.HatenaBlogTools.HatenaBlog {
   public class PostedEntry : Entry {
     /* read-only properties */
     public Uri Id { get; }

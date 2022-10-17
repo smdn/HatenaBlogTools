@@ -31,7 +31,7 @@ using System.Xml.Linq;
 
 using Smdn.Net;
 
-namespace Smdn.Applications.HatenaBlogTools.AtomPublishingProtocol {
+namespace Smdn.HatenaBlogTools.AtomPublishingProtocol {
   public class AtomPubClient {
     public static readonly int DefaultTimeoutMilliseconds = 20 * 1000;
 

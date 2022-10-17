@@ -26,7 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Smdn.Applications.HatenaBlogTools.HatenaBlog {
+namespace Smdn.HatenaBlogTools.HatenaBlog {
   public class Entry {
     public string Title { get; set; }
     public HashSet<string> Categories { get; } = new HashSet<string>(StringComparer.Ordinal);

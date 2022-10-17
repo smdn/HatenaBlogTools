@@ -27,7 +27,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   public interface IDiffGenerator {
     void DisplayDifference(string originalText, string modifiedText);
   }
