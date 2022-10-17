@@ -28,9 +28,9 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 
-using Smdn.Applications.HatenaBlogTools.HatenaBlog;
+using Smdn.HatenaBlogTools.HatenaBlog;
 
-namespace Smdn.Applications.HatenaBlogTools {
+namespace Smdn.HatenaBlogTools {
   public class AbortCommandException : Exception { }
 
   abstract class CliBase {
