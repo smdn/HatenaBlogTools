@@ -1,0 +1,23 @@
+<!--
+SPDX-FileCopyrightText: 2022 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Project>
+  <PropertyGroup Label="project assets">
+    <SmdnBuildAssetRootDirectory>$(MSBuildThisFileDirectory)..\</SmdnBuildAssetRootDirectory>
+  </PropertyGroup>
+
+  <ImportGroup Label="project assets">
+    <Import Project="$(MSBuildThisFileDirectory)ProjectAssets.props" />
+  </ImportGroup>
+
+  <PropertyGroup Label="package properties">
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://smdn.jp/works/tools/HatenaBlogTools/</PackageProjectUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Label="repository properties" Condition="'$(GITHUB_ACTIONS)' != 'true'">
+    <RepositoryUrl>https://github.com/smdn/HatenaBlogTools</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+</Project>
