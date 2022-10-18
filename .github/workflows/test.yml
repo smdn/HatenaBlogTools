@@ -67,7 +67,7 @@ jobs:
       project:            ${{ github.event.inputs.project }}
       os:                 ${{ needs.prerequisites.outputs.os }}
       verbose:            ${{ fromJSON(needs.prerequisites.outputs.verbose) }}
-      dotnet_sdk_version: '6.0.402'
+      dotnet_sdk_version: '6.0.200'
       timeout_hang:               "[ {'OS':'windows','Timeout':'6min'}, {'OS':'macos','Timeout':'3min'}, {'OS':'','Timeout':'1min'} ]"
       timeout_vstest_connection:  "[ {'OS':'windows','Timeout':360}, {'OS':'macos','Timeout':180}, {'OS':'','Timeout':60} ]"
     secrets:
