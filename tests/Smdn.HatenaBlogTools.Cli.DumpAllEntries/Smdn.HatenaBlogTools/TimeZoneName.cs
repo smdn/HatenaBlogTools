@@ -7,6 +7,6 @@ namespace Smdn.HatenaBlogTools {
 
     public static bool CanUseIanaTimeZoneName =>
       !Runtime.IsRunningOnNetFx && // .NET Framework uses Windows time zone name
-      !(RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && Runtime.IsRunningOnNetCore && Runtime.Version < runtimeVersionNET5); // MacOS + .NET Core uses Windows time zone name
+      !(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && Runtime.IsRunningOnNetCore && Runtime.Version < runtimeVersionNET5); // Windows + .NET Core uses Windows time zone name
   }
 }
