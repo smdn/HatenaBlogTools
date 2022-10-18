@@ -10,35 +10,39 @@ using Smdn.HatenaBlogTools.HatenaBlog;
 namespace Smdn.HatenaBlogTools {
   [TestFixture]
   public class MovableTypeFormatterTests {
-    [Test]
-    public void TestToDateString()
+    private static System.Collections.IEnumerable YieldTestCases_TestToDateString_DateTime()
     {
       //MM/dd/yyyy hh\:mm\:ss tt
-      Assert.AreEqual(
-        "03/31/2020 12:01:02 AM",
-        MovableTypeFormatter.ToDateString(new DateTime(2020, 3, 31, 0, 1, 2))
-      );
-      Assert.AreEqual(
-        "03/31/2020 01:01:02 AM",
-        MovableTypeFormatter.ToDateString(new DateTime(2020, 3, 31, 1, 1, 2))
-      );
-      Assert.AreEqual(
-        "03/31/2020 11:01:02 AM",
-        MovableTypeFormatter.ToDateString(new DateTime(2020, 3, 31, 11, 1, 2))
-      );
-      Assert.AreEqual(
-        "03/31/2020 12:01:02 PM",
-        MovableTypeFormatter.ToDateString(new DateTime(2020, 3, 31, 12, 1, 2))
-      );
-      Assert.AreEqual(
-        "03/31/2020 01:01:02 PM",
-        MovableTypeFormatter.ToDateString(new DateTime(2020, 3, 31, 13, 1, 2))
-      );
-      Assert.AreEqual(
-        "03/31/2020 11:01:02 PM",
-        MovableTypeFormatter.ToDateString(new DateTime(2020, 3, 31, 23, 1, 2))
-      );
+      yield return new object[] { new DateTime(2020, 3, 31, 0, 1, 2), "03/31/2020 12:01:02 AM" };
+      yield return new object[] { new DateTime(2020, 3, 31, 1, 1, 2), "03/31/2020 01:01:02 AM" };
+      yield return new object[] { new DateTime(2020, 3, 31, 11, 1, 2), "03/31/2020 11:01:02 AM" };
+      yield return new object[] { new DateTime(2020, 3, 31, 12, 1, 2), "03/31/2020 12:01:02 PM" };
+      yield return new object[] { new DateTime(2020, 3, 31, 13, 1, 2), "03/31/2020 01:01:02 PM" };
+      yield return new object[] { new DateTime(2020, 3, 31, 23, 1, 2), "03/31/2020 11:01:02 PM" };
     }
+
+    [TestCaseSource(nameof(YieldTestCases_TestToDateString_DateTime))]
+    public void TestToDateString_DateTime(DateTime dateTime, string expected)
+      => Assert.AreEqual(expected, MovableTypeFormatter.ToDateString(dateTime));
+
+    private static System.Collections.IEnumerable YieldTestCases_TestToDateString_DateTimeOffset()
+    {
+      //MM/dd/yyyy hh\:mm\:ss tt
+      yield return new object[] { new DateTimeOffset(2020, 3, 31, 0, 0, 0, TimeSpan.FromHours(+9)), "03/31/2020 12:00:00 AM" };
+      yield return new object[] { new DateTimeOffset(2020, 3, 31, 0, 0, 0, TimeSpan.FromHours(0)), "03/31/2020 12:00:00 AM" };
+      yield return new object[] { new DateTimeOffset(2020, 3, 31, 0, 0, 0, TimeSpan.FromHours(-5)), "03/31/2020 12:00:00 AM" };
+      yield return new object[] { new DateTimeOffset(2020, 3, 31, 1, 0, 0, TimeSpan.FromHours(0)), "03/31/2020 01:00:00 AM" };
+      yield return new object[] { new DateTimeOffset(2020, 3, 31, 11, 0, 0, TimeSpan.FromHours(0)), "03/31/2020 11:00:00 AM" };
+      yield return new object[] { new DateTimeOffset(2020, 3, 31, 12, 0, 0, TimeSpan.FromHours(+9)), "03/31/2020 12:00:00 PM" };
+      yield return new object[] { new DateTimeOffset(2020, 3, 31, 12, 0, 0, TimeSpan.FromHours(0)), "03/31/2020 12:00:00 PM" };
+      yield return new object[] { new DateTimeOffset(2020, 3, 31, 12, 0, 0, TimeSpan.FromHours(-5)), "03/31/2020 12:00:00 PM" };
+      yield return new object[] { new DateTimeOffset(2020, 3, 31, 13, 0, 0, TimeSpan.FromHours(0)), "03/31/2020 01:00:00 PM" };
+      yield return new object[] { new DateTimeOffset(2020, 3, 31, 23, 0, 0, TimeSpan.FromHours(0)), "03/31/2020 11:00:00 PM" };
+    }
+
+    [TestCaseSource(nameof(YieldTestCases_TestToDateString_DateTimeOffset))]
+    public void TestToDateString_DateTimeOffset(DateTimeOffset dateTimeOffset, string expected)
+      => Assert.AreEqual(expected, MovableTypeFormatter.ToDateString(dateTimeOffset));
 
     private static void Format(
       IEnumerable<PostedEntry> entries,

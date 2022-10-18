@@ -46,6 +46,9 @@ namespace Smdn.HatenaBlogTools {
     public static string ToDateString(DateTime dateTime)
       => dateTime.ToString("MM/dd/yyyy hh\\:mm\\:ss tt", System.Globalization.CultureInfo.InvariantCulture);
 
+    public static string ToDateString(DateTimeOffset dateTimeOffset)
+      => dateTimeOffset.ToString("MM/dd/yyyy hh\\:mm\\:ss tt", System.Globalization.CultureInfo.InvariantCulture);
+
     public override void Format(IEnumerable<PostedEntry> entries, Stream outputStream)
     {
       var writer = new StreamWriter(outputStream, Encoding.UTF8);
