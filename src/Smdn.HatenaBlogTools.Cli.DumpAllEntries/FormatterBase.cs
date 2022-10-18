@@ -30,6 +30,8 @@ using Smdn.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.HatenaBlogTools {
   public abstract class FormatterBase {
+    public TimeZoneInfo EntryTimeZone { get; set; } = TimeZoneInfo.Local;
+
     public FormatterBase(
 #if RETRIEVE_COMMENTS
       bool retrieveComments = false

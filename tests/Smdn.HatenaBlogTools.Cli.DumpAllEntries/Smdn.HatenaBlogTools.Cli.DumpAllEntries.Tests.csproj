@@ -8,6 +8,10 @@ SPDX-License-Identifier: MIT
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Smdn.Fundamental.RuntimeInformation" Version="[3.*,4.0)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\Common\Smdn.HatenaBlogTools.HatenaBlog\PseudoPostedEntry.cs" />
   </ItemGroup>
 </Project>

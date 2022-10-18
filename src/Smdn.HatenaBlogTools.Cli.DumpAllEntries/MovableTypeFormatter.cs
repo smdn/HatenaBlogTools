@@ -70,8 +70,11 @@ namespace Smdn.HatenaBlogTools {
         writer.WriteLine(string.Concat("STATUS: ", entry.IsDraft ? "Draft" : "Publish"));
         writer.WriteLine("CONVERT BREAKS: 0");
 
-        if (entry.DateUpdated.HasValue)
-          writer.WriteLine(string.Concat("DATE: ", ToDateString(entry.DateUpdated.Value.LocalDateTime)));
+        if (entry.DateUpdated.HasValue) {
+          var date = TimeZoneInfo.ConvertTime(entry.DateUpdated.Value, EntryTimeZone);
+
+          writer.WriteLine(string.Concat("DATE: ", ToDateString(date)));
+        }
 
         var tags = entry
           .Categories

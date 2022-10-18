@@ -48,9 +48,8 @@ namespace Smdn.HatenaBlogTools {
 
       foreach (var entry in entries) {
         var updatedDate = entry.DateUpdated ?? defaultUpdatedDate;
-        var date = updatedDate
-          .ToLocalTime()
-          .DateTime
+        var date =
+          TimeZoneInfo.ConvertTime(updatedDate, EntryTimeZone)
           .ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
 
         XElement dayElement, bodyElement;
