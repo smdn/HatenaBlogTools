@@ -17,17 +17,17 @@ namespace Smdn.HatenaBlogTools {
 
       yield return new object[] {
         dateTime_OffsetPlus0900,
-        TimeZoneName.CanUseIanaTimeZoneName ? "Asia/Tokyo" : "Tokyo Standard Time",
+        Runtime.SupportsIanaTimeZoneName ? "Asia/Tokyo" : "Tokyo Standard Time",
         "2020-03-31"
       };
       yield return new object[] {
         dateTime_OffsetPlus0900,
-        TimeZoneName.CanUseIanaTimeZoneName ? "America/New_York" : "Eastern Standard Time",
+        Runtime.SupportsIanaTimeZoneName ? "America/New_York" : "Eastern Standard Time",
         "2020-03-30"
       };
       yield return new object[] {
         dateTime_OffsetPlus0900,
-        TimeZoneName.CanUseIanaTimeZoneName ? "Europe/London" :  "GMT Standard Time",
+        Runtime.SupportsIanaTimeZoneName ? "Europe/London" :  "GMT Standard Time",
         "2020-03-30"
       };
 
@@ -35,17 +35,17 @@ namespace Smdn.HatenaBlogTools {
 
       yield return new object[] {
         dateTime_OffsetMinus0500,
-        TimeZoneName.CanUseIanaTimeZoneName ? "Asia/Tokyo" : "Tokyo Standard Time",
+        Runtime.SupportsIanaTimeZoneName ? "Asia/Tokyo" : "Tokyo Standard Time",
         "2020-04-01"
       };
       yield return new object[] {
         dateTime_OffsetMinus0500,
-        TimeZoneName.CanUseIanaTimeZoneName ? "America/New_York" : "Eastern Standard Time",
+        Runtime.SupportsIanaTimeZoneName ? "America/New_York" : "Eastern Standard Time",
         "2020-03-31"
       };
       yield return new object[] {
         dateTime_OffsetMinus0500,
-        TimeZoneName.CanUseIanaTimeZoneName ? "Europe/London" : "GMT Standard Time",
+        Runtime.SupportsIanaTimeZoneName ? "Europe/London" : "GMT Standard Time",
         "2020-04-01"
       };
     }
