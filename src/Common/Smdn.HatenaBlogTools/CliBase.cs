@@ -27,7 +27,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.Versioning;
 
+using Smdn;
 using Smdn.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.HatenaBlogTools {
@@ -42,7 +44,22 @@ namespace Smdn.HatenaBlogTools {
       public static string VersionMajorMinorString => $"{Version.Major}.{Version.Minor}";
       public static string Title => _Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
       public static string InformationalVersion => _Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-      public static string TargetFramework => _Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()?.FirstOrDefault(meta => meta.Key == "TargetFramework")?.Value;
+      public static string TargetFramework => GetTargetFrameworkNameOrMoniker();
+
+      private static string GetTargetFrameworkNameOrMoniker()
+      {
+        var frameworkDisplayName = _Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkDisplayName;
+
+        if (!string.IsNullOrEmpty(frameworkDisplayName))
+          return frameworkDisplayName;
+
+        var frameworkName = _Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
+
+        if (FrameworkNameUtils.TryGetMoniker(frameworkName, out var moniker))
+          return moniker;
+
+        return frameworkName;
+      }
     }
 
     internal static string UserAgent => $"{AssemblyInfo.Title?.Replace(' ', '-')}/{AssemblyInfo.VersionMajorMinorString} ({AssemblyInfo.TargetFramework}; {Environment.OSVersion.VersionString})";

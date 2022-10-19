@@ -15,14 +15,7 @@ SPDX-License-Identifier: MIT
   </PropertyGroup>
 
   <ItemGroup>
-    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" >
-        <_Parameter1>TargetFramework</_Parameter1>
-        <_Parameter2>$(TargetFramework)</_Parameter2>
-    </AssemblyAttribute>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Smdn.Fundamental.RuntimeInformation" Version="[3.*,4.0)" />
+    <PackageReference Include="Smdn.Fundamental.RuntimeInformation" Version="[3.0.2,4.0)" />
   </ItemGroup>
 
   <ItemGroup>
