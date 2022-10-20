@@ -114,7 +114,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       var statusCode = atom.Get(nextUri, out XDocument collectionDocument);
 
       if (statusCode != HttpStatusCode.OK)
-        throw new WebException(string.Format("エントリの取得に失敗したため中断しました ({0})", statusCode), WebExceptionStatus.ProtocolError);
+        throw new WebException($"エントリの取得に失敗したため中断しました ({statusCode})", WebExceptionStatus.ProtocolError);
 
       foreach (var entry in ReadEntries(collectionDocument)) {
         yield return entry;
