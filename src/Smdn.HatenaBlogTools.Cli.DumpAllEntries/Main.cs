@@ -307,7 +307,9 @@ internal partial class DumpAllEntries : CliBase {
     Console.Error.WriteLine("完了");
   }
 
+#pragma warning disable SA1305
   private static readonly XNamespace nsXLink = "http://www.w3.org/1999/xlink";
+#pragma warning restore SA1305
 
   private static void OutputEntriesToIndividualFiles(
     XDocument document,
