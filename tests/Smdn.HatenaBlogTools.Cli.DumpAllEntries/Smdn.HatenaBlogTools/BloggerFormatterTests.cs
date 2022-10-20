@@ -35,7 +35,7 @@ public class BloggerFormatterTests {
     var doc = XDocument.Load(new BloggerFormatter(blogTitle).ToStream(new[] { entry }));
 
     // /feed
-    var elementFeed = doc.Root;
+    var elementFeed = doc.Root!;
 
     Assert.AreEqual(
       AtomPub.Namespaces.Atom + "feed",
@@ -81,21 +81,24 @@ public class BloggerFormatterTests {
     );
 
     // /feed/entry/published
+    Assert.IsNotNull(elementEntry.Element(AtomPub.Namespaces.Atom + "published"));
     Assert.AreEqual(
       entry.DatePublished,
-      DateTimeOffset.Parse(elementEntry.Element(AtomPub.Namespaces.Atom + "published")?.Value)
+      DateTimeOffset.Parse(elementEntry.Element(AtomPub.Namespaces.Atom + "published")!.Value)
     );
 
     // /feed/entry/updated
+    Assert.IsNotNull(elementEntry.Element(AtomPub.Namespaces.Atom + "published"));
     Assert.AreEqual(
       entry.DateUpdated,
-      DateTimeOffset.Parse(elementEntry.Element(AtomPub.Namespaces.Atom + "updated")?.Value)
+      DateTimeOffset.Parse(elementEntry.Element(AtomPub.Namespaces.Atom + "updated")!.Value)
     );
 
     // /feed/entry/title
+    Assert.IsNotNull(elementEntry.Element(AtomPub.Namespaces.Atom + "title"));
     Assert.AreEqual(
       entry.Title,
-      elementEntry.Element(AtomPub.Namespaces.Atom + "title")?.Value
+      elementEntry.Element(AtomPub.Namespaces.Atom + "title")!.Value
     );
 
     // /feed/entry/app:control/app:draft
@@ -148,7 +151,7 @@ public class BloggerFormatterTests {
 
     // /feed/entry
     var elementEntry = doc
-      .Root
+      .Root!
       .Elements(AtomPub.Namespaces.Atom + "entry")
       .First(e =>
         e.Element(AtomPub.Namespaces.Atom + "category")?.HasAttributeWithValue("term", "http://schemas.google.com/blogger/2008/kind#post") ?? false
@@ -156,10 +159,10 @@ public class BloggerFormatterTests {
 
     // /feed/entry/app:control/app:draft
     Assert.IsNotNull(elementEntry.Element(AtomPub.Namespaces.App + "control"));
-    Assert.IsNotNull(elementEntry.Element(AtomPub.Namespaces.App + "control").Element(AtomPub.Namespaces.App + "draft"));
+    Assert.IsNotNull(elementEntry.Element(AtomPub.Namespaces.App + "control")!.Element(AtomPub.Namespaces.App + "draft"));
     Assert.AreEqual(
       "yes",
-      elementEntry.Element(AtomPub.Namespaces.App + "control").Element(AtomPub.Namespaces.App + "draft").Value
+      elementEntry.Element(AtomPub.Namespaces.App + "control")!.Element(AtomPub.Namespaces.App + "draft")!.Value
     );
   }
 
@@ -187,7 +190,7 @@ public class BloggerFormatterTests {
 
     // /feed/entry
     var elementListEntries = doc
-      .Root
+      .Root!
       .Elements(AtomPub.Namespaces.Atom + "entry")
       .Where(e =>
         e.Element(AtomPub.Namespaces.Atom + "category")?.HasAttributeWithValue("term", "http://schemas.google.com/blogger/2008/kind#post") ?? false

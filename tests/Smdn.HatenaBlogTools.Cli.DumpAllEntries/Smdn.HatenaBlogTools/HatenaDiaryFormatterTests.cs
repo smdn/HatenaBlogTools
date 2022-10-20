@@ -68,11 +68,11 @@ public class HatenaDiaryFormatterTests {
       EntryTimeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId),
     };
     var doc = XDocument.Load(formatter.ToStream(new[] { entry }));
-    var day = doc.Root.Element("day");
+    var day = doc.Root!.Element("day")!;
 
     Assert.AreEqual(expectedDateString, day.Attribute("date")?.Value);
 
-    var body = day.Element("body");
+    var body = day.Element("body")!;
     var bodyLines = new StringReader(body.Value).ReadAllLines();
     var firstLine = bodyLines.FirstOrDefault();
 
@@ -112,12 +112,12 @@ public class HatenaDiaryFormatterTests {
     var doc = XDocument.Load(new HatenaDiaryFormatter().ToStream(new[] { entry }));
 
     // /diary
-    Assert.AreEqual("diary", doc.Root.Name.LocalName);
+    Assert.AreEqual("diary", doc.Root!.Name.LocalName);
 
     // /diary/day
-    Assert.AreEqual(1, doc.Root.Elements("day").Count());
+    Assert.AreEqual(1, doc.Root!.Elements("day").Count());
 
-    var day = doc.Root.Element("day");
+    var day = doc.Root!.Element("day")!;
 
     Assert.AreEqual(dateUpdated.LocalDateTime.ToString("yyyy-MM-dd"), day.Attribute("date")?.Value);
     Assert.IsEmpty(day.Attribute("title")?.Value);
@@ -125,7 +125,7 @@ public class HatenaDiaryFormatterTests {
     // /diary/day/body
     Assert.AreEqual(1, day.Elements("body").Count());
 
-    var body = day.Element("body");
+    var body = day.Element("body")!;
     var bodyLines = new StringReader(body.Value).ReadAllLines();
     var firstLine = bodyLines.FirstOrDefault();
 
@@ -171,7 +171,7 @@ public class HatenaDiaryFormatterTests {
 
     var doc = XDocument.Load(new HatenaDiaryFormatter().ToStream(entries));
 
-    var day = doc.Root.Elements("day").First(
+    var day = doc.Root!.Elements("day").First(
       e => string.Equals(dateUpdatedEntry0.LocalDateTime.ToString("yyyy-MM-dd"), e.Attribute("date")?.Value, StringComparison.Ordinal)
     );
     var bodyText = day.Value;
@@ -210,16 +210,16 @@ public class HatenaDiaryFormatterTests {
 
     var doc = XDocument.Load(new HatenaDiaryFormatter().ToStream(entries));
 
-    var firstDay = doc.Root.Elements("day").First(
+    var firstDay = doc.Root!.Elements("day").First(
       e => string.Equals(dateUpdatedEntry0.LocalDateTime.ToString("yyyy-MM-dd"), e.Attribute("date")?.Value, StringComparison.Ordinal)
     );
 
-    StringAssert.Contains($"*{dateUpdatedEntry0.ToUnixTimeSeconds():D}*entry0\nentry0-content\n", firstDay.Element("body").Value.Replace("\r", string.Empty));
+    StringAssert.Contains($"*{dateUpdatedEntry0.ToUnixTimeSeconds():D}*entry0\nentry0-content\n", firstDay.Element("body")!.Value.Replace("\r", string.Empty));
 
-    var secondDay = doc.Root.Elements("day").First(
+    var secondDay = doc.Root!.Elements("day").First(
       e => string.Equals(dateUpdatedEntry1.LocalDateTime.ToString("yyyy-MM-dd"), e.Attribute("date")?.Value, StringComparison.Ordinal)
     );
 
-    StringAssert.Contains($"*{dateUpdatedEntry1.ToUnixTimeSeconds():D}*entry1\nentry1-content\n", secondDay.Element("body").Value.Replace("\r", string.Empty));
+    StringAssert.Contains($"*{dateUpdatedEntry1.ToUnixTimeSeconds():D}*entry1\nentry1-content\n", secondDay.Element("body")!.Value.Replace("\r", string.Empty));
   }
 }
