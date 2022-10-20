@@ -218,7 +218,7 @@ public partial class FixMixedContent : CliBase {
     if (confirm)
       confirmBeforePosting = () => ConsoleUtils.AskYesNo(false, "更新しますか");
 
-    if (!CliBase.Login(credential, out var hatenaBlog))
+    if (!Login(credential, out var hatenaBlog))
       return;
 
     IReadOnlyList<PostedEntry> updatedEntries = null;

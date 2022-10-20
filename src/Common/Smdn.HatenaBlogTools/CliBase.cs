@@ -93,7 +93,7 @@ public abstract class CliBase {
           break;
 
         case "--version":
-          CliBase.Version();
+          Version();
           break;
 
         case "/?":
@@ -146,7 +146,7 @@ public abstract class CliBase {
 
   protected static bool Login(HatenaBlogAtomPubCredential credential, out HatenaBlogAtomPubClient hatenaBlog)
   {
-    hatenaBlog = CliBase.CreateClient(credential);
+    hatenaBlog = CreateClient(credential);
 
     Console.Write("ログインしています ... ");
 

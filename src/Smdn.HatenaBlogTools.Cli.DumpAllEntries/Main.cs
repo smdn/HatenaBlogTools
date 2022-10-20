@@ -259,7 +259,7 @@ internal partial class DumpAllEntries : CliBase {
     Console.Error.WriteLine("結果を保存しています");
 
     if (outputFormat == OutputFormat.EntryFile) {
-      DumpAllEntries.OutputEntriesToIndividualFiles(
+      OutputEntriesToIndividualFiles(
         outputDocument,
         entries,
         hatenaBlog.BlogId,
