@@ -28,6 +28,8 @@ public static class WsseClient {
 
     rng.GetBytes(nonce);
 
+    var nonceBase64 = Convert.ToBase64String(nonce, Base64FormattingOptions.None);
+
     var createdDateTimeString = createdDateTime.ToString("o");
 
     string passwordDigest;
@@ -49,13 +51,7 @@ public static class WsseClient {
       );
     }
 
-    return string.Format(
-      "UsernameToken Username=\"{0}\", PasswordDigest=\"{1}\", Nonce=\"{2}\", Created=\"{3}\"",
-      credential.UserName,
-      passwordDigest,
-      Convert.ToBase64String(nonce, Base64FormattingOptions.None),
-      createdDateTimeString
-    );
+    return $"UsernameToken Username=\"{credential.UserName}\", PasswordDigest=\"{passwordDigest}\", Nonce=\"{nonceBase64}\", Created=\"{createdDateTimeString}\"";
   }
 
   public static void SetWsseHeader(this WebRequest request, NetworkCredential credential)

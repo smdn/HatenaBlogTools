@@ -51,12 +51,12 @@ public class DiffCommand : IDiffGenerator {
 
         arguments = $"{arguments} '{temporaryFilePathOriginal}' '{temporaryFilePathModified}'";
 
-        psi = new ProcessStartInfo("/bin/sh", string.Format("-c \"{0} {1}\"", command, arguments));
+        psi = new ProcessStartInfo("/bin/sh", $"-c \"{command} {arguments}\"");
       }
       else { // for windows
         var arguments = $"{commandArgs} \"{Path.GetFullPath(temporaryFilePathOriginal)}\" \"{Path.GetFullPath(temporaryFilePathModified)}\"";
 
-        // psi = new ProcessStartInfo("cmd", string.Format("/c \"{0}\" {1}", command, arguments));
+        // psi = new ProcessStartInfo("cmd", $"/c \"{command}\" {arguments}");
         psi = new ProcessStartInfo(command, arguments) {
           CreateNoWindow = true,
         };
