@@ -12,11 +12,11 @@ namespace Smdn.HatenaBlogTools;
 public abstract class FormatterBase {
   public TimeZoneInfo EntryTimeZone { get; set; } = TimeZoneInfo.Local;
 
-  public FormatterBase(
 #if RETRIEVE_COMMENTS
-    bool retrieveComments = false
+  public FormatterBase(bool retrieveComments = false) // TODO
+#else
+  public FormatterBase()
 #endif
-  )
   {
   }
 

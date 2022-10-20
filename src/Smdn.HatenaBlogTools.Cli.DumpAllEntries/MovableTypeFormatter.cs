@@ -15,11 +15,11 @@ namespace Smdn.HatenaBlogTools;
  * ref: http://www.movabletype.jp/documentation/appendices/import-export-format.html
  */
 public class MovableTypeFormatter : FormatterBase {
-  public MovableTypeFormatter(
 #if RETRIEVE_COMMENTS
-    bool retrieveComments = false
+  public MovableTypeFormatter(bool retrieveComments = false) // TODO
+#else
+  public MovableTypeFormatter()
 #endif
-  )
   {
   }
 

@@ -11,11 +11,11 @@ using Smdn.HatenaBlogTools.HatenaBlog;
 namespace Smdn.HatenaBlogTools;
 
 public class HatenaDiaryFormatter : FormatterBase {
-  public HatenaDiaryFormatter(
 #if RETRIEVE_COMMENTS
-    bool retrieveComments = false
+  public HatenaDiaryFormatter(bool retrieveComments = false) // TODO
+#else
+  public HatenaDiaryFormatter()
 #endif
-  )
   {
   }
 
