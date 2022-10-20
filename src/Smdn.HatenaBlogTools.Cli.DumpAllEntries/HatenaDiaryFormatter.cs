@@ -56,10 +56,13 @@ public class HatenaDiaryFormatter : FormatterBase {
 
       body.Append('*').Append(updatedDate.ToUnixTimeSeconds().ToString("D", CultureInfo.InvariantCulture)).Append('*');
 
-      var joinedCategory = string.Join("][", entry.Categories);
-
-      if (0 < joinedCategory.Length)
-        body.AppendFormat("[{0}]", joinedCategory);
+      if (0 < entry.Categories.Count) {
+#if SYSTEM_TEXT_STRINGBUILDER_APPENDJOIN
+        body.Append('[').AppendJoin("][", entry.Categories).Append(']');
+#else
+        body.Append('[').Append(string.Join("][", entry.Categories)).Append(']');
+#endif
+      }
 
       body.AppendLine(entry.Title);
 
