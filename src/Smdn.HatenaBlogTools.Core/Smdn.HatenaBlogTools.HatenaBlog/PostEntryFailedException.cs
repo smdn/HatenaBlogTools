@@ -10,6 +10,6 @@ public class PostEntryFailedException : Exception {
   public PostEntryFailedException(Entry causedEntry, Exception innerException)
     : base("exception occured while posting entry", innerException)
   {
-    this.CausedEntry = causedEntry;
+    CausedEntry = causedEntry;
   }
 }
