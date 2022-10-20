@@ -4,9 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Xml.Linq;
-
-using Smdn.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.HatenaBlogTools;
 
