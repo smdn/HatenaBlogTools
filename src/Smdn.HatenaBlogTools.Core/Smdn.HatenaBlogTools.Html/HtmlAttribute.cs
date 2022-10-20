@@ -5,7 +5,9 @@ using System.Text.RegularExpressions;
 
 namespace Smdn.HatenaBlogTools.Html;
 
+#pragma warning disable CA1711
 public class HtmlAttribute {
+#pragma warning restore CA1711
   // <element ___attr1_=_'value'____attr2=...
   //          >  >    >   >    >>
   //          |  |    |   |    ||
