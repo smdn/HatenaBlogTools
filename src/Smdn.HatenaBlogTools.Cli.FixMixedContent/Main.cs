@@ -325,7 +325,7 @@ public partial class FixMixedContent : CliBase {
       if (replaceBlogUrl && blogDomain == null && customBlogDomain == null)
         throw new ArgumentException($"{nameof(blogDomain)} or {nameof(customBlogDomain)} must be specified");
 
-      blogDomains = (new[] { blogDomain, customBlogDomain }).Where(d => d != null).ToArray();
+      blogDomains = new[] { blogDomain, customBlogDomain }.Where(d => d != null).ToArray();
 
       this.fixMixedContent = fixMixedContent;
       this.predicateForFixMixedContent = predicateForFixMixedContent;
