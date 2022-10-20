@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Xml.Linq;
@@ -29,7 +30,7 @@ public class HatenaDiaryFormatter : FormatterBase {
       var updatedDate = entry.DateUpdated ?? defaultUpdatedDate;
       var date =
         TimeZoneInfo.ConvertTime(updatedDate, EntryTimeZone)
-        .ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+        .ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
       XElement bodyElement;
 
@@ -53,7 +54,7 @@ public class HatenaDiaryFormatter : FormatterBase {
 
       var body = new StringBuilder();
 
-      body.AppendFormat("*{0}*", updatedDate.ToUnixTimeSeconds());
+      body.Append('*').Append(updatedDate.ToUnixTimeSeconds().ToString("D", CultureInfo.InvariantCulture)).Append('*');
 
       var joinedCategory = string.Join("][", entry.Categories);
 
