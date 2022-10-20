@@ -13,9 +13,7 @@ public static class WsseClient {
   private const string HeaderName = "X-WSSE";
 
   public static string CreateWsseUsernameToken(NetworkCredential credential)
-  {
-    return CreateWsseUsernameToken(credential, DateTimeOffset.Now);
-  }
+    => CreateWsseUsernameToken(credential, DateTimeOffset.Now);
 
   public static string CreateWsseUsernameToken(NetworkCredential credential, DateTimeOffset createdDateTime)
   {
@@ -57,9 +55,7 @@ public static class WsseClient {
   }
 
   public static void SetWsseHeader(this WebRequest request, NetworkCredential credential)
-  {
-    SetWsseHeader(request, credential, DateTimeOffset.Now);
-  }
+    => SetWsseHeader(request, credential, DateTimeOffset.Now);
 
   public static void SetWsseHeader(this WebRequest request, NetworkCredential credential, DateTimeOffset createdDateTime)
   {

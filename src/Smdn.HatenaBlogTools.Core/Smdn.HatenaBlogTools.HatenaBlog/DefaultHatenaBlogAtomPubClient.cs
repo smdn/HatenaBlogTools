@@ -44,9 +44,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
   private AtomPubClient atom = null;
 
   private static Uri GetRootEndPont(string hatenaId, string blogId)
-  {
-    return new Uri(string.Concat("https://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom"));
-  }
+    => new(string.Concat("https://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom"));
 
   internal DefaultHatenaBlogAtomPubClient(HatenaBlogAtomPubCredential credential)
   {
@@ -55,9 +53,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
   }
 
   public override void WaitForCinnamon()
-  {
-    System.Threading.Thread.Sleep(250);
-  }
+    => System.Threading.Thread.Sleep(250);
 
   private AtomPubClient EnsureInitAtomClient()
   {
@@ -73,9 +69,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
   }
 
   public override HttpStatusCode Login(out XDocument serviceDocument)
-  {
-    return GetServiceDocuments(out serviceDocument);
-  }
+    => GetServiceDocuments(out serviceDocument);
 
   private HttpStatusCode GetServiceDocuments(out XDocument serviceDocument)
   {

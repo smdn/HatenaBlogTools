@@ -36,19 +36,13 @@ public class AtomPubClient {
   }
 
   public HttpStatusCode Get(Uri requestUri, out XDocument responseDocument)
-  {
-    return GetResponse(() => CreateRequest(WebRequestMethods.Http.Get, requestUri), out responseDocument);
-  }
+    => GetResponse(() => CreateRequest(WebRequestMethods.Http.Get, requestUri), out responseDocument);
 
   public HttpStatusCode Post(Uri requestUri, XDocument requestDocument, out XDocument responseDocument)
-  {
-    return PostPut(WebRequestMethods.Http.Post, requestUri, requestDocument, out responseDocument);
-  }
+    => PostPut(WebRequestMethods.Http.Post, requestUri, requestDocument, out responseDocument);
 
   public HttpStatusCode Put(Uri requestUri, XDocument requestDocument, out XDocument responseDocument)
-  {
-    return PostPut(WebRequestMethods.Http.Put, requestUri, requestDocument, out responseDocument);
-  }
+    => PostPut(WebRequestMethods.Http.Put, requestUri, requestDocument, out responseDocument);
 
   private HttpStatusCode PostPut(string method, Uri requestUri, XDocument requestDocument, out XDocument responseDocument)
   {

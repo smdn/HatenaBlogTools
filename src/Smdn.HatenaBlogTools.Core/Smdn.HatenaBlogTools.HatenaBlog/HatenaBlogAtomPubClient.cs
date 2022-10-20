@@ -28,15 +28,11 @@ public abstract class HatenaBlogAtomPubClient {
   }
 
   public static HatenaBlogAtomPubClient Create(HatenaBlogAtomPubCredential credential)
-  {
-    return new DefaultHatenaBlogAtomPubClient(credential);
-  }
+    => new DefaultHatenaBlogAtomPubClient(credential);
 
 #if DEBUG
   public static HatenaBlogAtomPubClient Create(IReadOnlyList<PostedEntry> entries)
-  {
-    return new PseudoHatenaBlogAtomPubClient(entries);
-  }
+    => new PseudoHatenaBlogAtomPubClient(entries);
 #endif
 
   public static IEnumerable<PostedEntry> ReadEntriesFrom(XDocument document)

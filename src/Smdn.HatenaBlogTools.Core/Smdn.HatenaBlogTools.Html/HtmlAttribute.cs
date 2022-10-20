@@ -39,12 +39,8 @@ public class HtmlAttribute {
   }
 
   internal string ConstructHtml()
-  {
-    return string.Concat(preamble, Name, delimiter, Value, postamble);
-  }
+    => string.Concat(preamble, Name, delimiter, Value, postamble);
 
   public bool IsNameEqualsTo(string name)
-  {
-    return string.Equals(Name, name, StringComparison.OrdinalIgnoreCase);
-  }
+    => string.Equals(Name, name, StringComparison.OrdinalIgnoreCase);
 }

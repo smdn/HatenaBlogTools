@@ -41,9 +41,7 @@ public class HatenaBlogContentEditor : HtmlDocument {
   }
 
   public bool FixMixedContentReferences()
-  {
-    return FixMixedContentReferences(attribute => true);
-  }
+    => FixMixedContentReferences(attribute => true);
 
   public bool FixMixedContentReferences(Predicate<HtmlAttribute> targetPredicate)
   {

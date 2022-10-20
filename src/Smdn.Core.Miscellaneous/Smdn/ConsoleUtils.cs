@@ -114,9 +114,7 @@ public static class ConsoleUtils {
   }
 
   public static bool AskYesNo(string format, params object[] args)
-  {
-    return AskYesNo(false, format, args);
-  }
+    => AskYesNo(false, format, args);
 
   public static bool AskYesNo(bool @default, string format, params object[] args)
   {
@@ -136,9 +134,7 @@ public static class ConsoleUtils {
   }
 
   public static string ReadPassword()
-  {
-    return ReadPassword("Password: ");
-  }
+    => ReadPassword("Password: ");
 
   public static string ReadPassword(string promptFormat, params object[] arg)
   {
