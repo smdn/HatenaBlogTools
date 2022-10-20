@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: 2018 smdn <smdn@smdn.jp>
+// SPDX-FileCopyrightText: 2018 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 
 using System;
@@ -27,8 +27,10 @@ public static class HtmlParser {
 
     var elementLocalName = "[a-zA-z]+";
 
-    return new Regex($"\\<(?<localname>{elementLocalName}){attributeList}(?<elementclose>{whitespaceZeroOrMore}/?\\>)",
-                     RegexOptions.Multiline | RegexOptions.Compiled);
+    return new Regex(
+      $"\\<(?<localname>{elementLocalName}){attributeList}(?<elementclose>{whitespaceZeroOrMore}/?\\>)",
+      RegexOptions.Multiline | RegexOptions.Compiled
+    );
   }
 
   public static IEnumerable<HtmlElement> EnumerateHtmlElementStart(string input)
@@ -63,20 +65,35 @@ public static class HtmlParser {
 
         var captureAttribute = groupAttribute.Captures[attributeIndex];
 
-        attributes.Add(new HtmlAttribute(preamble: input.Substring(captureAttribute.Index, captureAttributeName.Index - captureAttribute.Index),
-                                         captureName: captureAttributeName,
-                                         delimiter: (captureAttributeValue == null) ? null : input.Substring(captureAttributeName.Index + captureAttributeName.Length, captureAttributeValue.Index - (captureAttributeName.Index + captureAttributeName.Length)),
-                                         captureValue: captureAttributeValue,
-                                         postamble: (captureAttributeValue == null) ? null : input.Substring(captureAttributeValue.Index + captureAttributeValue.Length, (captureAttribute.Index + captureAttribute.Length) - (captureAttributeValue.Index + captureAttributeValue.Length))));
+        attributes.Add(
+          new HtmlAttribute(
+            preamble: input.Substring(captureAttribute.Index, captureAttributeName.Index - captureAttribute.Index),
+            captureName: captureAttributeName,
+            delimiter: (captureAttributeValue == null)
+              ? null
+              : input.Substring(
+                captureAttributeName.Index + captureAttributeName.Length,
+                captureAttributeValue.Index - (captureAttributeName.Index + captureAttributeName.Length)
+              ),
+            captureValue: captureAttributeValue,
+            postamble: (captureAttributeValue == null)
+              ? null
+              : input.Substring(
+                captureAttributeValue.Index + captureAttributeValue.Length,
+                captureAttribute.Index + captureAttribute.Length - (captureAttributeValue.Index + captureAttributeValue.Length)
+              )
+          )
+        );
       }
 
-      yield return new HtmlElement(match.Groups["localname"].Value,
-                                   match,
-                                   attributes,
-                                   match.Groups["elementclose"].Value);
+      yield return new HtmlElement(
+        match.Groups["localname"].Value,
+        match,
+        attributes,
+        match.Groups["elementclose"].Value
+      );
 
       match = match.NextMatch();
     }
   }
 }
-

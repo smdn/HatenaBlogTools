@@ -31,9 +31,9 @@ public class MovableTypeFormatter : FormatterBase {
 
   public override void Format(IEnumerable<PostedEntry> entries, Stream outputStream)
   {
-    var writer = new StreamWriter(outputStream, Encoding.UTF8);
-
-    writer.NewLine = "\n"; // ???
+    var writer = new StreamWriter(outputStream, Encoding.UTF8) {
+      NewLine = "\n", // ???
+    };
 
     foreach (var entry in entries) {
       /*
@@ -58,7 +58,7 @@ public class MovableTypeFormatter : FormatterBase {
 
       var tags = entry
         .Categories
-        .Select(tag => tag.Contains(" ") ? string.Concat("\"", tag, "\"") : tag);
+        .Select(tag => tag.Contains(' ') ? string.Concat("\"", tag, "\"") : tag);
 
       writer.WriteLine(string.Concat("TAGS: ", string.Join(",", tags)));
 
@@ -70,7 +70,7 @@ public class MovableTypeFormatter : FormatterBase {
       writer.WriteLine(multilineFieldDelimiter);
 
       writer.WriteLine("BODY:");
-      //writer.WriteLine(entry.Content);
+      // writer.WriteLine(entry.Content);
       writer.WriteLine(entry.FormattedContent);
       writer.WriteLine(multilineFieldDelimiter);
 

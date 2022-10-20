@@ -3,11 +3,11 @@
 
 namespace Smdn.HatenaBlogTools;
 
-partial class FixMixedContent {
-  static int Main(string[] args)
+public partial class FixMixedContent {
+  private static int Main(string[] args)
   {
     try {
-      (new FixMixedContent()).Run(args);
+      new FixMixedContent().Run(args);
 
       return 0;
     }

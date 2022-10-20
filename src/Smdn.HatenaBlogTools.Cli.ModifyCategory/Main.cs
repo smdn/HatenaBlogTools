@@ -12,7 +12,7 @@ using CategorySet = System.Collections.Generic.HashSet<string>;
 
 namespace Smdn.HatenaBlogTools;
 
-partial class ModifyCategory : CliBase {
+internal partial class ModifyCategory : CliBase {
   protected override string GetDescription() => "記事のカテゴリを一括変更します。";
 
   protected override string GetUsageExtraMandatoryOptions() => "\"旧カテゴリ1:新カテゴリ1\" \"旧カテゴリ2:新カテゴリ2\" ...";
@@ -20,13 +20,13 @@ partial class ModifyCategory : CliBase {
   protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
   {
     yield return "-n, --dry-run        : 変更内容の確認だけ行い、変更の投稿は行いません";
-    yield return "";
+    yield return string.Empty;
     yield return "変更カテゴリの指定(例):";
     yield return "  <old>:<new>        : カテゴリ<old>を<new>に置き換えます";
     yield return "  <old>:             : カテゴリ<old>を削除します";
     yield return "  :<new>             : カテゴリが設定されていない記事にカテゴリ<new>を設定します";
     yield return "  <old>:<old>;<new>  : カテゴリ<old>の記事にカテゴリ<new>を追加します";
-    yield return "";
+    yield return string.Empty;
     yield return "カテゴリ指定の構文:";
     yield return "  <置換前のカテゴリグループ>:<置換後のカテゴリグループ>";
     yield return "  ";
@@ -42,7 +42,7 @@ partial class ModifyCategory : CliBase {
     yield return "  ";
     yield return "  置換後のカテゴリグループに何も指定しない場合、空のカテゴリへの置換となります";
     yield return "  つまり、置換前のカテゴリが'削除されます'";
-    yield return "";
+    yield return string.Empty;
     yield return "  \"a;b:\"と指定した場合、記事にカテゴリaとbが設定されている場合に、カテゴリの設定を削除します";
     yield return "  ";
     yield return "  置換前のカテゴリグループに何も指定しない場合、空のカテゴリからの置換となります";
@@ -68,12 +68,17 @@ partial class ModifyCategory : CliBase {
           var pos = args[i].IndexOf(':');
 
           if (0 <= pos) {
-            var categoriesOld = args[i].Substring(0, pos).Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
-            var categoriesNew = args[i].Substring(pos + 1).Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+            var categoriesOld = args[i].Substring(0, pos).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            var categoriesNew = args[i].Substring(pos + 1).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (0 < categoriesOld.Length || 0 < categoriesNew.Length)
-              categoryModifications.Add(new CategoryModification(new CategorySet(categoriesOld, StringComparer.Ordinal),
-                                                                 new CategorySet(categoriesNew, StringComparer.Ordinal)));
+            if (0 < categoriesOld.Length || 0 < categoriesNew.Length) {
+              categoryModifications.Add(
+                new CategoryModification(
+                  new CategorySet(categoriesOld, StringComparer.Ordinal),
+                  new CategorySet(categoriesNew, StringComparer.Ordinal)
+                )
+              );
+            }
           }
 
           break;
@@ -102,8 +107,7 @@ partial class ModifyCategory : CliBase {
 
     Console.WriteLine("エントリを取得中 ...");
 
-    List<PostedEntry> entries = null;
-
+    List<PostedEntry> entries;
     try {
       entries = hatenaBlog.EnumerateEntries().ToList();
     }
@@ -128,11 +132,13 @@ partial class ModifyCategory : CliBase {
 
       modifiedEntries.Add(entry);
 
-      Console.WriteLine("{0} \"{1}\" {2} -> {3}",
-                        entry.EntryUri,
-                        entry.Title,
-                        Join(prevCategories),
-                        Join(entry.Categories));
+      Console.WriteLine(
+        "{0} \"{1}\" {2} -> {3}",
+        entry.EntryUri,
+        entry.Title,
+        Join(prevCategories),
+        Join(entry.Categories)
+      );
     }
 
     if (modifiedEntries.Count == 0) {
@@ -151,10 +157,12 @@ partial class ModifyCategory : CliBase {
     Console.WriteLine();
 
     foreach (var entry in modifiedEntries) {
-      Console.Write("変更を更新中: {0} \"{1}\" [{2}] ... ",
-                    entry.DatePublished,
-                    entry.Title,
-                    string.Join("][", entry.Categories));
+      Console.Write(
+        "変更を更新中: {0} \"{1}\" [{2}] ... ",
+        entry.DatePublished,
+        entry.Title,
+        string.Join("][", entry.Categories)
+      );
 
       var statusCode = hatenaBlog.UpdateEntry(entry, out _);
 

@@ -14,7 +14,7 @@ public class EntryContentModifier : EntryTextModifier {
     out string modifiedText
   )
   {
-    if (Modify(entry.Content, modifier, out originalText, out modifiedText)) {
+    if (EntryTextModifier.Modify(entry.Content, modifier, out originalText, out modifiedText)) {
       entry.Content = modifiedText;
       return true;
     }

@@ -1,4 +1,3 @@
-
 // SPDX-FileCopyrightText: 2014 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;

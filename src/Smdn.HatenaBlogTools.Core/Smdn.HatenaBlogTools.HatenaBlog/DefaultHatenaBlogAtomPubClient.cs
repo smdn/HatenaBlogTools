@@ -32,7 +32,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
   private string userAgent;
 
   public override string UserAgent {
-    get { return atom?.UserAgent ?? userAgent; }
+    get => atom?.UserAgent ?? userAgent;
     set {
       userAgent = value;
 
@@ -50,10 +50,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
 
   internal DefaultHatenaBlogAtomPubClient(HatenaBlogAtomPubCredential credential)
   {
-    if (credential == null)
-      throw new ArgumentNullException(nameof(credential));
-
-    this.credential = credential;
+    this.credential = credential ?? throw new ArgumentNullException(nameof(credential));
     rootEndPoint = GetRootEndPont(credential.HatenaId, credential.BlogId);
   }
 
@@ -67,9 +64,10 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
     if (atom != null)
       return atom;
 
-    atom = new AtomPubClient();
-    atom.Credential = new NetworkCredential(credential.HatenaId, credential.ApiKey);
-    atom.UserAgent = userAgent;
+    atom = new AtomPubClient {
+      Credential = new NetworkCredential(credential.HatenaId, credential.ApiKey),
+      UserAgent = userAgent,
+    };
 
     return atom;
   }
@@ -89,16 +87,18 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
     if (serviceDocument.Root.Name != AtomPub.ElementNames.AppService)
       throw new NotSupportedException($"unexpected document type: {serviceDocument.Root.Name}");
 
-    blogTitle = serviceDocument.Root
-                                    .Element(AtomPub.ElementNames.AppWorkspace)
-                                    ?.Element(AtomPub.ElementNames.AtomTitle)
-                                    ?.Value;
+    blogTitle = serviceDocument
+      .Root
+      .Element(AtomPub.ElementNames.AppWorkspace)
+      ?.Element(AtomPub.ElementNames.AtomTitle)
+      ?.Value;
 
-    collectionUri = serviceDocument.Root
-                                        .Element(AtomPub.ElementNames.AppWorkspace)
-                                        ?.Elements(AtomPub.ElementNames.AppCollection)
-                                        ?.FirstOrDefault(e => e.Element(AtomPub.ElementNames.AppAccept).Value.Contains("type=entry"))
-                                        ?.GetAttributeValue("href", static val => new Uri(val));
+    collectionUri = serviceDocument
+      .Root
+      .Element(AtomPub.ElementNames.AppWorkspace)
+      ?.Elements(AtomPub.ElementNames.AppCollection)
+      ?.FirstOrDefault(e => e.Element(AtomPub.ElementNames.AppAccept).Value.Contains("type=entry"))
+      ?.GetAttributeValue("href", static val => new Uri(val));
 
     return statusCode;
   }
@@ -121,10 +121,11 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       }
 
       // 次のatom:linkを取得する
-      nextUri = collectionDocument.Element(AtomPub.Namespaces.Atom + "feed")
-                                  ?.Elements(AtomPub.Namespaces.Atom + "link")
-                                  ?.FirstOrDefault(e => e.HasAttributeWithValue("rel", "next"))
-                                  ?.GetAttributeValue("href", ToUriNullable);
+      nextUri = collectionDocument
+        .Element(AtomPub.Namespaces.Atom + "feed")
+        ?.Elements(AtomPub.Namespaces.Atom + "link")
+        ?.FirstOrDefault(e => e.HasAttributeWithValue("rel", "next"))
+        ?.GetAttributeValue("href", ToUriNullable);
 
       if (nextUri == null)
         break;
@@ -176,15 +177,15 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
         datePublished: datePublished,
         authors: authors,
         formattedContent: formattedContent
-      );
-
-      /*
-       * basic propeties
-       */
-      e.Title = entry.Element(AtomPub.Namespaces.Atom + "title")?.Value;
-      e.Summary = entry.Element(AtomPub.Namespaces.Atom + "summary")?.Value;
-      e.Content = entry.Element(AtomPub.Namespaces.Atom + "content")?.Value;
-      e.ContentType = entry.Element(AtomPub.Namespaces.Atom + "content")?.GetAttributeValue("type");
+      ) {
+        /*
+         * basic propeties
+         */
+        Title = entry.Element(AtomPub.Namespaces.Atom + "title")?.Value,
+        Summary = entry.Element(AtomPub.Namespaces.Atom + "summary")?.Value,
+        Content = entry.Element(AtomPub.Namespaces.Atom + "content")?.Value,
+        ContentType = entry.Element(AtomPub.Namespaces.Atom + "content")?.GetAttributeValue("type"),
+      };
 
       try {
         e.DateUpdated = DateTimeOffset.Parse(entry.Element(AtomPub.Namespaces.Atom + "updated")?.Value);
@@ -205,10 +206,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       return e;
     }
 
-    bool IsYes(string str)
-    {
-      return string.Equals(str, "yes", StringComparison.OrdinalIgnoreCase);
-    }
+    bool IsYes(string str) => string.Equals(str, "yes", StringComparison.OrdinalIgnoreCase);
   }
 
   public override HttpStatusCode UpdateEntry(PostedEntry updatingEntry, out XDocument responseDocument)
@@ -297,7 +295,9 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       )
     );
 
-    return new XDocument(new XDeclaration("1.0", "utf-8", null),
-                         entry);
+    return new XDocument(
+      new XDeclaration("1.0", "utf-8", null),
+      entry
+    );
   }
 }

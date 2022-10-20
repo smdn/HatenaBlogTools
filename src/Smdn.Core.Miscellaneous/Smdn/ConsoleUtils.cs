@@ -1,4 +1,3 @@
-//
 // SPDX-FileCopyrightText: 2009 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 
@@ -10,7 +9,7 @@ using System.Threading;
 namespace Smdn;
 
 public static class ConsoleUtils {
-  private static char[] progressChar = new char[] {'-', '\\', '|', '/'};
+  private static readonly char[] progressChar = new char[] { '-', '\\', '|', '/' };
   private static int progressCharIndex = 0;
 
   private static int? cursorLeft = null;
@@ -29,7 +28,7 @@ public static class ConsoleUtils {
         Console.CursorTop = (int)cursorTop;
 
       cursorLeft = Console.CursorLeft;
-      cursorTop  = Console.CursorTop;
+      cursorTop = Console.CursorTop;
     }
     catch (IOException) {
       // ignore
@@ -40,7 +39,7 @@ public static class ConsoleUtils {
   public static void ClearCursorPosition()
   {
     cursorLeft = null;
-    cursorTop  = null;
+    cursorTop = null;
   }
 
   private static void WriteProgressChar()
@@ -75,7 +74,7 @@ public static class ConsoleUtils {
     if (0 == denominator)
       Console.Write(" {0} ", denominator);
     else
-      Console.Write(" {0}/{1} ({2:P2}) ", numerator, denominator, (float)numerator / (float)denominator);
+      Console.Write(" {0}/{1} ({2:P2}) ", numerator, denominator, numerator / (float)denominator);
 
     WriteProgressChar();
   }
@@ -89,7 +88,7 @@ public static class ConsoleUtils {
     if (0 == denominator)
       Console.Write(" {0} ", denominator);
     else
-      Console.Write(" {0}/{1} ({2:P2}) ", numerator, denominator, (float)numerator / (float)denominator);
+      Console.Write(" {0}/{1} ({2:P2}) ", numerator, denominator, numerator / (float)denominator);
 
     WriteProgressChar();
   }

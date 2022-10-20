@@ -3,11 +3,11 @@
 
 namespace Smdn.HatenaBlogTools;
 
-partial class Login {
-  static int Main(string[] args)
+internal partial class Login {
+  private static int Main(string[] args)
   {
     try {
-      (new Login()).Run(args);
+      new Login().Run(args);
 
       return 0;
     }

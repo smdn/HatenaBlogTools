@@ -1,6 +1,5 @@
 // SPDX-FileCopyrightText: 2020 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,9 +31,9 @@ public class HatenaDiaryFormatter : FormatterBase {
         TimeZoneInfo.ConvertTime(updatedDate, EntryTimeZone)
         .ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
 
-      XElement dayElement, bodyElement;
+      XElement bodyElement;
 
-      if (dayElements.TryGetValue(date, out dayElement)) {
+      if (dayElements.TryGetValue(date, out var dayElement)) {
         bodyElement = dayElement.Element("body");
       }
       else {
@@ -84,8 +83,10 @@ public class HatenaDiaryFormatter : FormatterBase {
 #endif
     }
 
-    var outputDocument = new XDocument(new XDeclaration("1.0", "utf-8", null),
-                                       diaryElement);
+    var outputDocument = new XDocument(
+      new XDeclaration("1.0", "utf-8", null),
+      diaryElement
+    );
 
     outputDocument.Save(outputStream);
   }

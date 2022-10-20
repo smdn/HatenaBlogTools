@@ -1,14 +1,12 @@
 // SPDX-FileCopyrightText: 2020 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
-
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 
-using Smdn.HatenaBlogTools.HatenaBlog;
 using Smdn.HatenaBlogTools.AtomPublishingProtocol;
+using Smdn.HatenaBlogTools.HatenaBlog;
 
 namespace Smdn.HatenaBlogTools;
 
@@ -169,7 +167,7 @@ public class BloggerFormatter : FormatterBase {
       // /feed
       new XElement(
         AtomPub.Namespaces.Atom + "feed",
-        //new XAttribute(XNamespace.Xmlns + string.Empty, AtomPub.Namespaces.Atom),
+        // new XAttribute(XNamespace.Xmlns + string.Empty, AtomPub.Namespaces.Atom),
         new XAttribute(XNamespace.Xmlns + "app", AtomPub.Namespaces.App),
         // /feed/title
         string.IsNullOrEmpty(blogTitle)

@@ -18,7 +18,7 @@ public class PostedEntry : Entry {
   /* read-write properties */
   public HashSet<string> Authors { get; }
 
-  internal protected PostedEntry(
+  protected internal PostedEntry(
     Uri id,
     Uri memberUri,
     Uri entryUri,

@@ -2,16 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using System.Xml;
-using System.Xml.Linq;
-
-using Smdn.HatenaBlogTools.AtomPublishingProtocol;
-using Smdn.Xml.Linq;
 
 namespace Smdn.HatenaBlogTools.HatenaBlog;
 

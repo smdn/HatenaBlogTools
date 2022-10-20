@@ -18,7 +18,7 @@ public class AtomPubClient {
   private int timeout = DefaultTimeoutMilliseconds;
 
   public int Timeout {
-    get { return timeout; }
+    get => timeout;
     set {
       if (value < -1)
         throw ExceptionUtils.CreateArgumentMustBeGreaterThanOrEqualTo(-1, nameof(Timeout), value);
@@ -52,28 +52,30 @@ public class AtomPubClient {
 
   private HttpStatusCode PostPut(string method, Uri requestUri, XDocument requestDocument, out XDocument responseDocument)
   {
-    return GetResponse(() => {
-      var req = CreateRequest(method, requestUri);
+    return GetResponse(
+      () => {
+        var req = CreateRequest(method, requestUri);
 
-      req.ContentType = "application/atom+xml";
+        req.ContentType = "application/atom+xml";
 
-      var settings = new XmlWriterSettings() {
-        Encoding = new UTF8Encoding(false), // Hatena blog AtomPub API's XML parser does not accept XML documents with BOM
-        NewLineChars = "\n",
-        ConformanceLevel = ConformanceLevel.Document,
-        Indent = true,
-        IndentChars = " ",
-        CloseOutput = false,
-      };
+        var settings = new XmlWriterSettings() {
+          Encoding = new UTF8Encoding(false), // Hatena blog AtomPub API's XML parser does not accept XML documents with BOM
+          NewLineChars = "\n",
+          ConformanceLevel = ConformanceLevel.Document,
+          Indent = true,
+          IndentChars = " ",
+          CloseOutput = false,
+        };
 
-      using (var reqStream = req.GetRequestStream()) {
-        using (var writer = XmlWriter.Create(reqStream, settings)) {
+        using (var reqStream = req.GetRequestStream()) {
+          using var writer = XmlWriter.Create(reqStream, settings);
           requestDocument.Save(writer);
         }
-      }
 
-      return req;
-    }, out responseDocument);
+        return req;
+      },
+      out responseDocument
+    );
   }
 
   private HttpWebRequest CreateRequest(string method, Uri requestUri)
@@ -98,18 +100,19 @@ public class AtomPubClient {
 
     for (var timeoutRetryCount = maxTimeoutRetryCount; ;) {
       try {
-        using (var response = GetResponseCore(createRequest())) {
-          if (2 == ((int)response.StatusCode) / 100) { // 2XX
-            using (var responseStream = response.GetResponseStream()) {
-              responseDocument = XDocument.Load(responseStream);
-            }
-          }
-          else {
-            Console.Error.WriteLine("{0} {1} ({2} {3})",
-                                    (int)response.StatusCode,
-                                    response.StatusDescription,
-                                    response.Method,
-                                    response.ResponseUri);
+        using var response = GetResponseCore(createRequest());
+        if (2 == ((int)response.StatusCode) / 100) { // 2XX
+          using var responseStream = response.GetResponseStream();
+          responseDocument = XDocument.Load(responseStream);
+        }
+        else {
+          Console.Error.WriteLine(
+            "{0} {1} ({2} {3})",
+            (int)response.StatusCode,
+            response.StatusDescription,
+            response.Method,
+            response.ResponseUri
+          );
 
 #if false
             Console.Error.WriteLine("[response headers]");
@@ -117,29 +120,27 @@ public class AtomPubClient {
               Console.Error.WriteLine("{0}: {1}", h, response.Headers[h]);
             }
 #endif
-            // try read response body
-            // XXX: cannot read chunked response with GetResponseStream() (?)
-            // XXX: or cannot read empty response (?)
-            try {
-              using (var memoryStream = new MemoryStream()) {
-                using (var respStream = response.GetResponseStream()) {
-                  respStream.CopyTo(memoryStream);
-                }
-
-                memoryStream.Position = 0L;
-
-                using (var reader = new StreamReader(memoryStream, Encoding.UTF8)) {
-                  Console.Error.WriteLine(reader.ReadToEnd());
-                }
-              }
+          // try read response body
+          // XXX: cannot read chunked response with GetResponseStream() (?)
+          // XXX: or cannot read empty response (?)
+          try {
+            using var memoryStream = new MemoryStream();
+            using (var respStream = response.GetResponseStream()) {
+              respStream.CopyTo(memoryStream);
             }
-            catch {
-              // ignore exceptions
-            }
+
+            memoryStream.Position = 0L;
+
+            using var reader = new StreamReader(memoryStream, Encoding.UTF8);
+            Console.Error.WriteLine(reader.ReadToEnd());
           }
+          catch {
+            // ignore exceptions
+          }
+        }
 
-          return response.StatusCode;
-        } // using response
+        return response.StatusCode;
+        // using response
       }
       catch (TimeoutException) {
         if (0 < timeoutRetryCount--)
@@ -149,7 +150,7 @@ public class AtomPubClient {
       }
     }
 
-    HttpWebResponse GetResponseCore(HttpWebRequest req)
+    static HttpWebResponse GetResponseCore(HttpWebRequest req)
     {
 #if false
       Console.Error.WriteLine("[request headers]");

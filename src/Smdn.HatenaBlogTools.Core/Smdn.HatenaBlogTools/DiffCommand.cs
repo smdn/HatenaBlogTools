@@ -25,10 +25,12 @@ public class DiffCommand : IDiffGenerator {
 
   public void DisplayDifference(string originalText, string modifiedText)
   {
-    Diff(() => Console.OpenStandardOutput(),
-         () => Console.OpenStandardError(),
-         originalText,
-         modifiedText);
+    Diff(
+      () => Console.OpenStandardOutput(),
+      () => Console.OpenStandardError(),
+      originalText,
+      modifiedText
+    );
   }
 
   private void Diff(Func<Stream> openStdout, Func<Stream> openStderr, string originalText, string modifiedText)
@@ -54,9 +56,10 @@ public class DiffCommand : IDiffGenerator {
       else { // for windows
         var arguments = $"{commandArgs} \"{Path.GetFullPath(temporaryFilePathOriginal)}\" \"{Path.GetFullPath(temporaryFilePathModified)}\"";
 
-        //psi = new ProcessStartInfo("cmd", string.Format("/c \"{0}\" {1}", command, arguments));
-        psi = new ProcessStartInfo(command, arguments);
-        psi.CreateNoWindow = true;
+        // psi = new ProcessStartInfo("cmd", string.Format("/c \"{0}\" {1}", command, arguments));
+        psi = new ProcessStartInfo(command, arguments) {
+          CreateNoWindow = true,
+        };
       }
 
       psi.UseShellExecute = false;
@@ -65,17 +68,16 @@ public class DiffCommand : IDiffGenerator {
       psi.StandardOutputEncoding = utf8EncodingNoBom;
       psi.StandardErrorEncoding = utf8EncodingNoBom;
 
-      using (var process = Process.Start(psi)) {
-        using (var stdout = openStdout()) {
-          process.StandardOutput.BaseStream.CopyTo(stdout);
-        }
-
-        using (var stderr = openStderr()) {
-          process.StandardError.BaseStream.CopyTo(stderr);
-        }
-
-        process.WaitForExit();
+      using var process = Process.Start(psi);
+      using (var stdout = openStdout()) {
+        process.StandardOutput.BaseStream.CopyTo(stdout);
       }
+
+      using (var stderr = openStderr()) {
+        process.StandardError.BaseStream.CopyTo(stderr);
+      }
+
+      process.WaitForExit();
     }
     finally {
       if (Directory.Exists(temporaryDirectoryPath))

@@ -1,6 +1,5 @@
 // SPDX-FileCopyrightText: 2018 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,29 +22,29 @@ public partial class FixMixedContent : CliBase {
     yield return "                              複数指定可、ただし--exclude-domainと同時に指定することはできません";
     yield return "--exclude-domain <ドメイン> : --fix-mixed-contentで修正するURLのうち、指定された<ドメイン>のURLを修正対象外とします";
     yield return "                              複数指定可、ただし--include-domainと同時に指定することはできません";
-    yield return "";
+    yield return string.Empty;
     yield return "--fix-blog-url              : 自ブログのリンクURLをhttpからhttpsに修正します";
     yield return "--custom-domain <ドメイン>  : 独自ドメインを使用している場合は、その独自ドメイン名を指定します";
     yield return "                              --fix-blog-url で独自ドメインのURLも修正する場合に指定します";
-    yield return "";
+    yield return string.Empty;
     yield return "--update-content            : 変更箇所がない場合でも常に再投稿して記事を更新します";
     yield return "                              ブログをHTTPS化している場合は、再投稿によりはてな記法等で埋め込まれたURLが更新されます";
-    yield return "";
+    yield return string.Empty;
     yield return "--entry-url-skip-to <URL>   : 指定されたURLのエントリまで処理をスキップします";
     yield return "                              エラー等により中断した処理を途中から再開する場合などに指定してください";
-    yield return "";
+    yield return string.Empty;
     yield return "--list-fixed-entry          : すべての記事の更新を行ったあとに、再投稿した記事のURL一覧を表示します";
-    yield return "";
+    yield return string.Empty;
     yield return "-n, --dry-run               : 修正した内容の確認だけ行い、再投稿を行いません";
     yield return "-i, --interactive           : 修正した内容の再投稿を行う前に確認を行います";
-    yield return "";
+    yield return string.Empty;
 
     yield return "変更箇所の表示に関するオプション:";
     yield return "  --diff-cmd <コマンド>           : 再投稿前に指定された<コマンド>を使って変更箇所を表示します";
     yield return "  --diff-cmd-args <コマンド引数>  : --diff-cmdで指定されたコマンドに渡す引数(オプション)を指定します";
     yield return "  --diff-test                     : --diff-cmdで指定されたコマンドの動作テストを行います";
     yield return "                                    このオプションを指定した場合、はてなブログの記事の更新は一切行いません";
-    yield return "";
+    yield return string.Empty;
 
     yield return "更新するコンテンツの指定に関するオプション:";
     yield return "  --input-content [ファイル名|-]  : はてなブログの記事を取得する代わりに、指定されたファイルの内容に対して修正します";
@@ -57,9 +56,13 @@ public partial class FixMixedContent : CliBase {
 
   public void Run(string[] args)
   {
-    if (!ParseCommonCommandLineArgs(ref args,
-                                    new[] { "--diff-test", "--input-content", "--output-content" },
-                                    out var credential)) {
+    if (
+      !ParseCommonCommandLineArgs(
+        ref args,
+        new[] { "--diff-test", "--input-content", "--output-content" },
+        out var credential
+      )
+    ) {
       return;
     }
 
@@ -148,11 +151,13 @@ public partial class FixMixedContent : CliBase {
       }
     }
 
-    var diffGenerator = DiffGenerator.Create(false,
-                                             diffCommand,
-                                             diffCommandArgs,
-                                             "変更前の本文",
-                                             "変更後の本文");
+    var diffGenerator = DiffGenerator.Create(
+      false,
+      diffCommand,
+      diffCommandArgs,
+      "変更前の本文",
+      "変更後の本文"
+    );
 
     if (testDiffCommand) {
       DiffGenerator.Test(diffGenerator);
@@ -172,7 +177,7 @@ public partial class FixMixedContent : CliBase {
         return;
       }
       else {
-        var include = (0 < fixMixedContentDomainsInclude.Count);
+        var include = 0 < fixMixedContentDomainsInclude.Count;
         var domainList = include ? fixMixedContentDomainsInclude : fixMixedContentDomainsExclude;
         var domainPrefixList = domainList.Select(domain => "//" + domain + "/").ToList();
 
@@ -187,11 +192,13 @@ public partial class FixMixedContent : CliBase {
       }
     }
 
-    var editor = new EntryEditor(blogDomain: credential?.BlogId,
-                                 customBlogDomain: customBlogDomain,
-                                 fixMixedContent: fixMixedContent,
-                                 predicateForFixMixedContent: predicateForFixMixedContent,
-                                 replaceBlogUrl: fixBlogUrl);
+    var editor = new EntryEditor(
+      blogDomain: credential?.BlogId,
+      customBlogDomain: customBlogDomain,
+      fixMixedContent: fixMixedContent,
+      predicateForFixMixedContent: predicateForFixMixedContent,
+      replaceBlogUrl: fixBlogUrl
+    );
 
     if (editLocalContent) {
       EditContent(editor, contentInput, contentOutput);
@@ -211,7 +218,7 @@ public partial class FixMixedContent : CliBase {
     if (confirm)
       confirmBeforePosting = () => ConsoleUtils.AskYesNo(false, "更新しますか");
 
-    if (!Login(credential, out var hatenaBlog))
+    if (!CliBase.Login(credential, out var hatenaBlog))
       return;
 
     IReadOnlyList<PostedEntry> updatedEntries = null;
@@ -268,7 +275,7 @@ public partial class FixMixedContent : CliBase {
 
   private static void EditContent(IHatenaBlogEntryEditor editor, string input, string output)
   {
-    bool IsStdIO(string io)
+    static bool IsStdIO(string io)
     {
       if (string.IsNullOrEmpty(io))
         return true;
@@ -280,23 +287,23 @@ public partial class FixMixedContent : CliBase {
 
     var encoding = new UTF8Encoding(false);
 
-    using (var inputStream = IsStdIO(input) ? Console.OpenStandardInput() : File.OpenRead(input)) {
-      var reader = new StreamReader(inputStream, false);
-      var modified = editor.Edit(new Entry { Content = reader.ReadToEnd() },
-                                 out var originalText,
-                                 out var modifiedText);
+    using var inputStream = IsStdIO(input) ? Console.OpenStandardInput() : File.OpenRead(input);
+    var reader = new StreamReader(inputStream, false);
+    var modified = editor.Edit(
+      new Entry { Content = reader.ReadToEnd() },
+      out var originalText,
+      out var modifiedText
+    );
 
-      using (var outputStream = IsStdIO(output) ? Console.OpenStandardOutput() : File.Create(output)) {
-        var writer = new StreamWriter(outputStream, encoding);
+    using var outputStream = IsStdIO(output) ? Console.OpenStandardOutput() : File.Create(output);
+    var writer = new StreamWriter(outputStream, encoding);
 
-        if (modified)
-          writer.Write(modifiedText);
-        else
-          writer.Write(originalText);
+    if (modified)
+      writer.Write(modifiedText);
+    else
+      writer.Write(originalText);
 
-        writer.Flush();
-      }
-    }
+    writer.Flush();
   }
 
   private class EntryEditor : IHatenaBlogEntryEditor {
@@ -307,11 +314,13 @@ public partial class FixMixedContent : CliBase {
     private readonly bool replaceBlogUrl;
     private readonly string[] blogDomains;
 
-    public EntryEditor(string blogDomain,
-                       string customBlogDomain,
-                       bool fixMixedContent,
-                       Predicate<Html.HtmlAttribute> predicateForFixMixedContent,
-                       bool replaceBlogUrl)
+    public EntryEditor(
+      string blogDomain,
+      string customBlogDomain,
+      bool fixMixedContent,
+      Predicate<Html.HtmlAttribute> predicateForFixMixedContent,
+      bool replaceBlogUrl
+    )
     {
       if (replaceBlogUrl && blogDomain == null && customBlogDomain == null)
         throw new ArgumentException($"{nameof(blogDomain)} or {nameof(customBlogDomain)} must be specified");

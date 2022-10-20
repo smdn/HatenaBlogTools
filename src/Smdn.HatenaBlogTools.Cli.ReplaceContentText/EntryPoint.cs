@@ -3,11 +3,11 @@
 
 namespace Smdn.HatenaBlogTools;
 
-partial class ReplaceContentText {
-  static int Main(string[] args)
+public partial class ReplaceContentText {
+  private static int Main(string[] args)
   {
     try {
-      (new ReplaceContentText()).Run(args);
+      new ReplaceContentText().Run(args);
 
       return 0;
     }

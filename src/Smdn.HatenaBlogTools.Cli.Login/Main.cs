@@ -7,7 +7,7 @@ using System.Net;
 
 namespace Smdn.HatenaBlogTools;
 
-partial class Login : CliBase {
+internal partial class Login : CliBase {
   protected override string GetDescription() => "AtomPubによるはてなブログへのログインを行います。　記事の変更等は行いません。";
 
   protected override string GetUsageExtraMandatoryOptions() => string.Empty;

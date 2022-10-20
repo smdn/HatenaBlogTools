@@ -28,7 +28,7 @@ public class HtmlElement : HtmlNode {
 
     var sb = new StringBuilder(1024);
 
-    sb.Append("<");
+    sb.Append('<');
     sb.Append(LocalName);
 
     foreach (var attr in Attributes) {

@@ -3,11 +3,11 @@
 
 namespace Smdn.HatenaBlogTools;
 
-partial class PostNewEntry {
-  static int Main(string[] args)
+internal partial class PostNewEntry {
+  private static int Main(string[] args)
   {
     try {
-      (new PostNewEntry()).Run(args);
+      new PostNewEntry().Run(args);
 
       return 0;
     }

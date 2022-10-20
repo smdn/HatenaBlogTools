@@ -15,23 +15,23 @@ public class AbortCommandException : Exception { }
 
 public abstract class CliBase {
   internal static class AssemblyInfo {
-    private static Assembly _Assembly { get; } = Assembly.GetEntryAssembly();
+    private static Assembly Assembly { get; } = Assembly.GetEntryAssembly();
 
-    public static string Name => _Assembly.GetName().Name;
-    public static Version Version => _Assembly.GetName().Version;
+    public static string Name => Assembly.GetName().Name;
+    public static Version Version => Assembly.GetName().Version;
     public static string VersionMajorMinorString => $"{Version.Major}.{Version.Minor}";
-    public static string Title => _Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
-    public static string InformationalVersion => _Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+    public static string Title => Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
+    public static string InformationalVersion => Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
     public static string TargetFramework => GetTargetFrameworkNameOrMoniker();
 
     private static string GetTargetFrameworkNameOrMoniker()
     {
-      var frameworkDisplayName = _Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkDisplayName;
+      var frameworkDisplayName = Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkDisplayName;
 
       if (!string.IsNullOrEmpty(frameworkDisplayName))
         return frameworkDisplayName;
 
-      var frameworkName = _Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
+      var frameworkName = Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
 
       if (FrameworkNameUtils.TryGetMoniker(frameworkName, out var moniker))
         return moniker;
@@ -44,14 +44,18 @@ public abstract class CliBase {
 
   protected bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPubCredential credential)
   {
-    return ParseCommonCommandLineArgs(ref args,
-                                      Array.Empty<string>(),
-                                      out credential);
+    return ParseCommonCommandLineArgs(
+      ref args,
+      Array.Empty<string>(),
+      out credential
+    );
   }
 
-  protected bool ParseCommonCommandLineArgs(ref string[] args,
-                                            string[] argsNotRequireHatenaBlogClient,
-                                            out HatenaBlogAtomPubCredential credential)
+  protected bool ParseCommonCommandLineArgs(
+    ref string[] args,
+    string[] argsNotRequireHatenaBlogClient,
+    out HatenaBlogAtomPubCredential credential
+  )
   {
     credential = null;
 
@@ -65,7 +69,7 @@ public abstract class CliBase {
 
     _argsNotRequireHatenaBlogClient.AddRange(argsNotRequireHatenaBlogClient);
 
-    var requireHatenaBlogClient = !(new HashSet<string>(args, StringComparer.Ordinal)).Overlaps(_argsNotRequireHatenaBlogClient);
+    var requireHatenaBlogClient = !new HashSet<string>(args, StringComparer.Ordinal).Overlaps(_argsNotRequireHatenaBlogClient);
 
     string hatenaId = null;
     string blogId = null;
@@ -90,7 +94,7 @@ public abstract class CliBase {
           break;
 
         case "--version":
-          Version();
+          CliBase.Version();
           break;
 
         case "/?":
@@ -130,7 +134,7 @@ public abstract class CliBase {
     return true;
   }
 
-  protected HatenaBlogAtomPubClient CreateClient(HatenaBlogAtomPubCredential credential)
+  protected static HatenaBlogAtomPubClient CreateClient(HatenaBlogAtomPubCredential credential)
   {
     HatenaBlogAtomPubClient.InitializeHttpsServicePoint();
 
@@ -141,9 +145,9 @@ public abstract class CliBase {
     return client;
   }
 
-  protected bool Login(HatenaBlogAtomPubCredential credential, out HatenaBlogAtomPubClient hatenaBlog)
+  protected static bool Login(HatenaBlogAtomPubCredential credential, out HatenaBlogAtomPubClient hatenaBlog)
   {
-    hatenaBlog = CreateClient(credential);
+    hatenaBlog = CliBase.CreateClient(credential);
 
     Console.Write("ログインしています ... ");
 
@@ -173,7 +177,7 @@ public abstract class CliBase {
 
   protected abstract IEnumerable<string> GetUsageExtraOptionDescriptions();
 
-  private void Version()
+  private static void Version()
   {
     Console.WriteLine(AssemblyInfo.InformationalVersion);
 
@@ -192,19 +196,11 @@ public abstract class CliBase {
     }
 
     var assm = Assembly.GetEntryAssembly();
-
-    string commandLine = null;
-
-    switch (Runtime.RuntimeEnvironment) {
-      case RuntimeEnvironment.NetCore: commandLine = $"dotnet {System.IO.Path.GetFileName(assm.Location)} --"; break;
-      case RuntimeEnvironment.Mono: commandLine = $"mono {System.IO.Path.GetFileName(assm.Location)}"; break;
-
-      case RuntimeEnvironment.NetFx:
-      default:
-        commandLine = $"{System.IO.Path.GetFileName(assm.Location)}";
-        break;
-    }
-
+    var commandLine = Runtime.RuntimeEnvironment switch {
+      RuntimeEnvironment.NetCore => $"dotnet {System.IO.Path.GetFileName(assm.Location)} --",
+      RuntimeEnvironment.Mono => $"mono {System.IO.Path.GetFileName(assm.Location)}",
+      _ => $"{System.IO.Path.GetFileName(assm.Location)}",
+    };
     Console.Error.WriteLine($"{AssemblyInfo.Title} version {AssemblyInfo.InformationalVersion}");
     Console.Error.WriteLine($"User-Agent: {UserAgent}");
     Console.Error.WriteLine();

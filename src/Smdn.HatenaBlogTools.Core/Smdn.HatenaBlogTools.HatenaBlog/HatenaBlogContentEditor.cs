@@ -16,7 +16,7 @@ public class HatenaBlogContentEditor : HtmlDocument {
   {
   }
 
-  private static readonly Regex regexReplaceAttributeReferenceToHttps = new Regex(@"(?:\s*)(?<scheme>http)(?:\://[^/]+/)", RegexOptions.Singleline | RegexOptions.CultureInvariant);
+  private static readonly Regex regexReplaceAttributeReferenceToHttps = new(@"(?:\s*)(?<scheme>http)(?:\://[^/]+/)", RegexOptions.Singleline | RegexOptions.CultureInvariant);
 
   private static string ReplaceSchemeToHttps(string input, Regex regex, ref bool modified)
   {
@@ -28,9 +28,11 @@ public class HatenaBlogContentEditor : HtmlDocument {
 
       var groupScheme = match.Groups["scheme"];
 
-      input = string.Concat(input.Substring(0, groupScheme.Index),
-                            "https",
-                            input.Substring(groupScheme.Index + groupScheme.Length));
+      input = string.Concat(
+        input.Substring(0, groupScheme.Index),
+        "https",
+        input.Substring(groupScheme.Index + groupScheme.Length)
+      );
 
       modified |= true;
     }
@@ -85,6 +87,7 @@ public class HatenaBlogContentEditor : HtmlDocument {
             targets = element.Attributes
                              .Where(a => a.IsNameEqualsTo("href"));
           }
+
           break;
 
         // form@action
@@ -116,7 +119,7 @@ public class HatenaBlogContentEditor : HtmlDocument {
   } // end of method
 
   /// <summary>
-  /// replaces the blog url in plain text content and html a@href to https
+  /// replaces the blog url in plain text content and html a@href to https.
   /// </summary>
   public bool ReplaceBlogUrlToHttps(IEnumerable<string> hostNames)
   {

@@ -14,7 +14,7 @@ public class EntryTitleModifier : EntryTextModifier {
     out string modifiedText
   )
   {
-    if (Modify(entry.Title, modifier, out originalText, out modifiedText)) {
+    if (EntryTextModifier.Modify(entry.Title, modifier, out originalText, out modifiedText)) {
       entry.Title = modifiedText;
       return true;
     }

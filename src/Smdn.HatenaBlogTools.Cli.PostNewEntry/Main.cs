@@ -14,7 +14,7 @@ using Smdn.Xml.Linq;
 
 namespace Smdn.HatenaBlogTools;
 
-partial class PostNewEntry : CliBase {
+internal partial class PostNewEntry : CliBase {
   protected override string GetDescription() => "指定された内容で新しい記事を投稿します。";
 
   protected override string GetUsageExtraMandatoryOptions() => "--title <タイトル> --category <カテゴリ1> --category <カテゴリ2> <本文>";
@@ -26,11 +26,11 @@ partial class PostNewEntry : CliBase {
     yield return "                         \"--category カテゴリ1 --category カテゴリ2\"のように指定することで";
     yield return "                         複数のカテゴリを指定することができます";
     yield return "--draft                : 記事を下書きとして投稿します";
-    yield return "";
+    yield return string.Empty;
     yield return "<本文>                 : 投稿する記事の本文を指定します";
     yield return "--from-file <ファイル> : 指定された<ファイル>の内容を本文として投稿します";
     yield return "--from-file -          : 標準入力に与えられた内容を本文として投稿します";
-    yield return "";
+    yield return string.Empty;
     yield return "--from-atom-file <ファイル> : Atomフィード形式のファイルに記載されている内容で投稿します";
     yield return "                              複数のエントリが記載されている場合は、それをすべて投稿します";
     yield return "                              既存のエントリの場合(メンバURIが定義されている場合)はエントリを更新します";
@@ -84,9 +84,8 @@ partial class PostNewEntry : CliBase {
     if (string.IsNullOrEmpty(atomEntriesFile)) {
       if (!string.IsNullOrEmpty(contentFile)) {
         if (contentFile == "-") {
-          using (var reader = new StreamReader(Console.OpenStandardInput())) {
-            entry.Content = reader.ReadToEnd();
-          }
+          using var reader = new StreamReader(Console.OpenStandardInput());
+          entry.Content = reader.ReadToEnd();
         }
         else if (File.Exists(contentFile)) {
           entry.Content = File.ReadAllText(contentFile);

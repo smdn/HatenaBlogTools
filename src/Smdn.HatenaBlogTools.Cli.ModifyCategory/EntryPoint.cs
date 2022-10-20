@@ -3,11 +3,11 @@
 
 namespace Smdn.HatenaBlogTools;
 
-partial class ModifyCategory {
-  static int Main(string[] args)
+internal partial class ModifyCategory {
+  private static int Main(string[] args)
   {
     try {
-      (new ModifyCategory()).Run(args);
+      new ModifyCategory().Run(args);
 
       return 0;
     }

@@ -14,7 +14,7 @@ public abstract class EntryTextModifier {
     out string modifiedText
   );
 
-  protected bool Modify(
+  protected static bool Modify(
     string input,
     Converter<string, string> modifier,
     out string original,

@@ -16,14 +16,16 @@ public static class DiffGenerator {
     private readonly string descriptionForOriginalText;
     private readonly string descriptionForModifiedText;
 
-    public DefaultDiffGenerator(string descriptionForOriginalText,
-                                string descriptionForModifiedText)
+    public DefaultDiffGenerator(
+      string descriptionForOriginalText,
+      string descriptionForModifiedText
+    )
     {
       this.descriptionForOriginalText = descriptionForOriginalText;
       this.descriptionForModifiedText = descriptionForModifiedText;
     }
 
-    public bool IsAvailable() => true;
+    public static bool IsAvailable() => true;
 
     public void DisplayDifference(string originalText, string modifiedText)
     {
@@ -34,18 +36,23 @@ public static class DiffGenerator {
     }
   }
 
-  public static IDiffGenerator Create(bool silent,
-                                      string command,
-                                      string commandArgs,
-                                      string descriptionForOriginalText,
-                                      string descriptionForModifiedText)
+  public static IDiffGenerator Create(
+    bool silent,
+    string command,
+    string commandArgs,
+    string descriptionForOriginalText,
+    string descriptionForModifiedText
+  )
   {
     if (silent)
       return new NullDiffGenerator();
 
-    if (string.IsNullOrEmpty(command))
-      return new DefaultDiffGenerator(descriptionForOriginalText,
-                                      descriptionForModifiedText);
+    if (string.IsNullOrEmpty(command)) {
+      return new DefaultDiffGenerator(
+        descriptionForOriginalText,
+        descriptionForModifiedText
+      );
+    }
 
     return new DiffCommand(command, commandArgs);
   }
@@ -64,7 +71,9 @@ public static class DiffGenerator {
 
   public static void Test(IDiffGenerator generator)
   {
-    generator.DisplayDifference(string.Join(Environment.NewLine, testOriginalTextLines),
-                                string.Join(Environment.NewLine, testModifiedTextLines));
+    generator.DisplayDifference(
+      string.Join(Environment.NewLine, testOriginalTextLines),
+      string.Join(Environment.NewLine, testModifiedTextLines)
+    );
   }
 }

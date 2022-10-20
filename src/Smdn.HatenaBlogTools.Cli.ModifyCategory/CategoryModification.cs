@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 using System;
+
 using CategorySet = System.Collections.Generic.HashSet<string>;
 
 namespace Smdn.HatenaBlogTools;

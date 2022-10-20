@@ -1,6 +1,5 @@
 // SPDX-FileCopyrightText: 2013 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
-
 #undef RETRIEVE_COMMENTS
 
 using System;
@@ -16,7 +15,7 @@ using Smdn.Xml.Linq;
 
 namespace Smdn.HatenaBlogTools;
 
-partial class DumpAllEntries : CliBase {
+internal partial class DumpAllEntries : CliBase {
   private enum OutputFormat {
     Atom,
     AtomPostData,
@@ -54,13 +53,13 @@ partial class DumpAllEntries : CliBase {
     yield return "  --format atom-blogger : Atomフィード形式(Blogger用フォーマット)";
     yield return "  --format entry-file   : 記事ごとに個別のファイルに出力";
     yield return "　(省略した場合は、'--format atom'を指定した場合と同じ形式で出力します)";
-    yield return "";
+    yield return string.Empty;
     yield return "--exclude-category <カテゴリ>  : 指定された<カテゴリ>を除外してダンプします(複数指定可)";
     yield return "--include-category <カテゴリ>  : 指定された<カテゴリ>のみを抽出してダンプします(複数指定可)";
-    yield return "";
+    yield return string.Empty;
     yield return "--exclude-notation [hatena|md|html] : 指定された記法の記事を除外してダンプします(複数指定可)";
     yield return "--include-notation [hatena|md|html] : 指定された記法の記事のみを抽出してダンプします(複数指定可)";
-    yield return "";
+    yield return string.Empty;
 #if false
     yield return "Blogger用フォーマット(atom-blogger)のオプション:";
     yield return "  --blogger-domain <ドメイン> : Bloggerのブログドメイン(***.blogspot.com)を指定します(省略可)";
@@ -141,6 +140,7 @@ partial class DumpAllEntries : CliBase {
               Usage("unsupported format: {0}", format);
               break;
           }
+
           break;
 
         case "--exclude-category":
@@ -188,6 +188,7 @@ partial class DumpAllEntries : CliBase {
         Usage("--format entry-fileでは、出力先ディレクトリが指定されている必要があります");
         return;
       }
+
       if (outputPath == "-") {
         Usage("--format entry-fileでは、出力先に標準出力を指定することはできません");
         return;
@@ -207,44 +208,49 @@ partial class DumpAllEntries : CliBase {
     if (!Login(credential, out var hatenaBlog))
       return;
 
-    Predicate<PostedEntry> entryCategoryPredicate = entry => {
+    bool EntryCategoryPredicate(PostedEntry entry)
+    {
       if (0 < categoriesToExclude.Count && entry.Categories.Overlaps(categoriesToExclude)) {
         Console.Error.WriteLine("対象カテゴリを含むため除外します: ({0})", string.Join(", ", entry.Categories));
         return false;
       }
+
       if (0 < categoriesToInclude.Count && !entry.Categories.Overlaps(categoriesToInclude)) {
         Console.Error.WriteLine("対象カテゴリを含まないため除外します ({0})", string.Join(", ", entry.Categories));
         return false;
       }
 
       return true;
-    };
+    }
 
-    Predicate<PostedEntry> entryNotationPredicate = entry => {
+    bool EntryNotationPredicate(PostedEntry entry)
+    {
       if (0 < notationsToExclude.Count && notationsToExclude.Contains(entry.ContentType)) {
         Console.Error.WriteLine("対象外の記法で記述されているため除外します: ({0})", entry.ContentType);
         return false;
       }
+
       if (0 < notationsToInclude.Count && !notationsToInclude.Contains(entry.ContentType)) {
         Console.Error.WriteLine("対象の記法で記述されていないため除外します: ({0})", entry.ContentType);
         return false;
       }
 
       return true;
-    };
+    }
 
-    Predicate<PostedEntry> entryPredicate = entry => {
+    bool EntryPredicate(PostedEntry entry)
+    {
       Console.Error.Write($"{entry.EntryUri} \"{entry.Title}\" : ");
 
-      if (entryCategoryPredicate(entry) && entryNotationPredicate(entry)) {
+      if (EntryCategoryPredicate(entry) && EntryNotationPredicate(entry)) {
         Console.Error.WriteLine("完了");
         return true;
       }
 
       return false;
-    };
+    }
 
-    var outputDocument = DumpEntries(hatenaBlog, entryPredicate, out var entries);
+    var outputDocument = DumpEntries(hatenaBlog, EntryPredicate, out var entries);
 
     if (outputDocument == null)
       return;
@@ -253,7 +259,7 @@ partial class DumpAllEntries : CliBase {
     Console.Error.WriteLine("結果を保存しています");
 
     if (outputFormat == OutputFormat.EntryFile) {
-      OutputEntriesToIndividualFiles(
+      DumpAllEntries.OutputEntriesToIndividualFiles(
         outputDocument,
         entries,
         hatenaBlog.BlogId,
@@ -261,42 +267,40 @@ partial class DumpAllEntries : CliBase {
       );
     }
     else {
-      using (var outputStream = outputPath == "-"
+      using var outputStream = outputPath == "-"
         ? Console.OpenStandardOutput()
-        : new FileStream(outputPath, FileMode.Create, FileAccess.Write)
-      ) {
-        void OutputWithFormatter(FormatterBase _formatter) => _formatter.Format(entries, outputStream);
+        : new FileStream(outputPath, FileMode.Create, FileAccess.Write);
+      void OutputWithFormatter(FormatterBase formatter) => formatter.Format(entries, outputStream);
 
-        switch (outputFormat) {
-          case OutputFormat.Atom:
-          case OutputFormat.AtomPostData:
-            OutputDocument(outputDocument, outputFormat, outputStream);
-            break;
+      switch (outputFormat) {
+        case OutputFormat.Atom:
+        case OutputFormat.AtomPostData:
+          OutputDocument(outputDocument, outputFormat, outputStream);
+          break;
 
-          case OutputFormat.HatenaDiary:
-            OutputWithFormatter(new HatenaDiaryFormatter(/*retrieveComments*/));
-            break;
+        case OutputFormat.HatenaDiary:
+          OutputWithFormatter(new HatenaDiaryFormatter(/*retrieveComments*/));
+          break;
 
-          case OutputFormat.MovableType:
-            OutputWithFormatter(new MovableTypeFormatter(/*retrieveComments*/));
-            break;
+        case OutputFormat.MovableType:
+          OutputWithFormatter(new MovableTypeFormatter(/*retrieveComments*/));
+          break;
 
-          case OutputFormat.AtomBlogger:
-            OutputWithFormatter(
-              new BloggerFormatter(
-                blogTitle: hatenaBlog.BlogTitle
+        case OutputFormat.AtomBlogger:
+          OutputWithFormatter(
+            new BloggerFormatter(
+              blogTitle: hatenaBlog.BlogTitle
 #if false
                 blogDomain: bloggerDomain,
                 blogId: bloggerId
               /*, retrieveComments*/
 #endif
-              )
-            );
-            break;
+            )
+          );
+          break;
 
-          default:
-            throw new NotSupportedException($"unsupported format: {outputFormat}");
-        }
+        default:
+          throw new NotSupportedException($"unsupported format: {outputFormat}");
       }
     }
 
@@ -305,7 +309,7 @@ partial class DumpAllEntries : CliBase {
 
   private static readonly XNamespace nsXLink = "http://www.w3.org/1999/xlink";
 
-  private void OutputEntriesToIndividualFiles(
+  private static void OutputEntriesToIndividualFiles(
     XDocument document,
     IReadOnlyList<PostedEntry> entries,
     string blogId,

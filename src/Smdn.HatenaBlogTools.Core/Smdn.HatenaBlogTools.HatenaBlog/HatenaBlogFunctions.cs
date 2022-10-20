@@ -100,13 +100,13 @@ public static class HatenaBlogFunctions {
 
     switch (postMode) {
       case PostMode.PostNever:
-        return (HttpStatusCode)0;
+        return 0;
 
       case PostMode.PostIfModified:
         if (isModified)
           break;
         else
-          return (HttpStatusCode)0;
+          return 0;
 
       case PostMode.PostAlways:
         break;
@@ -117,7 +117,7 @@ public static class HatenaBlogFunctions {
 
     if (confirmBeforePosting != null && !confirmBeforePosting()) {
       Console.WriteLine("更新しません");
-      return (HttpStatusCode)0;
+      return 0;
     }
 
     Console.Write("{0} \"{1}\" を更新中 ... ", entry.EntryUri, entry.Title);

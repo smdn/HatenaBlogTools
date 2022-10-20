@@ -3,11 +3,11 @@
 
 namespace Smdn.HatenaBlogTools;
 
-partial class DumpAllEntries {
-  static int Main(string[] args)
+internal partial class DumpAllEntries {
+  private static int Main(string[] args)
   {
     try {
-      (new DumpAllEntries()).Run(args);
+      new DumpAllEntries().Run(args);
 
       return 0;
     }

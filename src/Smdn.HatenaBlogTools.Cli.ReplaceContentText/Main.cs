@@ -22,7 +22,7 @@ public partial class ReplaceContentText : CliBase {
     yield return "                             (デフォルトでは本文のみを置換します)";
     yield return "-n, --dry-run              : 置換結果の確認だけ行い、再投稿を行いません";
     yield return "-i, --interactive          : 置換結果の再投稿を行う前に確認を行います";
-    yield return "";
+    yield return string.Empty;
     yield return "変更箇所の表示に関するオプション:";
     yield return "  --diff-cmd <コマンド>           : 再投稿前に指定された<コマンド>を使って変更箇所を表示します";
     yield return "  --diff-cmd-args <コマンド引数>  : --diff-cmdで指定されたコマンドに渡す引数(オプション)を指定します";
@@ -32,9 +32,13 @@ public partial class ReplaceContentText : CliBase {
 
   public void Run(string[] args)
   {
-    if (!ParseCommonCommandLineArgs(ref args,
-                                    new[] { "-diff-test" },
-                                    out var credential)) {
+    if (
+      !ParseCommonCommandLineArgs(
+        ref args,
+        new[] { "-diff-test" },
+        out var credential
+      )
+    ) {
       return;
     }
 
@@ -97,11 +101,13 @@ public partial class ReplaceContentText : CliBase {
       ? "タイトル"
       : "本文";
 
-    var diffGenerator = DiffGenerator.Create(false,
-                                             diffCommand,
-                                             diffCommandArgs,
-                                             $"置換前の{descriptionOfReplacementTarget}",
-                                             $"置換前の{descriptionOfReplacementTarget}");
+    var diffGenerator = DiffGenerator.Create(
+      false,
+      diffCommand,
+      diffCommandArgs,
+      $"置換前の{descriptionOfReplacementTarget}",
+      $"置換前の{descriptionOfReplacementTarget}"
+    );
 
     if (testDiffCommand) {
       DiffGenerator.Test(diffGenerator);
@@ -113,15 +119,14 @@ public partial class ReplaceContentText : CliBase {
       return;
     }
 
-    if (replaceToText == null)
-      replaceToText = string.Empty; // delete
+    replaceToText ??= string.Empty; // delete
 
     var modifier = replaceTitleInsteadOfContent
-      ? (EntryTextModifier)new EntryTitleModifier()
+      ? new EntryTitleModifier()
       : (EntryTextModifier)new EntryContentModifier();
 
     var editor = replaceAsRegex
-      ? (IHatenaBlogEntryEditor)new RegexEntryEditor(replaceFromText, replaceToText, modifier)
+      ? new RegexEntryEditor(replaceFromText, replaceToText, modifier)
       : (IHatenaBlogEntryEditor)new EntryEditor(replaceFromText, replaceToText, modifier);
 
     var postMode = dryrun
