@@ -24,7 +24,7 @@ public class HtmlParserTests {
     var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
     Assert.IsNotNull(e);
-    Assert.AreEqual(expectedLocalName, e.LocalName, "local name");
+    Assert.AreEqual(expectedLocalName, e!.LocalName, "local name");
     Assert.IsEmpty(e.Attributes, "attributes");
   }
 
@@ -53,7 +53,7 @@ public class HtmlParserTests {
     var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
     Assert.IsNotNull(e);
-    Assert.AreEqual("e", e.LocalName, "local name");
+    Assert.AreEqual("e", e!.LocalName, "local name");
     Assert.IsEmpty(e.Attributes, "attributes");
   }
 
@@ -74,7 +74,7 @@ public class HtmlParserTests {
     var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
     Assert.IsNotNull(e);
-    Assert.AreEqual("e", e.LocalName, "local name");
+    Assert.AreEqual("e", e!.LocalName, "local name");
     Assert.AreEqual(1, e.Attributes.Count, "attribute count");
     Assert.AreEqual("attr", e.Attributes[0].Name, "attribute name #0");
     Assert.IsNull(e.Attributes[0].Value, "attribute value #0");
@@ -89,10 +89,10 @@ public class HtmlParserTests {
     var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
     Assert.IsNotNull(e);
-    Assert.AreEqual("e", e.LocalName, "local name");
-    Assert.AreEqual(1, e.Attributes.Count, "attribute count");
-    Assert.AreEqual("attr", e.Attributes[0].Name, "attribute name #0");
-    Assert.IsEmpty(e.Attributes[0].Value, "attribute value #0");
+    Assert.AreEqual("e", e!.LocalName, "local name");
+    Assert.AreEqual(1, e!.Attributes.Count, "attribute count");
+    Assert.AreEqual("attr", e!.Attributes[0].Name, "attribute name #0");
+    Assert.IsEmpty(e!.Attributes[0].Value, "attribute value #0");
   }
 
   [TestCase("<e attr=val>")]
@@ -112,10 +112,10 @@ public class HtmlParserTests {
     var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
     Assert.IsNotNull(e);
-    Assert.AreEqual("e", e.LocalName, "local name");
-    Assert.AreEqual(1, e.Attributes.Count, "attribute count");
-    Assert.AreEqual("attr", e.Attributes[0].Name, "attribute name #0");
-    Assert.AreEqual("val", e.Attributes[0].Value, "attribute value #0");
+    Assert.AreEqual("e", e!.LocalName, "local name");
+    Assert.AreEqual(1, e!.Attributes.Count, "attribute count");
+    Assert.AreEqual("attr", e!.Attributes[0].Name, "attribute name #0");
+    Assert.AreEqual("val", e!.Attributes[0].Value, "attribute value #0");
   }
 
   [TestCase("<e attr=val>")]
@@ -152,10 +152,10 @@ public class HtmlParserTests {
     var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
     Assert.IsNotNull(e);
-    Assert.AreEqual("e", e.LocalName, "local name");
-    Assert.AreEqual(1, e.Attributes.Count, "attribute count");
-    Assert.AreEqual("attr", e.Attributes[0].Name, "attribute name #0");
-    Assert.AreEqual("val", e.Attributes[0].Value, "attribute value #0");
+    Assert.AreEqual("e", e!.LocalName, "local name");
+    Assert.AreEqual(1, e!.Attributes.Count, "attribute count");
+    Assert.AreEqual("attr", e!.Attributes[0].Name, "attribute name #0");
+    Assert.AreEqual("val", e!.Attributes[0].Value, "attribute value #0");
   }
 
   [TestCase("<e\tattr=val>")]
@@ -183,10 +183,10 @@ public class HtmlParserTests {
     var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
     Assert.IsNotNull(e);
-    Assert.AreEqual("e", e.LocalName, "local name");
-    Assert.AreEqual(1, e.Attributes.Count, "attribute count");
-    Assert.AreEqual("attr", e.Attributes[0].Name, "attribute name #0");
-    Assert.AreEqual("val", e.Attributes[0].Value, "attribute value #0");
+    Assert.AreEqual("e", e!.LocalName, "local name");
+    Assert.AreEqual(1, e!.Attributes.Count, "attribute count");
+    Assert.AreEqual("attr", e!.Attributes[0].Name, "attribute name #0");
+    Assert.AreEqual("val", e!.Attributes[0].Value, "attribute value #0");
   }
 
   [TestCase("<e attr=\"foo=bar\">")]
@@ -196,10 +196,10 @@ public class HtmlParserTests {
     var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
     Assert.IsNotNull(e);
-    Assert.AreEqual("e", e.LocalName, "local name");
-    Assert.AreEqual(1, e.Attributes.Count, "attribute count");
-    Assert.AreEqual("attr", e.Attributes[0].Name, "attribute name #0");
-    Assert.AreEqual("foo=bar", e.Attributes[0].Value, "attribute value #0");
+    Assert.AreEqual("e", e!.LocalName, "local name");
+    Assert.AreEqual(1, e!.Attributes.Count, "attribute count");
+    Assert.AreEqual("attr", e!.Attributes[0].Name, "attribute name #0");
+    Assert.AreEqual("foo=bar", e!.Attributes[0].Value, "attribute value #0");
   }
 
   [TestCase("<e attr=\"<foo>\">")]
@@ -209,10 +209,10 @@ public class HtmlParserTests {
     var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
     Assert.IsNotNull(e);
-    Assert.AreEqual("e", e.LocalName, "local name");
-    Assert.AreEqual(1, e.Attributes.Count, "attribute count");
-    Assert.AreEqual("attr", e.Attributes[0].Name, "attribute name #0");
-    Assert.AreEqual("<foo>", e.Attributes[0].Value, "attribute value #0");
+    Assert.AreEqual("e", e!.LocalName, "local name");
+    Assert.AreEqual(1, e!.Attributes.Count, "attribute count");
+    Assert.AreEqual("attr", e!.Attributes[0].Name, "attribute name #0");
+    Assert.AreEqual("<foo>", e!.Attributes[0].Value, "attribute value #0");
   }
 
   [TestCase("<e attr1 attr2>")]
@@ -225,15 +225,15 @@ public class HtmlParserTests {
     var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
     Assert.IsNotNull(e);
-    Assert.AreEqual("e", e.LocalName, "local name");
+    Assert.AreEqual("e", e!.LocalName, "local name");
 
-    Assert.AreEqual(2, e.Attributes.Count, "attribute count");
+    Assert.AreEqual(2, e!.Attributes.Count, "attribute count");
 
-    Assert.AreEqual("attr1", e.Attributes[0].Name, "attribute name #0");
-    Assert.IsNull(e.Attributes[0].Value, "attribute value #0");
+    Assert.AreEqual("attr1", e!.Attributes[0].Name, "attribute name #0");
+    Assert.IsNull(e!.Attributes[0]!.Value, "attribute value #0");
 
-    Assert.AreEqual("attr2", e.Attributes[1].Name, "attribute name #1");
-    Assert.IsNull(e.Attributes[1].Value, "attribute value #1");
+    Assert.AreEqual("attr2", e!.Attributes[1].Name, "attribute name #1");
+    Assert.IsNull(e!.Attributes[1]!.Value, "attribute value #1");
   }
 
   [TestCase("<e attr1=val1 attr2=val2>")]
@@ -248,9 +248,9 @@ public class HtmlParserTests {
     var e = HtmlParser.EnumerateHtmlElementStart(input).FirstOrDefault();
 
     Assert.IsNotNull(e);
-    Assert.AreEqual("e", e.LocalName, "local name");
+    Assert.AreEqual("e", e!.LocalName, "local name");
 
-    Assert.AreEqual(2, e.Attributes.Count, "attribute count");
+    Assert.AreEqual(2, e!.Attributes.Count, "attribute count");
 
     Assert.AreEqual("attr1", e.Attributes[0].Name, "attribute name #0");
     Assert.AreEqual("val1", e.Attributes[0].Value, "attribute value #0");
