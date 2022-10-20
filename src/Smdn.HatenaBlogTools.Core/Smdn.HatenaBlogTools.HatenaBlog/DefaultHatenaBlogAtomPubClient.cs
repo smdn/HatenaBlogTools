@@ -158,17 +158,9 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       var authors = entry
         .Elements(AtomPub.Namespaces.Atom + "author")
         .Select(elementAuthor => elementAuthor.Element(AtomPub.Namespaces.Atom + "name")?.Value);
-      var datePublished = DateTimeOffset.MinValue;
 
-      try {
-        datePublished = DateTimeOffset.Parse(entry.Element(AtomPub.Namespaces.Atom + "published")?.Value);
-      }
-      catch (ArgumentNullException) {
-        // ignore exception
-      }
-      catch (FormatException) {
-        // ignore exception
-      }
+      if (!DateTimeOffset.TryParse(entry.Element(AtomPub.Namespaces.Atom + "published")?.Value, out var datePublished))
+        datePublished = DateTimeOffset.MinValue;
 
       var e = new PostedEntry(
         id: id,
@@ -187,15 +179,8 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
         ContentType = entry.Element(AtomPub.Namespaces.Atom + "content")?.GetAttributeValue("type"),
       };
 
-      try {
-        e.DateUpdated = DateTimeOffset.Parse(entry.Element(AtomPub.Namespaces.Atom + "updated")?.Value);
-      }
-      catch (ArgumentNullException) {
-        // ignore exception
-      }
-      catch (FormatException) {
-        // ignore exception
-      }
+      if (DateTimeOffset.TryParse(entry.Element(AtomPub.Namespaces.Atom + "updated")?.Value, out var dateUpdated))
+        e.DateUpdated = dateUpdated;
 
       foreach (var category in entry.Elements(AtomPub.Namespaces.Atom + "category").Select(c => c.GetAttributeValue("term"))) {
         e.Categories.Add(category);
