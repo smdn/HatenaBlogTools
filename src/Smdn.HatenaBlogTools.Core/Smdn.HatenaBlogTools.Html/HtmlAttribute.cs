@@ -25,13 +25,13 @@ public class HtmlAttribute {
   public string Name => captureName?.Value;
   public string Value { get; set; }
 
-  internal HtmlAttribute(string preamble, Capture captureName, string delimiter, Capture captureValue, string postabmle)
+  internal HtmlAttribute(string preamble, Capture captureName, string delimiter, Capture captureValue, string postamble)
   {
     this.preamble = preamble;
     this.captureName = captureName;
     this.delimiter = delimiter;
     this.captureValue = captureValue;
-    this.postamble = postabmle;
+    this.postamble = postamble;
 
     this.Value = captureValue?.Value;
   }
