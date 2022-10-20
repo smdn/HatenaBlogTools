@@ -127,10 +127,9 @@ public static class ConsoleUtils {
 
     var result = Console.ReadLine();
 
-    if (result == null)
-      return @default;
-    else
-      return result.StartsWith("y", StringComparison.OrdinalIgnoreCase);
+    return result is null
+      ? @default
+      : result.StartsWith("y", StringComparison.OrdinalIgnoreCase);
   }
 
   public static string ReadPassword()

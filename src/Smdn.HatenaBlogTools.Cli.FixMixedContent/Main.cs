@@ -276,14 +276,7 @@ public partial class FixMixedContent : CliBase {
   private static void EditContent(IHatenaBlogEntryEditor editor, string input, string output)
   {
     static bool IsStdIO(string io)
-    {
-      if (string.IsNullOrEmpty(io))
-        return true;
-      if (string.Equals(io, "-", StringComparison.Ordinal))
-        return true;
-
-      return false;
-    }
+      => string.IsNullOrEmpty(io) || string.Equals(io, "-", StringComparison.Ordinal);
 
     var encoding = new UTF8Encoding(false);
 

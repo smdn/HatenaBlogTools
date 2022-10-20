@@ -33,10 +33,9 @@ public abstract class CliBase {
 
       var frameworkName = Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
 
-      if (FrameworkNameUtils.TryGetMoniker(frameworkName, out var moniker))
-        return moniker;
-
-      return frameworkName;
+      return FrameworkNameUtils.TryGetMoniker(frameworkName, out var moniker)
+        ? moniker
+        : frameworkName;
     }
   }
 
