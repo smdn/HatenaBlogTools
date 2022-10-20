@@ -21,7 +21,7 @@ public class HtmlAttribute {
   private readonly string preamble;
   private readonly Capture captureName;
   private readonly string delimiter;
-  private readonly Capture captureValue;
+  // private readonly Capture captureValue;
   private readonly string postamble;
 
   public string Name => captureName?.Value;
@@ -32,7 +32,7 @@ public class HtmlAttribute {
     this.preamble = preamble;
     this.captureName = captureName;
     this.delimiter = delimiter;
-    this.captureValue = captureValue;
+    // this.captureValue = captureValue;
     this.postamble = postamble;
 
     Value = captureValue?.Value;
