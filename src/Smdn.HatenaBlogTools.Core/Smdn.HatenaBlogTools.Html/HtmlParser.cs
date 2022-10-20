@@ -25,77 +25,77 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Smdn.HatenaBlogTools.Html {
-  public static class HtmlParser {
-    private static readonly Regex regexElementStart = CreateElementStartRegex();
+namespace Smdn.HatenaBlogTools.Html;
 
-    private static Regex CreateElementStartRegex()
-    {
-      var whitespaceChars = @" \t\n\f\r";
-      var whitespaceOneOrMore = $"[{whitespaceChars}]+";
-      var whitespaceZeroOrMore = $"[{whitespaceChars}]*";
+public static class HtmlParser {
+  private static readonly Regex regexElementStart = CreateElementStartRegex();
 
-      var attributeNamePart = $"(?<attrname>[^{whitespaceChars}\"'>/=]+)";
-      var attributeValueQuoted = "'(?<attrvalue>[^']*)'";
-      var attributeValueDQuoted = "\"(?<attrvalue>[^\"]*)\"";
-      var attributeValueNotQuoted = $"(?<attrvalue>[^{whitespaceChars}\"'`=><]+)";
+  private static Regex CreateElementStartRegex()
+  {
+    var whitespaceChars = @" \t\n\f\r";
+    var whitespaceOneOrMore = $"[{whitespaceChars}]+";
+    var whitespaceZeroOrMore = $"[{whitespaceChars}]*";
 
-      var attributeValuePart = $"({attributeValueDQuoted}|{attributeValueQuoted}|{attributeValueNotQuoted})";
-      var attribute = $"(?<attr>{whitespaceOneOrMore}{attributeNamePart}({whitespaceZeroOrMore}={whitespaceZeroOrMore}{attributeValuePart})?)";
-      var attributeList = $"{attribute}*";
+    var attributeNamePart = $"(?<attrname>[^{whitespaceChars}\"'>/=]+)";
+    var attributeValueQuoted = "'(?<attrvalue>[^']*)'";
+    var attributeValueDQuoted = "\"(?<attrvalue>[^\"]*)\"";
+    var attributeValueNotQuoted = $"(?<attrvalue>[^{whitespaceChars}\"'`=><]+)";
 
-      var elementLocalName = "[a-zA-z]+";
+    var attributeValuePart = $"({attributeValueDQuoted}|{attributeValueQuoted}|{attributeValueNotQuoted})";
+    var attribute = $"(?<attr>{whitespaceOneOrMore}{attributeNamePart}({whitespaceZeroOrMore}={whitespaceZeroOrMore}{attributeValuePart})?)";
+    var attributeList = $"{attribute}*";
 
-      return new Regex($"\\<(?<localname>{elementLocalName}){attributeList}(?<elementclose>{whitespaceZeroOrMore}/?\\>)",
-                       RegexOptions.Multiline | RegexOptions.Compiled);
-    }
+    var elementLocalName = "[a-zA-z]+";
 
-    public static IEnumerable<HtmlElement> EnumerateHtmlElementStart(string input)
-    {
-      if (input == null)
-        throw new ArgumentNullException(nameof(input));
+    return new Regex($"\\<(?<localname>{elementLocalName}){attributeList}(?<elementclose>{whitespaceZeroOrMore}/?\\>)",
+                     RegexOptions.Multiline | RegexOptions.Compiled);
+  }
 
-      var match = regexElementStart.Match(input);
+  public static IEnumerable<HtmlElement> EnumerateHtmlElementStart(string input)
+  {
+    if (input == null)
+      throw new ArgumentNullException(nameof(input));
 
-      while (match.Success) {
-        var groupAttribute = match.Groups["attr"];
-        var groupAttributeName = match.Groups["attrname"];
-        var groupAttributeValue = match.Groups["attrvalue"];
+    var match = regexElementStart.Match(input);
 
-        var attributes = new List<HtmlAttribute>(groupAttribute.Captures.Count);
+    while (match.Success) {
+      var groupAttribute = match.Groups["attr"];
+      var groupAttributeName = match.Groups["attrname"];
+      var groupAttributeValue = match.Groups["attrvalue"];
 
-        for (var attributeIndex = 0; attributeIndex < groupAttribute.Captures.Count; attributeIndex++) {
-          var captureAttributeName = groupAttributeName.Captures[attributeIndex];
-          var indexOfNextAtttributeStart = attributeIndex < groupAttributeName.Captures.Count - 1 ? groupAttributeName.Captures[attributeIndex + 1].Index : match.Index + match.Length;
+      var attributes = new List<HtmlAttribute>(groupAttribute.Captures.Count);
 
-          Capture captureAttributeValue = null;
+      for (var attributeIndex = 0; attributeIndex < groupAttribute.Captures.Count; attributeIndex++) {
+        var captureAttributeName = groupAttributeName.Captures[attributeIndex];
+        var indexOfNextAtttributeStart = attributeIndex < groupAttributeName.Captures.Count - 1 ? groupAttributeName.Captures[attributeIndex + 1].Index : match.Index + match.Length;
 
-          for (var captureIndex = 0; captureIndex < groupAttributeValue.Captures.Count; captureIndex++) {
-            var capture = groupAttributeValue.Captures[captureIndex];
+        Capture captureAttributeValue = null;
 
-            if (captureAttributeName.Index + captureAttributeName.Length < capture.Index &&
-                capture.Index + capture.Length < indexOfNextAtttributeStart) {
-              captureAttributeValue = capture;
-              break;
-            }
+        for (var captureIndex = 0; captureIndex < groupAttributeValue.Captures.Count; captureIndex++) {
+          var capture = groupAttributeValue.Captures[captureIndex];
+
+          if (captureAttributeName.Index + captureAttributeName.Length < capture.Index &&
+              capture.Index + capture.Length < indexOfNextAtttributeStart) {
+            captureAttributeValue = capture;
+            break;
           }
-
-          var captureAttribute = groupAttribute.Captures[attributeIndex];
-
-          attributes.Add(new HtmlAttribute(preamble: input.Substring(captureAttribute.Index, captureAttributeName.Index - captureAttribute.Index),
-                                           captureName: captureAttributeName,
-                                           delimiter: (captureAttributeValue == null) ? null : input.Substring(captureAttributeName.Index + captureAttributeName.Length, captureAttributeValue.Index - (captureAttributeName.Index + captureAttributeName.Length)),
-                                           captureValue: captureAttributeValue,
-                                           postabmle: (captureAttributeValue == null) ? null : input.Substring(captureAttributeValue.Index + captureAttributeValue.Length, (captureAttribute.Index + captureAttribute.Length) - (captureAttributeValue.Index + captureAttributeValue.Length))));
         }
 
-        yield return new HtmlElement(match.Groups["localname"].Value,
-                                     match,
-                                     attributes,
-                                     match.Groups["elementclose"].Value);
+        var captureAttribute = groupAttribute.Captures[attributeIndex];
 
-        match = match.NextMatch();
+        attributes.Add(new HtmlAttribute(preamble: input.Substring(captureAttribute.Index, captureAttributeName.Index - captureAttribute.Index),
+                                         captureName: captureAttributeName,
+                                         delimiter: (captureAttributeValue == null) ? null : input.Substring(captureAttributeName.Index + captureAttributeName.Length, captureAttributeValue.Index - (captureAttributeName.Index + captureAttributeName.Length)),
+                                         captureValue: captureAttributeValue,
+                                         postabmle: (captureAttributeValue == null) ? null : input.Substring(captureAttributeValue.Index + captureAttributeValue.Length, (captureAttribute.Index + captureAttribute.Length) - (captureAttributeValue.Index + captureAttributeValue.Length))));
       }
+
+      yield return new HtmlElement(match.Groups["localname"].Value,
+                                   match,
+                                   attributes,
+                                   match.Groups["elementclose"].Value);
+
+      match = match.NextMatch();
     }
   }
 }

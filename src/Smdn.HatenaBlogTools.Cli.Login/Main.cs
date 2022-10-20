@@ -29,58 +29,58 @@ using System.Xml.Linq;
 
 using Smdn.HatenaBlogTools.HatenaBlog;
 
-namespace Smdn.HatenaBlogTools {
-  partial class Login : CliBase {
-    protected override string GetDescription() => "AtomPubによるはてなブログへのログインを行います。　記事の変更等は行いません。";
+namespace Smdn.HatenaBlogTools;
 
-    protected override string GetUsageExtraMandatoryOptions() => string.Empty;
+partial class Login : CliBase {
+  protected override string GetDescription() => "AtomPubによるはてなブログへのログインを行います。　記事の変更等は行いません。";
 
-    protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
-    {
-      yield return "-v, --verbose   : ログインに成功した場合、レスポンスのサービス文書を表示します。";
+  protected override string GetUsageExtraMandatoryOptions() => string.Empty;
+
+  protected override IEnumerable<string> GetUsageExtraOptionDescriptions()
+  {
+    yield return "-v, --verbose   : ログインに成功した場合、レスポンスのサービス文書を表示します。";
+  }
+
+  public void Run(string[] args)
+  {
+    if (!ParseCommonCommandLineArgs(ref args, out var credential))
+      return;
+
+    bool verbose = false;
+
+    for (var i = 0; i < args.Length; i++) {
+      switch (args[i]) {
+        case "--verbose":
+        case "-v":
+          verbose = true;
+          break;
+      }
     }
 
-    public void Run(string[] args)
-    {
-      if (!ParseCommonCommandLineArgs(ref args, out var credential))
-        return;
+    var hatenaBlog = CreateClient(credential);
 
-      bool verbose = false;
+    var statusCode = hatenaBlog.Login(out var serviceDocument);
 
-      for (var i = 0; i < args.Length; i++) {
-        switch (args[i]) {
-          case "--verbose":
-          case "-v":
-            verbose = true;
-            break;
-        }
-      }
+    if (statusCode == HttpStatusCode.OK) {
+      Console.ForegroundColor = ConsoleColor.Green;
+      Console.WriteLine("ログインに成功しました。");
+      Console.ResetColor();
 
-      var hatenaBlog = CreateClient(credential);
+      Console.WriteLine("はてなID: {0}", hatenaBlog.HatenaId);
+      Console.WriteLine("ブログID: {0}", hatenaBlog.BlogId);
+      Console.WriteLine("ブログタイトル: {0}", hatenaBlog.BlogTitle);
+      Console.WriteLine("コレクションURI: {0}", hatenaBlog.CollectionUri);
+    }
+    else {
+      Console.ForegroundColor = ConsoleColor.Red;
+      Console.Error.WriteLine("ログインに失敗しました。　({0:D} {0})", statusCode);
+      Console.ResetColor();
+    }
 
-      var statusCode = hatenaBlog.Login(out var serviceDocument);
-
-      if (statusCode == HttpStatusCode.OK) {
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("ログインに成功しました。");
-        Console.ResetColor();
-
-        Console.WriteLine("はてなID: {0}", hatenaBlog.HatenaId);
-        Console.WriteLine("ブログID: {0}", hatenaBlog.BlogId);
-        Console.WriteLine("ブログタイトル: {0}", hatenaBlog.BlogTitle);
-        Console.WriteLine("コレクションURI: {0}", hatenaBlog.CollectionUri);
-      }
-      else {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.Error.WriteLine("ログインに失敗しました。　({0:D} {0})", statusCode);
-        Console.ResetColor();
-      }
-
-      if (verbose && serviceDocument != null) {
-        Console.WriteLine();
-        Console.WriteLine(serviceDocument);
-        Console.WriteLine();
-      }
+    if (verbose && serviceDocument != null) {
+      Console.WriteLine();
+      Console.WriteLine(serviceDocument);
+      Console.WriteLine();
     }
   }
 }

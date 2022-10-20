@@ -22,18 +22,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Smdn.HatenaBlogTools {
-  partial class Login {
-    static int Main(string[] args)
-    {
-      try {
-        (new Login()).Run(args);
+namespace Smdn.HatenaBlogTools;
 
-        return 0;
-      }
-      catch (AbortCommandException) {
-        return -1;
-      }
+partial class Login {
+  static int Main(string[] args)
+  {
+    try {
+      (new Login()).Run(args);
+
+      return 0;
+    }
+    catch (AbortCommandException) {
+      return -1;
     }
   }
 }

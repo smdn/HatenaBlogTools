@@ -22,18 +22,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Smdn.HatenaBlogTools {
-  partial class ReplaceContentText {
-    static int Main(string[] args)
-    {
-      try {
-        (new ReplaceContentText()).Run(args);
+namespace Smdn.HatenaBlogTools;
 
-        return 0;
-      }
-      catch (AbortCommandException) {
-        return -1;
-      }
+partial class ReplaceContentText {
+  static int Main(string[] args)
+  {
+    try {
+      (new ReplaceContentText()).Run(args);
+
+      return 0;
+    }
+    catch (AbortCommandException) {
+      return -1;
     }
   }
 }
