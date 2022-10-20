@@ -34,22 +34,24 @@ public static class WsseClient {
 
     string passwordDigest;
 
-    using (var hash = SHA1.Create()) {
-      var buffer = new MemoryStream();
-      var writer = new BinaryWriter(buffer);
+#pragma warning disable CA5350
+    using var hash = SHA1.Create();
+#pragma warning restore CA5350
 
-      writer.Write(nonce);
-      writer.Write(Encoding.ASCII.GetBytes(createdDateTimeString));
-      writer.Write(Encoding.ASCII.GetBytes(credential.Password));
-      writer.Flush();
+    var buffer = new MemoryStream();
+    var writer = new BinaryWriter(buffer);
 
-      buffer.Position = 0L;
+    writer.Write(nonce);
+    writer.Write(Encoding.ASCII.GetBytes(createdDateTimeString));
+    writer.Write(Encoding.ASCII.GetBytes(credential.Password));
+    writer.Flush();
 
-      passwordDigest = Convert.ToBase64String(
-        hash.ComputeHash(buffer),
-        Base64FormattingOptions.None
-      );
-    }
+    buffer.Position = 0L;
+
+    passwordDigest = Convert.ToBase64String(
+      hash.ComputeHash(buffer),
+      Base64FormattingOptions.None
+    );
 
     return $"UsernameToken Username=\"{credential.UserName}\", PasswordDigest=\"{passwordDigest}\", Nonce=\"{nonceBase64}\", Created=\"{createdDateTimeString}\"";
   }
