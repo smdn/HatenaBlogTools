@@ -12,8 +12,8 @@ internal class CategoryModification {
 
   public CategoryModification(CategorySet old, CategorySet @new)
   {
-    this.Old = old ?? throw new ArgumentNullException(nameof(old));
-    this.New = @new ?? throw new ArgumentNullException(nameof(old));
+    Old = old ?? throw new ArgumentNullException(nameof(old));
+    New = @new ?? throw new ArgumentNullException(nameof(old));
   }
 
   public void Apply(CategorySet categories)

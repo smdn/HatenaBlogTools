@@ -19,8 +19,8 @@ public class HatenaBlogAtomPubCredential {
     if (string.IsNullOrEmpty(apiKey))
       throw new ArgumentException("must be non-empty string", nameof(apiKey));
 
-    this.HatenaId = hatenaId;
-    this.BlogId = blogId;
-    this.ApiKey = apiKey;
+    HatenaId = hatenaId;
+    BlogId = blogId;
+    ApiKey = apiKey;
   }
 }

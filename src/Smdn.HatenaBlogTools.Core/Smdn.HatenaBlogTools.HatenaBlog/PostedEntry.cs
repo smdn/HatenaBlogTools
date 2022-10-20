@@ -31,11 +31,11 @@ public class PostedEntry : Entry {
       categories: categories
     )
   {
-    this.Id = id;
-    this.MemberUri = memberUri;
-    this.EntryUri = entryUri;
-    this.DatePublished = datePublished;
-    this.FormattedContent = formattedContent;
-    this.Authors = new HashSet<string>(authors ?? Enumerable.Empty<string>(), StringComparer.Ordinal);
+    Id = id;
+    MemberUri = memberUri;
+    EntryUri = entryUri;
+    DatePublished = datePublished;
+    FormattedContent = formattedContent;
+    Authors = new HashSet<string>(authors ?? Enumerable.Empty<string>(), StringComparer.Ordinal);
   }
 }

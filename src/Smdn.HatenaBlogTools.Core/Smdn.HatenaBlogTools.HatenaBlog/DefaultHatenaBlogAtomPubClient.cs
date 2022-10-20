@@ -54,7 +54,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       throw new ArgumentNullException(nameof(credential));
 
     this.credential = credential;
-    this.rootEndPoint = GetRootEndPont(credential.HatenaId, credential.BlogId);
+    rootEndPoint = GetRootEndPont(credential.HatenaId, credential.BlogId);
   }
 
   public override void WaitForCinnamon()
@@ -89,12 +89,12 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
     if (serviceDocument.Root.Name != AtomPub.ElementNames.AppService)
       throw new NotSupportedException($"unexpected document type: {serviceDocument.Root.Name}");
 
-    this.blogTitle = serviceDocument.Root
+    blogTitle = serviceDocument.Root
                                     .Element(AtomPub.ElementNames.AppWorkspace)
                                     ?.Element(AtomPub.ElementNames.AtomTitle)
                                     ?.Value;
 
-    this.collectionUri = serviceDocument.Root
+    collectionUri = serviceDocument.Root
                                         .Element(AtomPub.ElementNames.AppWorkspace)
                                         ?.Elements(AtomPub.ElementNames.AppCollection)
                                         ?.FirstOrDefault(e => e.Element(AtomPub.ElementNames.AppAccept).Value.Contains("type=entry"))

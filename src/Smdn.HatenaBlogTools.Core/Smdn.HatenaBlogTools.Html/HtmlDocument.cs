@@ -17,21 +17,21 @@ public class HtmlDocument {
 
   public HtmlDocument(string input)
   {
-    this.nodes = new List<HtmlNode>();
-    this.elements = HtmlParser.EnumerateHtmlElementStart(input).ToList();
+    nodes = new List<HtmlNode>();
+    elements = HtmlParser.EnumerateHtmlElementStart(input).ToList();
 
     var endIndexOfLastElementStart = 0;
 
     foreach (var element in elements) {
-      this.nodes.Add(new HtmlText(input.Substring(endIndexOfLastElementStart, element.Match.Index - endIndexOfLastElementStart)));
-      this.nodes.Add(element);
+      nodes.Add(new HtmlText(input.Substring(endIndexOfLastElementStart, element.Match.Index - endIndexOfLastElementStart)));
+      nodes.Add(element);
 
       endIndexOfLastElementStart = element.Match.Index + element.Match.Length;
     }
 
-    this.nodes.Add(new HtmlText(input.Substring(endIndexOfLastElementStart)));
+    nodes.Add(new HtmlText(input.Substring(endIndexOfLastElementStart)));
 
-    this.texts = this.nodes.OfType<HtmlText>().ToList();
+    texts = nodes.OfType<HtmlText>().ToList();
   }
 
   public override string ToString()

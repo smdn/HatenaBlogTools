@@ -33,7 +33,7 @@ public class HtmlAttribute {
     this.captureValue = captureValue;
     this.postamble = postamble;
 
-    this.Value = captureValue?.Value;
+    Value = captureValue?.Value;
   }
 
   internal string ConstructHtml()

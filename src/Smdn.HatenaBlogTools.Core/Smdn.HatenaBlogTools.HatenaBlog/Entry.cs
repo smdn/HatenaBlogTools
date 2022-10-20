@@ -45,12 +45,12 @@ public class Entry {
     string contentType = null
   )
   {
-    this.Title = title;
-    this.Categories = new HashSet<string>(categories ?? Enumerable.Empty<string>(), StringComparer.Ordinal);
-    this.DateUpdated = dateUpdated;
-    this.IsDraft = isDraft;
-    this.Summary = summary;
-    this.Content = content;
-    this.ContentType = contentType;
+    Title = title;
+    Categories = new HashSet<string>(categories ?? Enumerable.Empty<string>(), StringComparer.Ordinal);
+    DateUpdated = dateUpdated;
+    IsDraft = isDraft;
+    Summary = summary;
+    Content = content;
+    ContentType = contentType;
   }
 }

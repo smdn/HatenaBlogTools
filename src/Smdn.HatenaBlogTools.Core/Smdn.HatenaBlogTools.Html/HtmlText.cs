@@ -7,7 +7,7 @@ public class HtmlText : HtmlNode {
 
   public HtmlText(string text)
   {
-    this.Text = text;
+    Text = text;
   }
 
   public override string ConstructHtml() => Text;

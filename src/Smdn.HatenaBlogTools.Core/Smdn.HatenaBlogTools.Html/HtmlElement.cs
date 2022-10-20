@@ -15,9 +15,9 @@ public class HtmlElement : HtmlNode {
 
   internal HtmlElement(string localName, Match match, List<HtmlAttribute> attributes, string elementClose)
   {
-    this.LocalName = localName;
-    this.Match = match;
-    this.Attributes = attributes;
+    LocalName = localName;
+    Match = match;
+    Attributes = attributes;
     this.elementClose = elementClose;
   }
 
