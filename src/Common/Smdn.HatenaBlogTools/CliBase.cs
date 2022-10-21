@@ -1,8 +1,13 @@
 // SPDX-FileCopyrightText: 2018 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+#nullable enable
 
 using System;
 using System.Collections.Generic;
+#if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
+using System.Diagnostics.CodeAnalysis;
+#endif
+using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Runtime.Versioning;
@@ -15,23 +20,23 @@ public class AbortCommandException : Exception { }
 
 public abstract class CliBase {
   internal static class AssemblyInfo {
-    private static Assembly Assembly { get; } = Assembly.GetEntryAssembly();
+    private static Assembly? Assembly { get; } = Assembly.GetEntryAssembly();
 
-    public static string Name => Assembly.GetName().Name;
-    public static Version Version => Assembly.GetName().Version;
-    public static string VersionMajorMinorString => $"{Version.Major}.{Version.Minor}";
-    public static string Title => Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
-    public static string InformationalVersion => Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-    public static string TargetFramework => GetTargetFrameworkNameOrMoniker();
+    public static string? Name => Assembly?.GetName()?.Name;
+    public static Version? Version => Assembly?.GetName()?.Version;
+    public static string? VersionMajorMinorString => Version is null ? null : $"{Version.Major}.{Version.Minor}";
+    public static string? Title => Assembly?.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
+    public static string? InformationalVersion => Assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+    public static string? TargetFramework => GetTargetFrameworkNameOrMoniker();
 
-    private static string GetTargetFrameworkNameOrMoniker()
+    private static string? GetTargetFrameworkNameOrMoniker()
     {
-      var frameworkDisplayName = Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkDisplayName;
+      var frameworkDisplayName = Assembly?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkDisplayName;
 
       if (!string.IsNullOrEmpty(frameworkDisplayName))
         return frameworkDisplayName;
 
-      var frameworkName = Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
+      var frameworkName = Assembly?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
 
       return FrameworkNameUtils.TryGetMoniker(frameworkName, out var moniker)
         ? moniker
@@ -39,9 +44,9 @@ public abstract class CliBase {
     }
   }
 
-  internal static string UserAgent => $"{AssemblyInfo.Title?.Replace(' ', '-')}/{AssemblyInfo.VersionMajorMinorString} ({AssemblyInfo.TargetFramework}; {Environment.OSVersion.VersionString})";
+  internal static string UserAgent => $"{AssemblyInfo.Title?.Replace(' ', '-')}/{AssemblyInfo.VersionMajorMinorString} ({AssemblyInfo.TargetFramework ?? ".net"}; {Environment.OSVersion.VersionString})";
 
-  protected bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPubCredential credential)
+  protected bool ParseCommonCommandLineArgs(ref string[] args, out HatenaBlogAtomPubCredential? credential)
   {
     return ParseCommonCommandLineArgs(
       ref args,
@@ -53,7 +58,7 @@ public abstract class CliBase {
   protected bool ParseCommonCommandLineArgs(
     ref string[] args,
     string[] argsNotRequireHatenaBlogClient,
-    out HatenaBlogAtomPubCredential credential
+    out HatenaBlogAtomPubCredential? credential
   )
   {
     credential = null;
@@ -70,9 +75,9 @@ public abstract class CliBase {
 
     var requireHatenaBlogClient = !new HashSet<string>(args, StringComparer.Ordinal).Overlaps(_argsNotRequireHatenaBlogClient);
 
-    string hatenaId = null;
-    string blogId = null;
-    string apiKey = null;
+    string? hatenaId = null;
+    string? blogId = null;
+    string? apiKey = null;
     var unparsedArgs = new List<string>(args.Length);
 
     for (var i = 0; i < args.Length; i++) {
@@ -125,7 +130,7 @@ public abstract class CliBase {
         return false;
       }
 
-      credential = new HatenaBlogAtomPubCredential(hatenaId, blogId, apiKey);
+      credential = new HatenaBlogAtomPubCredential(hatenaId!, blogId!, apiKey!);
     }
 
     args = unparsedArgs.ToArray();
@@ -144,7 +149,13 @@ public abstract class CliBase {
     return client;
   }
 
-  protected static bool Login(HatenaBlogAtomPubCredential credential, out HatenaBlogAtomPubClient hatenaBlog)
+  protected static bool Login(
+    HatenaBlogAtomPubCredential credential,
+#if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
+    [NotNullWhen(true)]
+#endif
+    out HatenaBlogAtomPubClient? hatenaBlog
+  )
   {
     hatenaBlog = CreateClient(credential);
 
@@ -183,7 +194,7 @@ public abstract class CliBase {
     Environment.Exit(0);
   }
 
-  protected void Usage(string format, params string[] args)
+  protected void Usage(string? format, params string[] args)
   {
     if (format != null) {
       Console.ForegroundColor = ConsoleColor.Red;
