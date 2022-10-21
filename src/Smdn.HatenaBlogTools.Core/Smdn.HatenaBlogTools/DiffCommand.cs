@@ -15,9 +15,9 @@ public class DiffCommand : IDiffGenerator {
   private static readonly string temporaryFilePathModified = Path.Combine(temporaryDirectoryPath, "modified.txt");
 
   private readonly string command;
-  private readonly string commandArgs;
+  private readonly string? commandArgs;
 
-  public DiffCommand(string command, string commandArgs)
+  public DiffCommand(string command, string? commandArgs)
   {
     this.command = command;
     this.commandArgs = commandArgs;

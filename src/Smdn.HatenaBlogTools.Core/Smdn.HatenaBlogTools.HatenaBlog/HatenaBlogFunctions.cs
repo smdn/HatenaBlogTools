@@ -19,7 +19,7 @@ public static class HatenaBlogFunctions {
     IHatenaBlogEntryEditor editor,
     IDiffGenerator diff,
     Uri? entryUrlSkipTo,
-    Func<bool> confirmBeforePosting,
+    Func<bool>? confirmBeforePosting,
     out IReadOnlyList<PostedEntry> updatedEntries,
     out IReadOnlyList<PostedEntry> modifiedEntries
   )
@@ -73,7 +73,7 @@ public static class HatenaBlogFunctions {
     PostMode postMode,
     IHatenaBlogEntryEditor editor,
     IDiffGenerator diff,
-    Func<bool> confirmBeforePosting,
+    Func<bool>? confirmBeforePosting,
     out bool isModified
   )
   {

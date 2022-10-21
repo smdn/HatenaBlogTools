@@ -38,8 +38,8 @@ public static class DiffGenerator {
 
   public static IDiffGenerator Create(
     bool silent,
-    string command,
-    string commandArgs,
+    string? command,
+    string? commandArgs,
     string descriptionForOriginalText,
     string descriptionForModifiedText
   )
@@ -54,7 +54,7 @@ public static class DiffGenerator {
       );
     }
 
-    return new DiffCommand(command, commandArgs);
+    return new DiffCommand(command!, commandArgs);
   }
 
   private static readonly string[] testOriginalTextLines = new[] {
