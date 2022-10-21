@@ -205,11 +205,18 @@ public abstract class CliBase {
       Console.Error.WriteLine();
     }
 
-    var assm = Assembly.GetEntryAssembly();
+    var processPath =
+#if SYSTEM_ENVIRONMENT_PROCESSPATH
+      Environment.ProcessPath;
+#else
+      Assembly.GetEntryAssembly()?.Location;
+#endif
+    var processFileName = Path.GetFileName(processPath ?? AssemblyInfo.Name);
+
     var commandLine = Runtime.RuntimeEnvironment switch {
-      RuntimeEnvironment.NetCore => $"dotnet {System.IO.Path.GetFileName(assm.Location)} --",
-      RuntimeEnvironment.Mono => $"mono {System.IO.Path.GetFileName(assm.Location)}",
-      _ => $"{System.IO.Path.GetFileName(assm.Location)}",
+      RuntimeEnvironment.NetCore => $"dotnet {processFileName} --",
+      RuntimeEnvironment.Mono => $"mono {processFileName}",
+      _ => processFileName,
     };
     Console.Error.WriteLine($"{AssemblyInfo.Title} version {AssemblyInfo.InformationalVersion}");
     Console.Error.WriteLine($"User-Agent: {UserAgent}");
