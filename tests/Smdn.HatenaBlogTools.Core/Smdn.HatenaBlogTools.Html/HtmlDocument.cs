@@ -160,7 +160,7 @@ public class HtmlDocumentTests {
 
     foreach (var e in doc.Elements) {
       foreach (var a in e.Attributes) {
-        a.Value = a.Value.Substring(1);
+        a.Value = a.Value!.Substring(1);
       }
     }
 

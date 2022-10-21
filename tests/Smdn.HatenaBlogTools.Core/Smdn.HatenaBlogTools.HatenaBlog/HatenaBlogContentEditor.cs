@@ -167,7 +167,7 @@ public class HatenaBlogContentEditorTests {
   {
     var editor = new HatenaBlogContentEditor(input);
 
-    editor.FixMixedContentReferences(attribute => attribute.Value.Contains("//example.com/"));
+    editor.FixMixedContentReferences(attribute => attribute.Value!.Contains("//example.com/"));
 
     Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
   }
