@@ -33,6 +33,9 @@ internal partial class Login : CliBase {
       }
     }
 
+    if (credential is null)
+      throw new InvalidOperationException("credential not set");
+
     var hatenaBlog = CreateClient(credential);
 
     var statusCode = hatenaBlog.Login(out var serviceDocument);

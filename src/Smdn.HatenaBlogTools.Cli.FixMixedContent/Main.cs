@@ -183,7 +183,7 @@ public partial class FixMixedContent : CliBase {
 
         predicateForFixMixedContent = attr => {
           foreach (var domainPrefix in domainPrefixList) {
-            if (attr.Value.Contains(domainPrefix))
+            if (attr.Value is not null && attr.Value.Contains(domainPrefix))
               return include;
           }
 
@@ -217,6 +217,9 @@ public partial class FixMixedContent : CliBase {
 
     if (confirm)
       confirmBeforePosting = () => ConsoleUtils.AskYesNo(false, "更新しますか");
+
+    if (credential is null)
+      throw new InvalidOperationException("credential not set");
 
     if (!Login(credential, out var hatenaBlog))
       return;
@@ -329,6 +332,9 @@ public partial class FixMixedContent : CliBase {
     {
       originalText = entry.Content;
       modifiedText = null;
+
+      if (originalText is null)
+        return false; // not modified
 
       var contentEditor = new HatenaBlogContentEditor(originalText);
       var modified = false;

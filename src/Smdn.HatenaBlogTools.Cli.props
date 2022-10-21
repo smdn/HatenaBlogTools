@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
     <TargetFrameworks>net6.0;net47;netcoreapp3.1</TargetFrameworks>
     <VersionPrefix>3.1</VersionPrefix>
     <VersionSuffix></VersionSuffix>
+    <Nullable Condition=" '$(TargetFramework)' == 'net6.0' ">warnings</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Label="assembly attributes">

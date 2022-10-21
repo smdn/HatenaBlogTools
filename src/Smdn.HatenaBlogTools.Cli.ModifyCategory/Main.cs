@@ -102,6 +102,9 @@ internal partial class ModifyCategory : CliBase {
 
     Console.WriteLine();
 
+    if (credential is null)
+      throw new InvalidOperationException("credential not set");
+
     if (!Login(credential, out var hatenaBlog))
       return;
 

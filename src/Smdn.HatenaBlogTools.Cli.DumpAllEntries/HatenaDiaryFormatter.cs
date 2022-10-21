@@ -69,7 +69,7 @@ public class HatenaDiaryFormatter : FormatterBase {
       body.AppendLine(entry.Content);
       body.AppendLine();
 
-      bodyElement.Add(new XText(body.ToString()));
+      bodyElement!.Add(new XText(body.ToString()));
 
 #if RETRIEVE_COMMENTS
       if (retrieveComments) {

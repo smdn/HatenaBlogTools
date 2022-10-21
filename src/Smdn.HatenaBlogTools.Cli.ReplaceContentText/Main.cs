@@ -138,6 +138,9 @@ public partial class ReplaceContentText : CliBase {
     if (confirm)
       confirmBeforePosting = () => ConsoleUtils.AskYesNo(false, "更新しますか");
 
+    if (credential is null)
+      throw new InvalidOperationException("credential not set");
+
     if (!Login(credential, out var hatenaBlog))
       return;
 

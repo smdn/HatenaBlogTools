@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -205,6 +206,9 @@ internal partial class DumpAllEntries : CliBase {
       return;
     }
 
+    if (credential is null)
+      throw new InvalidOperationException("credential not set");
+
     if (!Login(credential, out var hatenaBlog))
       return;
 
@@ -318,17 +322,22 @@ internal partial class DumpAllEntries : CliBase {
     string outputDirectory
   )
   {
+    const string defaultOutputFileExtension = ".txt";
+
     Directory.CreateDirectory(outputDirectory);
 
-    foreach (var entry in entries) {
-      var fileName =
-        $"{entry.DatePublished.Year:D4}{entry.DatePublished.Month:D2}{entry.DatePublished.Day:D2}_" +
-        // replace: '/' -> '-', invalid chars -> '_'
-        string.Join(
-          "-",
-          entry.EntryUri.LocalPath.Substring(1).Split('/').Select(seg => PathUtils.ReplaceInvalidFileNameChars(seg, "_"))
-        );
-      var fileExtension = EntryContentType.GetFileExtension(entry.ContentType) ?? ".txt";
+    foreach (var (entry, index) in entries.Select(static (entry, index) => (entry, index))) {
+      // replace: '/' -> '-', invalid chars -> '_'
+      var suffix = entry.EntryUri is null
+        ? index.ToString("D", CultureInfo.InvariantCulture) // use entry index instead
+        : string.Join(
+            "-",
+            (entry.Id ?? entry.EntryUri).LocalPath.Substring(1).Split('/').Select(seg => PathUtils.ReplaceInvalidFileNameChars(seg, "_"))
+          );
+      var fileName = $"{entry.DatePublished.Year:D4}{entry.DatePublished.Month:D2}{entry.DatePublished.Day:D2}_{suffix}";
+      var fileExtension = entry.ContentType is null
+        ? defaultOutputFileExtension
+        : EntryContentType.GetFileExtension(entry.ContentType) ?? defaultOutputFileExtension;
 
       var entryFilePath = Path.Combine(
         outputDirectory,
@@ -343,33 +352,35 @@ internal partial class DumpAllEntries : CliBase {
 
       // edit metadata
       var elementEntry = document
-        .Root
-        .Elements(AtomPub.Namespaces.Atom + "entry")
-        .FirstOrDefault(e =>
-          e.Element(AtomPub.Namespaces.Atom + "id")?.Value == entry.Id.AbsoluteUri
+        ?.Root
+        ?.Elements(AtomPub.Namespaces.Atom + "entry")
+        ?.FirstOrDefault(e =>
+          string.Equals(e.Element(AtomPub.Namespaces.Atom + "id")?.Value, entry.Id?.AbsoluteUri, StringComparison.Ordinal)
         );
 
       if (elementEntry != null) {
         // replace atom:content
         var elementEntryContent = elementEntry.Element(AtomPub.Namespaces.Atom + "content");
 
-        elementEntryContent.AddAfterSelf(
-          new XElement(
-            AtomPub.Namespaces.Atom + "content",
-            new XAttribute("type", entry.ContentType),
-            new XAttribute(nsXLink + "type", "simple"),
-            new XAttribute(nsXLink + "href", new Uri("file://" + Path.GetFullPath(entryFilePath)))
-          )
-        );
+        if (elementEntryContent is not null) {
+          elementEntryContent.AddAfterSelf(
+            new XElement(
+              AtomPub.Namespaces.Atom + "content",
+              new XAttribute("type", entry.ContentType ?? EntryContentType.Default),
+              new XAttribute(nsXLink + "type", "simple"),
+              new XAttribute(nsXLink + "href", new Uri("file://" + Path.GetFullPath(entryFilePath)))
+            )
+          );
 
-        elementEntryContent.Remove();
+          elementEntryContent.Remove();
+        }
 
         // remove hatena:formatted-content
         elementEntry.Element(AtomPub.Namespaces.Hatena + "formatted-content")?.Remove();
       }
     }
 
-    document.Root.Add(
+    document.Root?.Add(
       new XAttribute(XNamespace.Xmlns + "xlink", nsXLink.NamespaceName)
     );
 
@@ -389,12 +400,14 @@ internal partial class DumpAllEntries : CliBase {
   {
     switch (outputFormat) {
       case OutputFormat.AtomPostData:
-        var elementsEntry = document.Root.Elements(AtomPub.Namespaces.Atom + "entry");
+        var elementsEntry = document.Root?.Elements(AtomPub.Namespaces.Atom + "entry");
 
-        elementsEntry.Elements(AtomPub.Namespaces.Atom + "id").Remove();
-        elementsEntry.Elements(AtomPub.Namespaces.Atom + "link").Remove();
-        elementsEntry.Elements(AtomPub.Namespaces.App + "edited").Remove();
-        elementsEntry.Elements(AtomPub.Namespaces.Hatena + "formatted-content").Remove();
+        if (elementsEntry is not null) {
+          elementsEntry.Elements(AtomPub.Namespaces.Atom + "id").Remove();
+          elementsEntry.Elements(AtomPub.Namespaces.Atom + "link").Remove();
+          elementsEntry.Elements(AtomPub.Namespaces.App + "edited").Remove();
+          elementsEntry.Elements(AtomPub.Namespaces.Hatena + "formatted-content").Remove();
+        }
 
         goto case OutputFormat.Atom;
 
@@ -420,26 +433,26 @@ internal partial class DumpAllEntries : CliBase {
     Console.Error.WriteLine("エントリをダンプ中 ...");
 
     hatenaBlog.EnumerateEntries((postedEntry, entryElement) => {
-      if (outputDocument == null) {
+      if (outputDocument == null && entryElement.Document is not null) {
         // オリジナルのレスポンス文書からlink[@rel=first/next], entry以外の要素をコピーしてヘッダ部を構築する
         outputDocument = new XDocument(entryElement.Document);
 
         outputDocument
           .Root
-          .Elements(AtomPub.Namespaces.Atom + "entry")
-          .Remove();
+          ?.Elements(AtomPub.Namespaces.Atom + "entry")
+          ?.Remove();
 
         outputDocument
           .Root
-          .Elements(AtomPub.Namespaces.Atom + "link")
-          .Where(e => e.HasAttributeWithValue("rel", "first") || e.HasAttributeWithValue("rel", "next"))
-          .Remove();
+          ?.Elements(AtomPub.Namespaces.Atom + "link")
+          ?.Where(e => e.HasAttributeWithValue("rel", "first") || e.HasAttributeWithValue("rel", "next"))
+          ?.Remove();
       }
 
       if (!entryPredicate(postedEntry))
         return; // continue
 
-      outputDocument.Root.Add(new XElement(entryElement));
+      outputDocument?.Root?.Add(new XElement(entryElement));
 
       filteredEntries.Add(postedEntry);
     });

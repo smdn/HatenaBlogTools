@@ -110,6 +110,9 @@ internal partial class PostNewEntry : CliBase {
       postingEntries.Sort((e1, e2) => DateTimeOffset.Compare(e1.DateUpdated ?? DateTimeOffset.MinValue, e2.DateUpdated ?? DateTimeOffset.MinValue));
     }
 
+    if (credential is null)
+      throw new InvalidOperationException("credential not set");
+
     if (!Login(credential, out var hatenaBlog))
       return;
 
@@ -135,7 +138,7 @@ internal partial class PostNewEntry : CliBase {
             statusCode = hatenaBlog.PostEntry(postingEntry, out responseDocument);
           }
 
-          if (statusCode == expectedStatusCode) {
+          if (statusCode == expectedStatusCode && responseDocument is not null) {
             var createdUri = responseDocument.Element(AtomPub.Namespaces.Atom + "entry")
                                              ?.Elements(AtomPub.Namespaces.Atom + "link")
                                              ?.FirstOrDefault(e => e.HasAttributeWithValue("rel", "alternate"))
@@ -147,7 +150,10 @@ internal partial class PostNewEntry : CliBase {
           }
           else {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.Error.WriteLine("失敗しました: {0}", statusCode);
+            if (statusCode == expectedStatusCode)
+              Console.Error.WriteLine("レスポンスが取得できませんでした: {0}", statusCode);
+            else
+              Console.Error.WriteLine("失敗しました: {0}", statusCode);
             Console.ResetColor();
 
             failedEntries.Add(postingEntry);
