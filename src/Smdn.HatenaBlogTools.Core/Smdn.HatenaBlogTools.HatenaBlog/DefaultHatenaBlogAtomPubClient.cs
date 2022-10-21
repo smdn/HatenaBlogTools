@@ -90,7 +90,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       .Root
       .Element(AtomPub.ElementNames.AppWorkspace)
       ?.Elements(AtomPub.ElementNames.AppCollection)
-      ?.FirstOrDefault(e => e.Element(AtomPub.ElementNames.AppAccept).Value.Contains("type=entry"))
+      ?.FirstOrDefault(static e => e.Element(AtomPub.ElementNames.AppAccept).Value.Contains("type=entry"))
       ?.GetAttributeValue("href", static val => new Uri(val))
       ?? throw new InvalidOperationException("could not get blog collection URI");
 
@@ -118,7 +118,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       nextUri = collectionDocument
         .Element(AtomPub.Namespaces.Atom + "feed")
         ?.Elements(AtomPub.Namespaces.Atom + "link")
-        ?.FirstOrDefault(e => e.HasAttributeWithValue("rel", "next"))
+        ?.FirstOrDefault(static e => e.HasAttributeWithValue("rel", "next"))
         ?.GetAttributeValue("href", ToUriNullable);
 
       if (nextUri == null)
@@ -133,31 +133,31 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
     return doc
       .Element(AtomPub.Namespaces.Atom + "feed")
       ?.Elements(AtomPub.Namespaces.Atom + "entry")
-      ?.Select(entry => Tuple.Create(ConvertEntry(entry), entry))
+      ?.Select(static entry => Tuple.Create(ConvertEntry(entry), entry))
       ?? Enumerable.Empty<Tuple<PostedEntry, XElement>>();
 
-    PostedEntry ConvertEntry(XElement entry)
+    static PostedEntry ConvertEntry(XElement entry)
     {
       /*
        * posted-entry only propeties
        */
       var memberUri = entry
         .Elements(AtomPub.Namespaces.Atom + "link")
-        .FirstOrDefault(link => link.HasAttributeWithValue("rel", "edit"))
+        .FirstOrDefault(static link => link.HasAttributeWithValue("rel", "edit"))
         ?.GetAttributeValue("href", ToUriNullable);
       var entryUri = entry
         .Elements(AtomPub.Namespaces.Atom + "link")
         .FirstOrDefault(
-          link => link.HasAttributeWithValue("rel", "alternate") && link.HasAttributeWithValue("type", "text/html")
+          static link => link.HasAttributeWithValue("rel", "alternate") && link.HasAttributeWithValue("type", "text/html")
         )
         ?.GetAttributeValue("href", ToUriNullable);
       var id = ToUriNullable(entry.Element(AtomPub.Namespaces.Atom + "id")?.Value);
       var formattedContent = entry.Element(AtomPub.Namespaces.Hatena + "formatted-content")?.Value;
       var authors = entry
         .Elements(AtomPub.Namespaces.Atom + "author")
-        .Select(elementAuthor => elementAuthor.Element(AtomPub.Namespaces.Atom + "name"))
-        .Where(name => name.Value is not null)
-        .Select(author => author.Value!);
+        .Select(static elementAuthor => elementAuthor.Element(AtomPub.Namespaces.Atom + "name"))
+        .Where(static name => name.Value is not null)
+        .Select(static author => author.Value!);
 
       if (!DateTimeOffset.TryParse(entry.Element(AtomPub.Namespaces.Atom + "published")?.Value, out var datePublished))
         datePublished = DateTimeOffset.MinValue;
@@ -185,7 +185,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       e.Categories.UnionWith(
         entry
           .Elements(AtomPub.Namespaces.Atom + "category")
-          .Select(c => c.GetAttributeValue("term"))
+          .Select(static c => c.GetAttributeValue("term"))
       );
 
       e.IsDraft = IsYes(
@@ -214,7 +214,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       var putDocument = CreatePostDocument(updatingEntry);
 
       putDocument.Root.Add(
-        updatingEntry.Authors.Select(author =>
+        updatingEntry.Authors.Select(static author =>
           string.IsNullOrEmpty(author)
             ? null
             : new XElement(
@@ -279,7 +279,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
         new XText(postEntry.Content)
       ),
       postEntry.Categories.Select(
-        c => new XElement(
+        static c => new XElement(
           AtomPub.Namespaces.Atom + "category",
           new XAttribute("term", c)
         )
