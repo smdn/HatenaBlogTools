@@ -76,7 +76,6 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       return statusCode;
     if (serviceDocument is null)
       throw new InvalidOperationException("could not get response XML document");
-
     if (serviceDocument.Root.Name != AtomPub.ElementNames.AppService)
       throw new NotSupportedException($"unexpected document type: {serviceDocument.Root.Name}");
 
@@ -131,9 +130,11 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
 
   internal static IEnumerable<Tuple<PostedEntry, XElement>> ReadEntries(XDocument doc)
   {
-    return doc.Element(AtomPub.Namespaces.Atom + "feed")
-              ?.Elements(AtomPub.Namespaces.Atom + "entry")
-              ?.Select(entry => Tuple.Create(ConvertEntry(entry), entry)) ?? Enumerable.Empty<Tuple<PostedEntry, XElement>>();
+    return doc
+      .Element(AtomPub.Namespaces.Atom + "feed")
+      ?.Elements(AtomPub.Namespaces.Atom + "entry")
+      ?.Select(entry => Tuple.Create(ConvertEntry(entry), entry))
+      ?? Enumerable.Empty<Tuple<PostedEntry, XElement>>();
 
     PostedEntry ConvertEntry(XElement entry)
     {
@@ -146,7 +147,9 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
         ?.GetAttributeValue("href", ToUriNullable);
       var entryUri = entry
         .Elements(AtomPub.Namespaces.Atom + "link")
-        .FirstOrDefault(link => link.HasAttributeWithValue("rel", "alternate") && link.HasAttributeWithValue("type", "text/html"))
+        .FirstOrDefault(
+          link => link.HasAttributeWithValue("rel", "alternate") && link.HasAttributeWithValue("type", "text/html")
+        )
         ?.GetAttributeValue("href", ToUriNullable);
       var id = ToUriNullable(entry.Element(AtomPub.Namespaces.Atom + "id")?.Value);
       var formattedContent = entry.Element(AtomPub.Namespaces.Hatena + "formatted-content")?.Value;
@@ -179,11 +182,17 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       if (DateTimeOffset.TryParse(entry.Element(AtomPub.Namespaces.Atom + "updated")?.Value, out var dateUpdated))
         e.DateUpdated = dateUpdated;
 
-      foreach (var category in entry.Elements(AtomPub.Namespaces.Atom + "category").Select(c => c.GetAttributeValue("term"))) {
-        e.Categories.Add(category);
-      }
+      e.Categories.UnionWith(
+        entry
+          .Elements(AtomPub.Namespaces.Atom + "category")
+          .Select(c => c.GetAttributeValue("term"))
+      );
 
-      e.IsDraft = IsYes(entry.Element(AtomPub.Namespaces.App + "control")?.Element(AtomPub.Namespaces.App + "draft")?.Value);
+      e.IsDraft = IsYes(
+        entry.Element(AtomPub.Namespaces.App + "control")
+        ?.Element(AtomPub.Namespaces.App + "draft")
+        ?.Value
+      );
 
       return e;
     }
@@ -249,7 +258,9 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       postEntry.DateUpdated.HasValue
         ? new XElement(
           AtomPub.Namespaces.Atom + "updated",
-          new XText(XmlConvert.ToString(postEntry.DateUpdated.Value))
+          new XText(
+            XmlConvert.ToString(postEntry.DateUpdated.Value)
+          )
         )
         : null,
       postEntry.Summary == null
@@ -267,10 +278,12 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
         new XAttribute("type", EntryContentType.Default),
         new XText(postEntry.Content)
       ),
-      postEntry.Categories.Select(c => new XElement(
-        AtomPub.Namespaces.Atom + "category",
-        new XAttribute("term", c)
-      )),
+      postEntry.Categories.Select(
+        c => new XElement(
+          AtomPub.Namespaces.Atom + "category",
+          new XAttribute("term", c)
+        )
+      ),
       new XElement(
         AtomPub.Namespaces.App + "control",
         new XElement(
