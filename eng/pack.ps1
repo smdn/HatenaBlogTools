@@ -24,11 +24,13 @@ $PackageName = "HatenaBlogTools-${Version}"
 $PathToPublishOutputDirectory = $([System.IO.Path]::Combine(${PSScriptRoot}, $PackageName))
 
 # build and publish CLI executables
+dotnet clean --configuration Release $PathToCliSolutionFile
 dotnet publish --configuration Release --framework $PublishTargetFramework --no-self-contained --output $PathToPublishOutputDirectory $PathToCliSolutionFile
 
 # create ZIP archive
 $PathToArchive = $([System.IO.Path]::Combine(${PSScriptRoot}, $PackageName + ".zip"))
 
+Remove-Item -Path $PathToArchive # remove existing file before creating archive
 Compress-Archive -CompressionLevel Optimal -Path ${PathToPublishOutputDirectory} -DestinationPath $PathToArchive
 
 # delete the temporary output directory
