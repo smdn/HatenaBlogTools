@@ -9,23 +9,23 @@ namespace Smdn.HatenaBlogTools.HatenaBlog;
 
 public class PostedEntry : Entry {
   /* read-only properties */
-  public Uri Id { get; }
-  public Uri MemberUri { get; }
-  public Uri EntryUri { get; }
+  public Uri? Id { get; }
+  public Uri? MemberUri { get; }
+  public Uri? EntryUri { get; }
   public DateTimeOffset DatePublished { get; }
-  public string FormattedContent { get; }
+  public string? FormattedContent { get; }
 
   /* read-write properties */
   public HashSet<string> Authors { get; }
 
   protected internal PostedEntry(
-    Uri id,
-    Uri memberUri,
-    Uri entryUri,
+    Uri? id,
+    Uri? memberUri,
+    Uri? entryUri,
     DateTimeOffset datePublished,
-    IEnumerable<string> authors,
-    string formattedContent,
-    IEnumerable<string> categories = null
+    IEnumerable<string>? authors,
+    string? formattedContent,
+    IEnumerable<string>? categories = null
   )
     : base(
       categories: categories

@@ -13,7 +13,8 @@ using Smdn.Xml.Linq;
 namespace Smdn.HatenaBlogTools.HatenaBlog;
 
 internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
-  private static Uri ToUriNullable(string val) => (val == null) ? null : new Uri(val);
+  private static Uri? ToUriNullable(string? val) => val is null ? null : new Uri(val);
+  private static Exception CreateNotLoggedIn() => new InvalidOperationException($"not logged in yet. call {nameof(Login)}() first.");
 
   private readonly HatenaBlogAtomPubCredential credential;
 
@@ -23,15 +24,14 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
   private readonly Uri rootEndPoint;
   public override Uri RootEndPoint => rootEndPoint;
 
-  private string blogTitle;
-  public override string BlogTitle => blogTitle;
+  private string? blogTitle;
+  public override string BlogTitle => blogTitle ?? throw CreateNotLoggedIn();
 
-  private Uri collectionUri;
-  public override Uri CollectionUri => collectionUri;
+  private Uri? collectionUri;
+  public override Uri CollectionUri => collectionUri ?? throw CreateNotLoggedIn();
 
-  private string userAgent;
-
-  public override string UserAgent {
+  private string? userAgent;
+  public override string? UserAgent {
     get => atom?.UserAgent ?? userAgent;
     set {
       userAgent = value;
@@ -41,7 +41,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
     }
   }
 
-  private AtomPubClient atom = null;
+  private AtomPubClient? atom = null;
 
   private static Uri GetRootEndPont(string hatenaId, string blogId)
     => new(string.Concat("https://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom"));
@@ -57,26 +57,25 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
 
   private AtomPubClient EnsureInitAtomClient()
   {
-    if (atom != null)
-      return atom;
-
-    atom = new AtomPubClient {
-      Credential = new NetworkCredential(credential.HatenaId, credential.ApiKey),
-      UserAgent = userAgent,
-    };
+    atom ??= new AtomPubClient(
+      credential: new NetworkCredential(credential.HatenaId, credential.ApiKey),
+      userAgent: userAgent
+    );
 
     return atom;
   }
 
-  public override HttpStatusCode Login(out XDocument serviceDocument)
+  public override HttpStatusCode Login(out XDocument? serviceDocument)
     => GetServiceDocuments(out serviceDocument);
 
-  private HttpStatusCode GetServiceDocuments(out XDocument serviceDocument)
+  private HttpStatusCode GetServiceDocuments(out XDocument? serviceDocument)
   {
     var statusCode = EnsureInitAtomClient().Get(RootEndPoint, out serviceDocument);
 
     if (statusCode != HttpStatusCode.OK)
       return statusCode;
+    if (serviceDocument is null)
+      throw new InvalidOperationException("could not get response XML document");
 
     if (serviceDocument.Root.Name != AtomPub.ElementNames.AppService)
       throw new NotSupportedException($"unexpected document type: {serviceDocument.Root.Name}");
@@ -85,14 +84,16 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       .Root
       .Element(AtomPub.ElementNames.AppWorkspace)
       ?.Element(AtomPub.ElementNames.AtomTitle)
-      ?.Value;
+      ?.Value
+      ?? throw new InvalidOperationException("could not get blog title");
 
     collectionUri = serviceDocument
       .Root
       .Element(AtomPub.ElementNames.AppWorkspace)
       ?.Elements(AtomPub.ElementNames.AppCollection)
       ?.FirstOrDefault(e => e.Element(AtomPub.ElementNames.AppAccept).Value.Contains("type=entry"))
-      ?.GetAttributeValue("href", static val => new Uri(val));
+      ?.GetAttributeValue("href", static val => new Uri(val))
+      ?? throw new InvalidOperationException("could not get blog collection URI");
 
     return statusCode;
   }
@@ -105,9 +106,9 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
     var nextUri = CollectionUri;
 
     for (; ; ) {
-      var statusCode = atom.Get(nextUri, out XDocument collectionDocument);
+      var statusCode = atom.Get(nextUri, out var collectionDocument);
 
-      if (statusCode != HttpStatusCode.OK)
+      if (statusCode != HttpStatusCode.OK || collectionDocument is null)
         throw new WebException($"エントリの取得に失敗したため中断しました ({statusCode})", WebExceptionStatus.ProtocolError);
 
       foreach (var entry in ReadEntries(collectionDocument)) {
@@ -151,7 +152,9 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       var formattedContent = entry.Element(AtomPub.Namespaces.Hatena + "formatted-content")?.Value;
       var authors = entry
         .Elements(AtomPub.Namespaces.Atom + "author")
-        .Select(elementAuthor => elementAuthor.Element(AtomPub.Namespaces.Atom + "name")?.Value);
+        .Select(elementAuthor => elementAuthor.Element(AtomPub.Namespaces.Atom + "name"))
+        .Where(name => name.Value is not null)
+        .Select(author => author.Value!);
 
       if (!DateTimeOffset.TryParse(entry.Element(AtomPub.Namespaces.Atom + "published")?.Value, out var datePublished))
         datePublished = DateTimeOffset.MinValue;
@@ -185,13 +188,16 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       return e;
     }
 
-    bool IsYes(string str) => string.Equals(str, "yes", StringComparison.OrdinalIgnoreCase);
+    static bool IsYes(string? str)
+      => string.Equals(str, "yes", StringComparison.OrdinalIgnoreCase);
   }
 
-  public override HttpStatusCode UpdateEntry(PostedEntry updatingEntry, out XDocument responseDocument)
+  public override HttpStatusCode UpdateEntry(PostedEntry updatingEntry, out XDocument? responseDocument)
   {
     if (atom == null)
       throw new InvalidOperationException("not logged in");
+    if (updatingEntry.MemberUri is null)
+      throw new InvalidOperationException($"cannot edit this entry since member URI is not set (ID: {updatingEntry.Id}, entry URI: {updatingEntry.EntryUri}, title: {updatingEntry.Title})");
 
     responseDocument = null;
 
@@ -219,7 +225,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
     }
   }
 
-  public override HttpStatusCode PostEntry(Entry entry, out XDocument responseDocument)
+  public override HttpStatusCode PostEntry(Entry entry, out XDocument? responseDocument)
   {
     if (atom == null)
       throw new InvalidOperationException("not logged in");

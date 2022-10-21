@@ -15,6 +15,12 @@ namespace Smdn.HatenaBlogTools.AtomPublishingProtocol;
 public class AtomPubClient {
   public static readonly int DefaultTimeoutMilliseconds = 20 * 1000;
 
+  public AtomPubClient(NetworkCredential credential, string? userAgent = null)
+  {
+    this.credential = credential ?? throw new ArgumentNullException(nameof(credential));
+    UserAgent = userAgent;
+  }
+
   private int timeout = DefaultTimeoutMilliseconds;
 
   public int Timeout {
@@ -27,24 +33,25 @@ public class AtomPubClient {
     }
   }
 
+  private NetworkCredential credential;
+
   public NetworkCredential Credential {
-    get; set;
+    get => credential;
+    set => credential = value ?? throw new ArgumentNullException(nameof(Credential));
   }
 
-  public string UserAgent {
-    get; set;
-  }
+  public string? UserAgent { get; set; }
 
-  public HttpStatusCode Get(Uri requestUri, out XDocument responseDocument)
+  public HttpStatusCode Get(Uri requestUri, out XDocument? responseDocument)
     => GetResponse(() => CreateRequest(WebRequestMethods.Http.Get, requestUri), out responseDocument);
 
-  public HttpStatusCode Post(Uri requestUri, XDocument requestDocument, out XDocument responseDocument)
+  public HttpStatusCode Post(Uri requestUri, XDocument requestDocument, out XDocument? responseDocument)
     => PostPut(WebRequestMethods.Http.Post, requestUri, requestDocument, out responseDocument);
 
-  public HttpStatusCode Put(Uri requestUri, XDocument requestDocument, out XDocument responseDocument)
+  public HttpStatusCode Put(Uri requestUri, XDocument requestDocument, out XDocument? responseDocument)
     => PostPut(WebRequestMethods.Http.Put, requestUri, requestDocument, out responseDocument);
 
-  private HttpStatusCode PostPut(string method, Uri requestUri, XDocument requestDocument, out XDocument responseDocument)
+  private HttpStatusCode PostPut(string method, Uri requestUri, XDocument requestDocument, out XDocument? responseDocument)
   {
     return GetResponse(
       () => {
@@ -81,22 +88,26 @@ public class AtomPubClient {
     req.Accept = "application/x.atom+xml, application/atom+xml, application/atomsvc+xml, application/xml, text/xml, */*";
     req.Timeout = timeout;
     req.ReadWriteTimeout = timeout;
-    req.UserAgent = UserAgent;
+
+    if (UserAgent is not null)
+      req.UserAgent = UserAgent;
 
     return req;
   }
 
   private static readonly int maxTimeoutRetryCount = 3;
 
-  private static HttpStatusCode GetResponse(Func<HttpWebRequest> createRequest, out XDocument responseDocument)
+  private static HttpStatusCode GetResponse(Func<HttpWebRequest> createRequest, out XDocument? responseDocument)
   {
     responseDocument = null;
 
     for (var timeoutRetryCount = maxTimeoutRetryCount; ;) {
       try {
         using var response = GetResponseCore(createRequest());
+
         if (2 == ((int)response.StatusCode) / 100) { // 2XX
           using var responseStream = response.GetResponseStream();
+
           responseDocument = XDocument.Load(responseStream);
         }
         else {
@@ -153,15 +164,19 @@ public class AtomPubClient {
       }
 #endif
 
+      HttpWebResponse? resp = null;
+
       try {
-        return req.GetResponse() as HttpWebResponse;
+        resp = req.GetResponse() as HttpWebResponse;
       }
       catch (WebException ex) when (ex.Status == WebExceptionStatus.Timeout) {
         throw new TimeoutException("request timed out", ex);
       }
       catch (WebException ex) when (ex.Status == WebExceptionStatus.ProtocolError) {
-        return ex.Response as HttpWebResponse;
+        resp = ex.Response as HttpWebResponse;
       }
+
+      return resp ?? throw new InvalidOperationException("could not get HTTP response");
     }
   }
 }

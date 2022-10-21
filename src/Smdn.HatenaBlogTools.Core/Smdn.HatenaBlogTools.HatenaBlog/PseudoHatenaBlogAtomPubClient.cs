@@ -22,7 +22,7 @@ internal class PseudoHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
   public override Uri RootEndPoint => throw new NotImplementedException();
   public override string BlogTitle => string.Empty;
   public override Uri CollectionUri => throw new NotImplementedException();
-  public override string UserAgent { get; set; }
+  public override string? UserAgent { get; set; }
 
   public override HttpStatusCode Login(out XDocument serviceDocument)
   {

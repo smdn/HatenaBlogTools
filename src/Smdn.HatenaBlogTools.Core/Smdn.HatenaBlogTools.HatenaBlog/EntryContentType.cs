@@ -11,7 +11,7 @@ public static class EntryContentType {
   public static readonly string Markdown = "text/x-markdown";
   public static readonly string Html = "text/html";
 
-  public static string GetFileExtension(string contentType)
+  public static string? GetFileExtension(string contentType)
   {
     if (string.Equals(contentType, HatenaSyntax, StringComparison.OrdinalIgnoreCase))
       return ".hatena.txt";

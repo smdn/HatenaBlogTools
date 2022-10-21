@@ -13,7 +13,7 @@ public class HtmlElement : HtmlNode {
   internal Match Match { get; }
   private readonly string elementClose;
 
-  internal HtmlElement(string localName, Match match, List<HtmlAttribute> attributes, string elementClose)
+  internal HtmlElement(string localName, Match match, IReadOnlyList<HtmlAttribute> attributes, string elementClose)
   {
     LocalName = localName;
     Match = match;

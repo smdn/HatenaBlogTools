@@ -51,7 +51,7 @@ public class HatenaBlogContentEditor : HtmlDocument {
     var modified = false;
 
     foreach (var element in Elements) {
-      IEnumerable<HtmlAttribute> targets = null;
+      IEnumerable<HtmlAttribute>? targets = null;
 
       switch (element.LocalName.ToLowerInvariant()) {
         // img@src
@@ -108,7 +108,7 @@ public class HatenaBlogContentEditor : HtmlDocument {
         continue;
 
       foreach (var target in targets) {
-        if (targetPredicate(target))
+        if (targetPredicate(target) && target.Value is not null)
           target.Value = ReplaceSchemeToHttps(target.Value, regexReplaceAttributeReferenceToHttps, ref modified);
       }
     } // for each element
@@ -127,12 +127,14 @@ public class HatenaBlogContentEditor : HtmlDocument {
       var regexReplaceBlogUrlToHttps = new Regex(@"(?<scheme>http)\://" + Regex.Escape(hostName) + "/", RegexOptions.Singleline | RegexOptions.CultureInvariant);
 
       foreach (var text in Texts) {
-        text.Text = ReplaceSchemeToHttps(text.Text, regexReplaceBlogUrlToHttps, ref modified);
+        if (text.Text is not null)
+          text.Text = ReplaceSchemeToHttps(text.Text, regexReplaceBlogUrlToHttps, ref modified);
       }
 
       foreach (var anchor in Elements.Where(e => string.Equals(e.LocalName, "a", StringComparison.OrdinalIgnoreCase))) {
         foreach (var href in anchor.Attributes.Where(a => a.IsNameEqualsTo("href"))) {
-          href.Value = ReplaceSchemeToHttps(href.Value, regexReplaceBlogUrlToHttps, ref modified);
+          if (href.Value is not null)
+            href.Value = ReplaceSchemeToHttps(href.Value, regexReplaceBlogUrlToHttps, ref modified);
         }
       }
     }

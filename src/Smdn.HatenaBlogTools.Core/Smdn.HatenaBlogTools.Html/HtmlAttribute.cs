@@ -20,14 +20,20 @@ public class HtmlAttribute {
 
   private readonly string preamble;
   private readonly Capture captureName;
-  private readonly string delimiter;
+  private readonly string? delimiter;
   // private readonly Capture captureValue;
-  private readonly string postamble;
+  private readonly string? postamble;
 
-  public string Name => captureName?.Value;
-  public string Value { get; set; }
+  public string? Name => captureName?.Value;
+  public string? Value { get; set; }
 
-  internal HtmlAttribute(string preamble, Capture captureName, string delimiter, Capture captureValue, string postamble)
+  internal HtmlAttribute(
+    string preamble,
+    Capture captureName,
+    string? delimiter,
+    Capture? captureValue,
+    string? postamble
+  )
   {
     this.preamble = preamble;
     this.captureName = captureName;

@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
     <LangVersion>latest</LangVersion>
     <VersionPrefix>3.0</VersionPrefix>
     <VersionSuffix></VersionSuffix>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Label="assembly attributes">

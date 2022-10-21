@@ -51,7 +51,7 @@ public static class HtmlParser {
         var captureAttributeName = groupAttributeName.Captures[attributeIndex];
         var indexOfNextAtttributeStart = attributeIndex < groupAttributeName.Captures.Count - 1 ? groupAttributeName.Captures[attributeIndex + 1].Index : match.Index + match.Length;
 
-        Capture captureAttributeValue = null;
+        Capture? captureAttributeValue = null;
 
         for (var captureIndex = 0; captureIndex < groupAttributeValue.Captures.Count; captureIndex++) {
           var capture = groupAttributeValue.Captures[captureIndex];
@@ -69,14 +69,14 @@ public static class HtmlParser {
           new HtmlAttribute(
             preamble: input.Substring(captureAttribute.Index, captureAttributeName.Index - captureAttribute.Index),
             captureName: captureAttributeName,
-            delimiter: (captureAttributeValue == null)
+            delimiter: captureAttributeValue is null
               ? null
               : input.Substring(
                 captureAttributeName.Index + captureAttributeName.Length,
                 captureAttributeValue.Index - (captureAttributeName.Index + captureAttributeName.Length)
               ),
             captureValue: captureAttributeValue,
-            postamble: (captureAttributeValue == null)
+            postamble: captureAttributeValue is null
               ? null
               : input.Substring(
                 captureAttributeValue.Index + captureAttributeValue.Length,

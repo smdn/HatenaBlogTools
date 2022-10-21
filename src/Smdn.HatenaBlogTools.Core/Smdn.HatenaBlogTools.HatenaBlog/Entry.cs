@@ -8,17 +8,18 @@ using System.Linq;
 namespace Smdn.HatenaBlogTools.HatenaBlog;
 
 public class Entry {
-  public string Title { get; set; }
-  public HashSet<string> Categories { get; } = new HashSet<string>(StringComparer.Ordinal);
+  public string? Title { get; set; }
+  public HashSet<string> Categories { get; }
   public DateTimeOffset? DateUpdated { get; set; }
-  public bool IsDraft { get; set; } = false;
-  public string Summary { get; set; }
-  public string Content { get; set; }
-  public string ContentType { get; set; }
+  public bool IsDraft { get; set; }
+  public string? Summary { get; set; }
+  public string? Content { get; set; }
+  public string? ContentType { get; set; }
 
   // default constructor
   public Entry()
   {
+    Categories = new HashSet<string>(StringComparer.Ordinal);
   }
 
   // copy constructor
@@ -36,13 +37,13 @@ public class Entry {
   }
 
   public Entry(
-    string title = null,
-    IEnumerable<string> categories = null,
+    string? title = null,
+    IEnumerable<string>? categories = null,
     DateTimeOffset? dateUpdated = null,
     bool isDraft = false,
-    string summary = null,
-    string content = null,
-    string contentType = null
+    string? summary = null,
+    string? content = null,
+    string? contentType = null
   )
   {
     Title = title;

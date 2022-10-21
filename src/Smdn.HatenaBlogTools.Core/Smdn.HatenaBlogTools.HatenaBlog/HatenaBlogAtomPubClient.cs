@@ -50,11 +50,11 @@ public abstract class HatenaBlogAtomPubClient {
   public abstract Uri RootEndPoint { get; }
   public abstract string BlogTitle { get; }
   public abstract Uri CollectionUri { get; }
-  public abstract string UserAgent { get; set; }
+  public abstract string? UserAgent { get; set; }
 
   public abstract void WaitForCinnamon();
 
-  public abstract HttpStatusCode Login(out XDocument serviceDocument);
+  public abstract HttpStatusCode Login(out XDocument? serviceDocument);
 
   public IEnumerable<PostedEntry> EnumerateEntries()
   {
@@ -75,7 +75,7 @@ public abstract class HatenaBlogAtomPubClient {
 
   protected abstract IEnumerable<Tuple<PostedEntry, XElement>> EnumerateAllEntries();
 
-  public abstract HttpStatusCode UpdateEntry(PostedEntry updatingEntry, out XDocument responseDocument);
+  public abstract HttpStatusCode UpdateEntry(PostedEntry updatingEntry, out XDocument? responseDocument);
 
-  public abstract HttpStatusCode PostEntry(Entry entry, out XDocument responseDocument);
+  public abstract HttpStatusCode PostEntry(Entry entry, out XDocument? responseDocument);
 }

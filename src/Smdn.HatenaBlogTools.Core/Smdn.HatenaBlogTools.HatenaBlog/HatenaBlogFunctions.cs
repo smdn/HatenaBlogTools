@@ -18,7 +18,7 @@ public static class HatenaBlogFunctions {
     PostMode postMode,
     IHatenaBlogEntryEditor editor,
     IDiffGenerator diff,
-    Uri entryUrlSkipTo,
+    Uri? entryUrlSkipTo,
     Func<bool> confirmBeforePosting,
     out IReadOnlyList<PostedEntry> updatedEntries,
     out IReadOnlyList<PostedEntry> modifiedEntries
@@ -28,8 +28,8 @@ public static class HatenaBlogFunctions {
     var entriesModified = new List<PostedEntry>();
 
     foreach (var entry in hatenaBlog.EnumerateEntries()) {
-      if (entryUrlSkipTo != null) {
-        if (entry.EntryUri.Equals(entryUrlSkipTo)) {
+      if (entryUrlSkipTo is not null) {
+        if (entryUrlSkipTo.Equals(entry.EntryUri)) {
           entryUrlSkipTo = null;
         }
         else {

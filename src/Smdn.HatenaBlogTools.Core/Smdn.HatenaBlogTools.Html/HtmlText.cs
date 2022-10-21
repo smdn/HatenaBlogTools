@@ -3,12 +3,12 @@
 namespace Smdn.HatenaBlogTools.Html;
 
 public class HtmlText : HtmlNode {
-  public string Text { get; set; }
+  public string? Text { get; set; }
 
-  public HtmlText(string text)
+  public HtmlText(string? text)
   {
     Text = text;
   }
 
-  public override string ConstructHtml() => Text;
+  public override string ConstructHtml() => Text ?? string.Empty;
 }
