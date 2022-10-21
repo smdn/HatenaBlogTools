@@ -70,7 +70,7 @@ public class BloggerFormatterTests {
 
     // /feed/entry/id
     Assert.AreEqual(
-      entry.Id.AbsoluteUri,
+      entry.Id!.AbsoluteUri,
       elementEntry.Element(AtomPub.Namespaces.Atom + "id")?.Value
     );
 
@@ -202,7 +202,7 @@ public class BloggerFormatterTests {
     for (var index = 0; index < entries.Length; index++) {
       // /feed/entry[index]/id
       Assert.AreEqual(
-        entries[index].Id.AbsoluteUri,
+        entries[index].Id!.AbsoluteUri,
         elementListEntries[index].Element(AtomPub.Namespaces.Atom + "id")?.Value
       );
 

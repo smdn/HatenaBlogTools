@@ -22,7 +22,7 @@ public class ReplaceContentTextTests {
       hatenaBlog,
       HatenaBlogFunctions.PostMode.PostIfModified,
       editor,
-      DiffGenerator.Create(silent: true, null, null, null, null),
+      DiffGenerator.Create(silent: true, null, null, string.Empty, string.Empty),
       null,
       null,
       out updatedEntries,
