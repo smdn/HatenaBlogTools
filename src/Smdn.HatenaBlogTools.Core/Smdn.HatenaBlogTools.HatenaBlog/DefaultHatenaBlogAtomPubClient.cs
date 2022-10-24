@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Collections.Generic;
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Linq;
 using System.Net;
 using System.Xml;
@@ -42,6 +45,15 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
   }
 
   private AtomPubClient? atom = null;
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE
+  [MemberNotNull(nameof(atom))]
+#endif
+  private void ThrowIfNotLoggedIn()
+  {
+    if (atom is null)
+      throw CreateNotLoggedIn();
+  }
 
   private static Uri GetRootEndPont(string hatenaId, string blogId)
     => new(string.Concat("https://blog.hatena.ne.jp/", hatenaId, "/", blogId, "/atom"));
@@ -99,13 +111,18 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
 
   protected override IEnumerable<Tuple<PostedEntry, XElement>> EnumerateAllEntries()
   {
-    if (atom == null)
-      throw new InvalidOperationException("not logged in");
+    ThrowIfNotLoggedIn();
 
     var nextUri = CollectionUri;
 
     for (; ; ) {
+#if !SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE
+#pragma warning disable CS8602
+#endif
       var statusCode = atom.Get(nextUri, out var collectionDocument);
+#if !SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE
+#pragma warning restore CS8602
+#endif
 
       if (statusCode != HttpStatusCode.OK || collectionDocument is null)
         throw new WebException($"エントリの取得に失敗したため中断しました ({statusCode})", WebExceptionStatus.ProtocolError);
@@ -203,8 +220,8 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
 
   public override HttpStatusCode UpdateEntry(PostedEntry updatingEntry, out XDocument? responseDocument)
   {
-    if (atom == null)
-      throw new InvalidOperationException("not logged in");
+    ThrowIfNotLoggedIn();
+
     if (updatingEntry.MemberUri is null)
       throw new InvalidOperationException($"cannot edit this entry since member URI is not set (ID: {updatingEntry.Id}, entry URI: {updatingEntry.EntryUri}, title: {updatingEntry.Title})");
 
@@ -227,7 +244,13 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
         )
       );
 
+#if !SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE
+#pragma warning disable CS8602
+#endif
       return atom.Put(updatingEntry.MemberUri, putDocument, out responseDocument);
+#if !SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE
+#pragma warning restore CS8602
+#endif
     }
     catch (Exception ex) {
       throw new PostEntryFailedException(updatingEntry, ex);
@@ -236,11 +259,16 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
 
   public override HttpStatusCode PostEntry(Entry entry, out XDocument? responseDocument)
   {
-    if (atom == null)
-      throw new InvalidOperationException("not logged in");
+    ThrowIfNotLoggedIn();
 
     try {
+#if !SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE
+#pragma warning disable CS8602
+#endif
       return atom.Post(CollectionUri, CreatePostDocument(entry), out responseDocument);
+#if !SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE
+#pragma warning restore CS8602
+#endif
     }
     catch (Exception ex) {
       throw new PostEntryFailedException(entry, ex);
