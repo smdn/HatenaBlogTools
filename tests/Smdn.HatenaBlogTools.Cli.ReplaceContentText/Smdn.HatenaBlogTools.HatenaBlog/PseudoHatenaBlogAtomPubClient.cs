@@ -8,7 +8,6 @@ using System.Xml.Linq;
 
 namespace Smdn.HatenaBlogTools.HatenaBlog;
 
-#if DEBUG
 internal class PseudoHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
   private readonly IReadOnlyList<PostedEntry> entries;
 
@@ -57,4 +56,3 @@ internal class PseudoHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
     }
   }
 }
-#endif

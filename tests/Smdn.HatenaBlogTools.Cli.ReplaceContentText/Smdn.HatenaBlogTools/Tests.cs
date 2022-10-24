@@ -8,7 +8,6 @@ namespace Smdn.HatenaBlogTools;
 
 [TestFixture]
 public class ReplaceContentTextTests {
-#if DEBUG
   private static void EditAllEntry(
     IReadOnlyList<PostedEntry> entries,
     IHatenaBlogEntryEditor editor,
@@ -16,7 +15,7 @@ public class ReplaceContentTextTests {
     out IReadOnlyList<PostedEntry> modifiedEntries
   )
   {
-    var hatenaBlog = HatenaBlogAtomPubClient.Create(entries);
+    var hatenaBlog = new PseudoHatenaBlogAtomPubClient(entries);
 
     HatenaBlogFunctions.EditAllEntry(
       hatenaBlog,
@@ -216,11 +215,4 @@ public class ReplaceContentTextTests {
     Assert.AreEqual("foobar", entries[0].Content);
     Assert.AreEqual("foobar", entries[0].Title);
   }
-#else // if DEBUG
-  [Test]
-  public void Test()
-  {
-    Assert.Warn("some test cases are available only with configuration of DEBUG");
-  }
-#endif
 }

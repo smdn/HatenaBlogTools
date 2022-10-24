@@ -30,11 +30,6 @@ public abstract class HatenaBlogAtomPubClient {
   public static HatenaBlogAtomPubClient Create(HatenaBlogAtomPubCredential credential)
     => new DefaultHatenaBlogAtomPubClient(credential);
 
-#if DEBUG
-  public static HatenaBlogAtomPubClient Create(IReadOnlyList<PostedEntry> entries)
-    => new PseudoHatenaBlogAtomPubClient(entries);
-#endif
-
   public static IEnumerable<PostedEntry> ReadEntriesFrom(XDocument document)
   {
     foreach (var entry in DefaultHatenaBlogAtomPubClient.ReadEntries(document)) {
