@@ -69,6 +69,10 @@ public class DiffCommand : IDiffGenerator {
       psi.StandardErrorEncoding = utf8EncodingNoBom;
 
       using var process = Process.Start(psi);
+
+      if (process is null)
+        throw new InvalidOperationException("new process could not be started.");
+
       using (var stdout = openStdout()) {
         process.StandardOutput.BaseStream.CopyTo(stdout);
       }
@@ -77,7 +81,8 @@ public class DiffCommand : IDiffGenerator {
         process.StandardError.BaseStream.CopyTo(stderr);
       }
 
-      process.WaitForExit();
+      if (!process.HasExited)
+        process.WaitForExit();
     }
     finally {
       if (Directory.Exists(temporaryDirectoryPath))
