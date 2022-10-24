@@ -35,7 +35,7 @@ public partial class ReplaceContentText : CliBase {
     if (
       !ParseCommonCommandLineArgs(
         ref args,
-        new[] { "-diff-test" },
+        new[] { "--diff-test" },
         out var credential
       )
     ) {
