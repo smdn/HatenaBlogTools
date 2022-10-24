@@ -3,6 +3,7 @@
 #nullable enable
 
 using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -85,15 +86,17 @@ public class AtomPubClientTests {
     var request = await task;
 
     Assert.AreEqual(WebRequestMethods.Http.Get, request.HttpMethod, nameof(request.HttpMethod));
-    Assert.AreEqual(string.IsNullOrEmpty(userAgent) ? null : userAgent, request.UserAgent, nameof(request.UserAgent));
+    Assert.AreEqual(userAgent ?? string.Empty, request.UserAgent ?? string.Empty, nameof(request.UserAgent));
     Assert.IsNotNull(request.Headers["X-WSSE"], "has X-WSSE header");
     StringAssert.Contains($"UsernameToken Username=\"{userName}\"", request.Headers["X-WSSE"], "X-WSSE header value");
 
-    CollectionAssert.Contains(request.AcceptTypes, "application/x.atom+xml");
-    CollectionAssert.Contains(request.AcceptTypes, "application/atom+xml");
-    CollectionAssert.Contains(request.AcceptTypes, "application/atomsvc+xml");
-    CollectionAssert.Contains(request.AcceptTypes, "application/xml");
-    CollectionAssert.Contains(request.AcceptTypes, "text/xml");
+    var trimmedAcceptTypes = request.AcceptTypes?.Select(static t => t?.Trim())?.ToList();
+
+    CollectionAssert.Contains(trimmedAcceptTypes, "application/x.atom+xml");
+    CollectionAssert.Contains(trimmedAcceptTypes, "application/atom+xml");
+    CollectionAssert.Contains(trimmedAcceptTypes, "application/atomsvc+xml");
+    CollectionAssert.Contains(trimmedAcceptTypes, "application/xml");
+    CollectionAssert.Contains(trimmedAcceptTypes, "text/xml");
   }
 
   [Test]
