@@ -15,7 +15,12 @@ public abstract class HatenaBlogAtomPubClient {
   {
     ServicePointManager.SecurityProtocol = SecurityProtocolType.SystemDefault;
 
-    ServicePointManager.ServerCertificateValidationCallback = (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => {
+    ServicePointManager.ServerCertificateValidationCallback = (
+      object sender,
+      X509Certificate? certificate,
+      X509Chain? chain,
+      SslPolicyErrors sslPolicyErrors
+    ) => {
       if (sslPolicyErrors == SslPolicyErrors.None) {
         return true;
       }
