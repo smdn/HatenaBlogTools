@@ -88,6 +88,8 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       return statusCode;
     if (serviceDocument is null)
       throw new InvalidOperationException("could not get response XML document");
+    if (serviceDocument.Root is null)
+      throw new InvalidOperationException("could not read response XML document (empty document)");
     if (serviceDocument.Root.Name != AtomPub.ElementNames.AppService)
       throw new NotSupportedException($"unexpected document type: {serviceDocument.Root.Name}");
 
@@ -102,7 +104,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       .Root
       .Element(AtomPub.ElementNames.AppWorkspace)
       ?.Elements(AtomPub.ElementNames.AppCollection)
-      ?.FirstOrDefault(static e => e.Element(AtomPub.ElementNames.AppAccept).Value.Contains("type=entry"))
+      ?.FirstOrDefault(static e => e.Element(AtomPub.ElementNames.AppAccept)?.Value?.Contains("type=entry") ?? false)
       ?.GetAttributeValue("href", static val => new Uri(val))
       ?? throw new InvalidOperationException("could not get blog collection URI");
 
@@ -173,8 +175,8 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       var authors = entry
         .Elements(AtomPub.Namespaces.Atom + "author")
         .Select(static elementAuthor => elementAuthor.Element(AtomPub.Namespaces.Atom + "name"))
-        .Where(static name => name.Value is not null)
-        .Select(static author => author.Value!);
+        .Where(static name => name is not null && name.Value is not null)
+        .Select(static author => author!.Value!);
 
       if (!DateTimeOffset.TryParse(entry.Element(AtomPub.Namespaces.Atom + "published")?.Value, out var datePublished))
         datePublished = DateTimeOffset.MinValue;
@@ -230,7 +232,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
     try {
       var putDocument = CreatePostDocument(updatingEntry);
 
-      putDocument.Root.Add(
+      putDocument.Root!.Add(
         updatingEntry.Authors.Select(static author =>
           string.IsNullOrEmpty(author)
             ? null
@@ -281,7 +283,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       AtomPub.Namespaces.Atom + "entry",
       new XElement(
         AtomPub.Namespaces.Atom + "title",
-        new XText(postEntry.Title)
+        postEntry.Title is null ? null : new XText(postEntry.Title)
       ),
       postEntry.DateUpdated.HasValue
         ? new XElement(
@@ -304,7 +306,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
         new XAttribute("type", postEntry.ContentType ?? EntryContentType.Default),
 #endif
         new XAttribute("type", EntryContentType.Default),
-        new XText(postEntry.Content)
+        postEntry.Content is null ? null : new XText(postEntry.Content)
       ),
       postEntry.Categories.Select(
         static c => new XElement(
