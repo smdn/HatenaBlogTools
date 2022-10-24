@@ -72,15 +72,22 @@ internal class PseudoAtomPubServer : IDisposable {
 
   private static readonly Encoding utf8nobom = new UTF8Encoding(false);
 
-  public Task<HttpListenerRequest> ProcessRequestAsync()
+  public Task<(HttpListenerRequest, Stream)> ProcessRequestAsync()
   {
     ThrowIfDisposed();
 
     return Task.Run(() => Core(listener!));
 
-    HttpListenerRequest Core(HttpListener l)
+    (HttpListenerRequest, Stream) Core(HttpListener l)
     {
       var context = l!.GetContext();
+
+      var requestStream = new MemoryStream();
+
+      context.Request.InputStream.CopyTo(requestStream);
+
+      requestStream.Position = 0L;
+
       var response = context.Response;
 
       response.ContentEncoding = utf8nobom;
@@ -114,7 +121,7 @@ internal class PseudoAtomPubServer : IDisposable {
           context.Response.OutputStream.Close();
       }
 
-      return context.Request;
+      return (context.Request, requestStream);
     }
   }
 }

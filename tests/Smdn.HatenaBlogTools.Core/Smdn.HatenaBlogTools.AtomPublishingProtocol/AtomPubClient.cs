@@ -83,7 +83,7 @@ public class AtomPubClientTests {
     Assert.AreEqual("service", responseDocument!.Root!.Name.LocalName);
     Assert.AreEqual(AtomPub.Namespaces.App.NamespaceName, responseDocument.Root!.Name.NamespaceName);
 
-    var request = await task;
+    var (request, _) = await task;
 
     Assert.AreEqual(WebRequestMethods.Http.Get, request.HttpMethod, nameof(request.HttpMethod));
     Assert.AreEqual(userAgent ?? string.Empty, request.UserAgent ?? string.Empty, nameof(request.UserAgent));
@@ -123,7 +123,7 @@ public class AtomPubClientTests {
     Assert.AreEqual(HttpStatusCode.BadRequest, status);
     Assert.IsNull(responseDocument, nameof(responseDocument));
 
-    var request = await task;
+    var (request, _) = await task;
 
     Assert.AreEqual(WebRequestMethods.Http.Get, request.HttpMethod, nameof(request.HttpMethod));
     Assert.IsNotNull(request.Headers["X-WSSE"], "has X-WSSE header");
@@ -164,7 +164,7 @@ public class AtomPubClientTests {
     Assert.AreEqual("entry", responseDocument!.Root!.Name.LocalName);
     Assert.AreEqual(AtomPub.Namespaces.Atom.NamespaceName, responseDocument.Root!.Name.NamespaceName);
 
-    var request = await task;
+    var (request, _) = await task;
 
     Assert.AreEqual(WebRequestMethods.Http.Post, request.HttpMethod, nameof(request.HttpMethod));
     Assert.IsNotNull(request.Headers["X-WSSE"], "has X-WSSE header");
@@ -201,7 +201,7 @@ public class AtomPubClientTests {
     Assert.AreEqual(HttpStatusCode.Unauthorized, status);
     Assert.IsNull(responseDocument, nameof(responseDocument));
 
-    var request = await task;
+    var (request, _) = await task;
 
     Assert.AreEqual(WebRequestMethods.Http.Post, request.HttpMethod, nameof(request.HttpMethod));
   }
@@ -240,7 +240,7 @@ public class AtomPubClientTests {
     Assert.AreEqual("entry", responseDocument!.Root!.Name.LocalName);
     Assert.AreEqual(AtomPub.Namespaces.Atom.NamespaceName, responseDocument.Root!.Name.NamespaceName);
 
-    var request = await task;
+    var (request, _) = await task;
 
     Assert.AreEqual(WebRequestMethods.Http.Put, request.HttpMethod, nameof(request.HttpMethod));
     Assert.IsNotNull(request.Headers["X-WSSE"], "has X-WSSE header");
@@ -277,7 +277,7 @@ public class AtomPubClientTests {
     Assert.AreEqual(HttpStatusCode.MethodNotAllowed, status);
     Assert.IsNull(responseDocument, nameof(responseDocument));
 
-    var request = await task;
+    var (request, _) = await task;
 
     Assert.AreEqual(WebRequestMethods.Http.Put, request.HttpMethod, nameof(request.HttpMethod));
   }
@@ -311,7 +311,7 @@ public class AtomPubClientTests {
         : client.Put(server.Url, requestDocument, out responseDocument);
     });
 
-    var request = await task;
+    var (request, requestStream) = await task;
 
     Assert.AreEqual(
       postIfTrueOtherwisePut
@@ -323,7 +323,7 @@ public class AtomPubClientTests {
 
     var requestBodyFirst5Bytes = new byte[5];
 
-    request.InputStream.Read(requestBodyFirst5Bytes, 0, requestBodyFirst5Bytes.Length);
+    requestStream.Read(requestBodyFirst5Bytes, 0, requestBodyFirst5Bytes.Length);
 
     CollectionAssert.AreEqual(
       new byte[] { (byte)'<', (byte)'?', (byte)'x', (byte)'m', (byte)'l'},
