@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 $PublishTargetFramework = 'net8.0'
-$PathToProjectToGetVersion = $([System.IO.Path]::Combine(${PSScriptRoot}, '..\src\Smdn.HatenaBlogTools.Cli.Login\Smdn.HatenaBlogTools.Cli.Login.csproj'))
+$PathToProjectToGetVersion = $([System.IO.Path]::Join(${PSScriptRoot}, '..', 'src', 'Smdn.HatenaBlogTools.Cli.Login', 'Smdn.HatenaBlogTools.Cli.Login.csproj'))
 
 # get CLI version
 dotnet build --framework net8.0 $PathToProjectToGetVersion
@@ -15,7 +15,7 @@ $Version = New-Object -TypeName System.Version -ArgumentList $InformationalVersi
 # generate a temporary solution file for build CLI assemblies
 $CliSolutionName = 'Smdn.HatenaBlogTools.Cli'
 $PathToCliSolutionDirectory = $PSScriptRoot
-$PathToCliSolutionFile = $([System.IO.Path]::Combine($PathToCliSolutionDirectory, $CliSolutionName + '.sln'))
+$PathToCliSolutionFile = $([System.IO.Path]::Join($PathToCliSolutionDirectory, $CliSolutionName + '.sln'))
 
 dotnet new sln --name $CliSolutionName --output $PathToCliSolutionDirectory
 dotnet sln $PathToCliSolutionFile add $([System.IO.Path]::Combine(${PSScriptRoot}, '..\src\Smdn.HatenaBlogTools.Cli.*\Smdn.HatenaBlogTools.Cli.*.csproj'))
