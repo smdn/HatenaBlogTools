@@ -4,9 +4,6 @@
 
 **HatenaBlogTools** is the command line tools for authoring and editting [Hatena Blog](https://hatenablog.com/).
 
-# License
-This software is released under the MIT License, see [LICENSE.txt](/LICENSE.txt).
-
 # Requirements
 Requires one of the following **.NET runtimes** to run binaries.
 
@@ -39,3 +36,15 @@ dotnet run -f net8.0 -- --help
 
 > [!NOTE]
 > 'Login' command only attempts to login Hatena Blog, and does not edit anything even if the login is successful.
+
+# Notice
+## License
+本プロジェクトは[MIT License](./LICENSE.txt)の条件に基づきライセンスされています。
+
+This project is licensed under the terms of the [MIT License](./LICENSE.txt).
+
+
+## Disclaimer
+本プロジェクトは[はてなブログ](https://hatena.blog/)および[株式会社はてな](https://hatena.co.jp/)とは無関係の、非公式なものです。
+
+This is an unofficial project that has no affiliation with [Hatena Blog](https://hatena.blog/) and [Hatena Co., Ltd.](https://hatena.co.jp/)
