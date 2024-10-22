@@ -9,6 +9,7 @@ $PathToProjectToGetVersion = $([System.IO.Path]::Combine(${PSScriptRoot}, '../sr
 dotnet build --framework net8.0 $PathToProjectToGetVersion
 $InformationalVersion = dotnet run --no-build --framework net8.0 --project $PathToProjectToGetVersion -- --version
 $InformationalVersion = $InformationalVersion -replace '\(.+\)', ''
+$InformationalVersion = $InformationalVersion -replace '\+[0-9a-z]+', ''
 $Version = New-Object -TypeName System.Version -ArgumentList $InformationalVersion
 
 # generate a temporary solution file for build CLI assemblies
@@ -20,7 +21,7 @@ dotnet new sln --name $CliSolutionName --output $PathToCliSolutionDirectory
 dotnet sln $PathToCliSolutionFile add $([System.IO.Path]::Combine(${PSScriptRoot}, '../src/Smdn.HatenaBlogTools.Cli.*/Smdn.HatenaBlogTools.Cli.*.csproj'))
 
 # determine package name and output directory
-$PackageName = "HatenaBlogTools-${Version}"
+$PackageName = "HatenaBlogTools-$($Version.Major).$($Version.Minor)"
 $PathToPublishOutputDirectory = $([System.IO.Path]::Combine(${PSScriptRoot}, $PackageName))
 
 # build and publish CLI executables
