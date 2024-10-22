@@ -59,7 +59,7 @@ public partial class FixMixedContent : CliBase {
     if (
       !ParseCommonCommandLineArgs(
         ref args,
-        new[] { "--diff-test", "--input-content", "--output-content" },
+        ["--diff-test", "--input-content", "--output-content"],
         out var credential
       )
     ) {

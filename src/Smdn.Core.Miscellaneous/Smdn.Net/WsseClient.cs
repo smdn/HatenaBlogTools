@@ -22,7 +22,7 @@ public static class WsseClient {
 
     const int nonceLength = 40;
     var nonce = new byte[nonceLength];
-    var rng = RandomNumberGenerator.Create();
+    using var rng = RandomNumberGenerator.Create();
 
     rng.GetBytes(nonce);
 

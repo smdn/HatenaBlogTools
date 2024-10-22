@@ -26,8 +26,8 @@ public class DiffCommand : IDiffGenerator {
   public void DisplayDifference(string originalText, string modifiedText)
   {
     Diff(
-      () => Console.OpenStandardOutput(),
-      () => Console.OpenStandardError(),
+      Console.OpenStandardOutput,
+      Console.OpenStandardError,
       originalText,
       modifiedText
     );
@@ -46,8 +46,13 @@ public class DiffCommand : IDiffGenerator {
       if (File.Exists("/bin/sh")) { // XXX: for unix
         var arguments = commandArgs;
 
-        if (arguments != null)
+        if (arguments != null) {
+#if SYSTEM_STRING_REPLACE_STRING_STRING_STRINGCOMPARISON
+          arguments = arguments.Replace("\"", "\\\"", StringComparison.Ordinal);
+#else
           arguments = arguments.Replace("\"", "\\\"");
+#endif
+        }
 
         arguments = $"{arguments} '{temporaryFilePathOriginal}' '{temporaryFilePathModified}'";
 
@@ -68,10 +73,7 @@ public class DiffCommand : IDiffGenerator {
       psi.StandardOutputEncoding = utf8EncodingNoBom;
       psi.StandardErrorEncoding = utf8EncodingNoBom;
 
-      using var process = Process.Start(psi);
-
-      if (process is null)
-        throw new InvalidOperationException("new process could not be started.");
+      using var process = Process.Start(psi) ?? throw new InvalidOperationException("new process could not be started.");
 
       using (var stdout = openStdout()) {
         process.StandardOutput.BaseStream.CopyTo(stdout);

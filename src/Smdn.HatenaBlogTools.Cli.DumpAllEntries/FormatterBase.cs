@@ -13,9 +13,9 @@ public abstract class FormatterBase {
   public TimeZoneInfo EntryTimeZone { get; set; } = TimeZoneInfo.Local;
 
 #if RETRIEVE_COMMENTS
-  public FormatterBase(bool retrieveComments = false) // TODO
+  protected FormatterBase(bool retrieveComments = false) // TODO
 #else
-  public FormatterBase()
+  protected FormatterBase()
 #endif
   {
   }

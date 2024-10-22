@@ -49,6 +49,8 @@ internal partial class ModifyCategory : CliBase {
     yield return "  つまり、'カテゴリが設定されてない記事に対してのみ'置換を行います";
   }
 
+  private static readonly char[] categorySplitterChars = new[] { ';' };
+
   public void Run(string[] args)
   {
     if (!ParseCommonCommandLineArgs(ref args, out var credential))
@@ -68,8 +70,8 @@ internal partial class ModifyCategory : CliBase {
           var pos = args[i].IndexOf(':');
 
           if (0 <= pos) {
-            var categoriesOld = args[i].Substring(0, pos).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-            var categoriesNew = args[i].Substring(pos + 1).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            var categoriesOld = args[i].Substring(0, pos).Split(categorySplitterChars, StringSplitOptions.RemoveEmptyEntries);
+            var categoriesNew = args[i].Substring(pos + 1).Split(categorySplitterChars, StringSplitOptions.RemoveEmptyEntries);
 
             if (0 < categoriesOld.Length || 0 < categoriesNew.Length) {
               categoryModifications.Add(

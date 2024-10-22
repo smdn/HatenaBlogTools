@@ -139,9 +139,11 @@ public class AtomPubClient {
             using var reader = new StreamReader(memoryStream, Encoding.UTF8);
             Console.Error.WriteLine(reader.ReadToEnd());
           }
+#pragma warning disable CA1031
           catch {
             // ignore exceptions
           }
+#pragma warning restore CA1031
         }
 
         return response.StatusCode;

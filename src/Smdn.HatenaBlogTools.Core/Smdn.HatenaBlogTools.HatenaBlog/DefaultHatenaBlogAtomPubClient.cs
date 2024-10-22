@@ -17,7 +17,7 @@ namespace Smdn.HatenaBlogTools.HatenaBlog;
 
 internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
   private static Uri? ToUriNullable(string? val) => val is null ? null : new Uri(val);
-  private static Exception CreateNotLoggedIn() => new InvalidOperationException($"not logged in yet. call {nameof(Login)}() first.");
+  private static InvalidOperationException CreateNotLoggedIn() => new($"not logged in yet. call {nameof(Login)}() first.");
 
   private readonly HatenaBlogAtomPubCredential credential;
 
@@ -105,7 +105,7 @@ internal class DefaultHatenaBlogAtomPubClient : HatenaBlogAtomPubClient {
       .Element(AtomPub.ElementNames.AppWorkspace)
       ?.Elements(AtomPub.ElementNames.AppCollection)
       ?.FirstOrDefault(static e => e.Element(AtomPub.ElementNames.AppAccept)?.Value?.Contains("type=entry") ?? false)
-      ?.GetAttributeValue("href", static val => new Uri(val))
+      ?.GetAttributeValue("href", static val => val is null ? null : new Uri(val))
       ?? throw new InvalidOperationException("could not get blog collection URI");
 
     return statusCode;
