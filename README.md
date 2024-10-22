@@ -37,4 +37,5 @@ dotnet run -f net8.0 -- --id <your-hatena-id> --blog-id <your.hatena.blog.domain
 dotnet run -f net8.0 -- --help
 ```
 
+> [!NOTE]
 > 'Login' command only attempts to login Hatena Blog, and does not edit anything even if the login is successful.
