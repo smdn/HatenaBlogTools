@@ -21,6 +21,14 @@ SPDX-License-Identifier: MIT
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
+  <PropertyGroup Label="common project configurations">
+    <NoWarn>CA1032;$(NoWarn)</NoWarn> <!-- CA1032: Add the following constructor to XxxException -->
+    <NoWarn>CA1062;$(NoWarn)</NoWarn> <!-- CA1062: 検証パラメーターが使用前に非 null です。適切であれば、引数が null の場合に ArgumentNullException をスローします。 -->
+    <NoWarn>CS1591;$(NoWarn)</NoWarn> <!-- CS1591: Missing XML comment for publicly visible type or member 'Type_or_Member' -->
+    <NoWarn>IDE1006;$(NoWarn)</NoWarn> <!-- IDE1006: Naming rule violation: These words must begin with upper case characters: -->
+    <NoWarn>SYSLIB1045;$(NoWarn)</NoWarn> <!-- SYSLIB1045: コンパイル時に正規表現の実装を生成するには、'GeneratedRegexAttribute' を使用します。 -->
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference
       Include="Smdn.MSBuild.DefineConstants.NETSdkApi"
