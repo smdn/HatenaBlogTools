@@ -2,12 +2,12 @@
 # SPDX-FileCopyrightText: 2022 smdn <smdn@smdn.jp>
 # SPDX-License-Identifier: MIT
 
-$PublishTargetFramework = 'netcoreapp3.1'
+$PublishTargetFramework = 'net8.0'
 $PathToProjectToGetVersion = $([System.IO.Path]::Combine(${PSScriptRoot}, '../src/Smdn.HatenaBlogTools.Cli.Login/Smdn.HatenaBlogTools.Cli.Login.csproj'))
 
 # get CLI version
-dotnet build --framework net6.0 $PathToProjectToGetVersion
-$InformationalVersion = dotnet run --no-build --framework net6.0 --project $PathToProjectToGetVersion -- --version
+dotnet build --framework net8.0 $PathToProjectToGetVersion
+$InformationalVersion = dotnet run --no-build --framework net8.0 --project $PathToProjectToGetVersion -- --version
 $InformationalVersion = $InformationalVersion -replace '\(.+\)', ''
 $Version = New-Object -TypeName System.Version -ArgumentList $InformationalVersion
 
