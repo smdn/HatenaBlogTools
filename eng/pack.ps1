@@ -17,8 +17,13 @@ $CliSolutionName = 'Smdn.HatenaBlogTools.Cli'
 $PathToCliSolutionDirectory = $PSScriptRoot
 $PathToCliSolutionFile = $([System.IO.Path]::Join($PathToCliSolutionDirectory, $CliSolutionName + '.sln'))
 
-dotnet new sln --name $CliSolutionName --output $PathToCliSolutionDirectory
-dotnet sln $PathToCliSolutionFile add $([System.IO.Path]::Combine(${PSScriptRoot}, '..\src\Smdn.HatenaBlogTools.Cli.*\Smdn.HatenaBlogTools.Cli.*.csproj'))
+dotnet new sln --name $CliSolutionName --output $PathToCliSolutionDirectory --force
+
+$ProjectFilesToPublish = Get-ChildItem -Path $([System.IO.Path]::Join(${PSScriptRoot}, '..', 'src', 'Smdn.HatenaBlogTools.Cli.*', '*')) -Filter '*.csproj'
+
+foreach ($ProjectFile in $ProjectFilesToPublish) {
+  dotnet sln $PathToCliSolutionFile add $ProjectFile
+}
 
 # determine package name and output directory
 $PackageName = "HatenaBlogTools-$($Version.Major).$($Version.Minor)"
