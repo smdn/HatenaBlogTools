@@ -42,6 +42,9 @@ on:
         description: "The common extra options to be set on running the `dotnet restore/build/test` command."
         required: false
         type: string
+        # set '/maxcpucount:1' to avoid 'error MSB4018: The "GenerateDepsFile" task failed unexpectedly'
+        # ref: https://github.com/dotnet/sdk/issues/2902
+        default: "/maxcpucount:1"
 
       dotnet_test_options_verbosity_level:
         description: "The argument to be set to the `--verbosity <LEVEL>` option of the `dotnet test` command. <LEVEL> := q[uiet], m[inimal], n[ormal], d[etailed], diag[nostic]"
