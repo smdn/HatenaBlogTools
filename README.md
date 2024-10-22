@@ -10,10 +10,9 @@ This software is released under the MIT License, see [LICENSE.txt](/LICENSE.txt)
 # Requirements
 Requires one of the following **.NET runtimes** to run binaries.
 
-- [.NET Runtime](https://dotnet.microsoft.com/download/dotnet/6.0) 6.0 or over
-- [.NET Core Runtime](https://dotnet.microsoft.com/download/dotnet/3.1) 3.1 or over
+- [.NET Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) 8.0 or over
 
-Also requires **.NET SDK** 6.0 to build and run from source codes.
+Also requires **.NET SDK** 8.0 to build and run from source codes.
 
 # Install & How to use
 see https://smdn.jp/works/tools/HatenaBlogTools/
@@ -29,13 +28,13 @@ cd src/Smdn.HatenaBlogTools.Cli.Login/
 dotnet restore
 
 # build the command
-dotnet build -f net6.0
+dotnet build -f net8.0
 
 # run the command
-dotnet run -f net6.0 -- --id <your-hatena-id> --blog-id <your.hatena.blog.domain> --api-key <your-api-key>
+dotnet run -f net8.0 -- --id <your-hatena-id> --blog-id <your.hatena.blog.domain> --api-key <your-api-key>
 
 # show usage of the command
-dotnet run -f net6.0 -- --help
+dotnet run -f net8.0 -- --help
 ```
 
 > 'Login' command only attempts to login Hatena Blog, and does not edit anything even if the login is successful.
