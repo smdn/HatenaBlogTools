@@ -70,16 +70,16 @@ public class HatenaDiaryFormatterTests {
     var doc = XDocument.Load(formatter.ToStream(new[] { entry }));
     var day = doc.Root!.Element("day")!;
 
-    Assert.AreEqual(expectedDateString, day.Attribute("date")?.Value);
+    Assert.That(day.Attribute("date")?.Value, Is.EqualTo(expectedDateString));
 
     var body = day.Element("body")!;
     var bodyLines = new StringReader(body.Value).ReadAllLines();
     var firstLine = bodyLines.FirstOrDefault();
 
-    Assert.IsNotNull(firstLine);
-    Assert.AreEqual(
-      $"*{dateUpdated.ToUnixTimeSeconds():D}*entry0",
-      firstLine
+    Assert.That(firstLine, Is.Not.Null);
+    Assert.That(
+      firstLine,
+      Is.EqualTo($"*{dateUpdated.ToUnixTimeSeconds():D}*entry0")
     );
   }
 
@@ -112,32 +112,32 @@ public class HatenaDiaryFormatterTests {
     var doc = XDocument.Load(new HatenaDiaryFormatter().ToStream(new[] { entry }));
 
     // /diary
-    Assert.AreEqual("diary", doc.Root!.Name.LocalName);
+    Assert.That(doc.Root!.Name.LocalName, Is.EqualTo("diary"));
 
     // /diary/day
-    Assert.AreEqual(1, doc.Root!.Elements("day").Count());
+    Assert.That(doc.Root!.Elements("day").Count(), Is.EqualTo(1));
 
     var day = doc.Root!.Element("day")!;
 
-    Assert.AreEqual(dateUpdated.LocalDateTime.ToString("yyyy-MM-dd"), day.Attribute("date")?.Value);
-    Assert.IsEmpty(day.Attribute("title")?.Value);
+    Assert.That(day.Attribute("date")?.Value, Is.EqualTo(dateUpdated.LocalDateTime.ToString("yyyy-MM-dd")));
+    Assert.That(day.Attribute("title")?.Value, Is.Empty);
 
     // /diary/day/body
-    Assert.AreEqual(1, day.Elements("body").Count());
+    Assert.That(day.Elements("body").Count(), Is.EqualTo(1));
 
     var body = day.Element("body")!;
     var bodyLines = new StringReader(body.Value).ReadAllLines();
     var firstLine = bodyLines.FirstOrDefault();
 
-    Assert.IsNotNull(firstLine);
-    Assert.AreEqual(
-      $"*{dateUpdated.ToUnixTimeSeconds():D}*[entry0-category0][entry0-category1][entry0-category2]entry0",
-      firstLine
+    Assert.That(firstLine, Is.Not.Null);
+    Assert.That(
+      firstLine,
+      Is.EqualTo($"*{dateUpdated.ToUnixTimeSeconds():D}*[entry0-category0][entry0-category1][entry0-category2]entry0")
     );
 
-    StringAssert.StartsWith(
-      entry.Content,
-      string.Join("\n", bodyLines.Skip(1))
+    Assert.That(
+      string.Join("\n", bodyLines.Skip(1)),
+      Does.StartWith(entry.Content)
     );
   }
 
@@ -176,8 +176,8 @@ public class HatenaDiaryFormatterTests {
     );
     var bodyText = day.Value;
 
-    StringAssert.Contains($"*{dateUpdatedEntry0.ToUnixTimeSeconds():D}*entry0\nentry0-content", bodyText.Replace("\r", string.Empty));
-    StringAssert.Contains($"*{dateUpdatedEntry1.ToUnixTimeSeconds():D}*entry1\nentry1-content", bodyText.Replace("\r", string.Empty));
+    Assert.That(bodyText.Replace("\r", string.Empty), Does.Contain($"*{dateUpdatedEntry0.ToUnixTimeSeconds():D}*entry0\nentry0-content"));
+    Assert.That(bodyText.Replace("\r", string.Empty), Does.Contain($"*{dateUpdatedEntry1.ToUnixTimeSeconds():D}*entry1\nentry1-content"));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_TestFormat_MultipleEntries_DifferentDate()
@@ -214,12 +214,12 @@ public class HatenaDiaryFormatterTests {
       e => string.Equals(dateUpdatedEntry0.LocalDateTime.ToString("yyyy-MM-dd"), e.Attribute("date")?.Value, StringComparison.Ordinal)
     );
 
-    StringAssert.Contains($"*{dateUpdatedEntry0.ToUnixTimeSeconds():D}*entry0\nentry0-content\n", firstDay.Element("body")!.Value.Replace("\r", string.Empty));
+    Assert.That(firstDay.Element("body")!.Value.Replace("\r", string.Empty), Does.Contain($"*{dateUpdatedEntry0.ToUnixTimeSeconds():D}*entry0\nentry0-content\n"));
 
     var secondDay = doc.Root!.Elements("day").First(
       e => string.Equals(dateUpdatedEntry1.LocalDateTime.ToString("yyyy-MM-dd"), e.Attribute("date")?.Value, StringComparison.Ordinal)
     );
 
-    StringAssert.Contains($"*{dateUpdatedEntry1.ToUnixTimeSeconds():D}*entry1\nentry1-content\n", secondDay.Element("body")!.Value.Replace("\r", string.Empty));
+    Assert.That(secondDay.Element("body")!.Value.Replace("\r", string.Empty), Does.Contain($"*{dateUpdatedEntry1.ToUnixTimeSeconds():D}*entry1\nentry1-content\n"));
   }
 }

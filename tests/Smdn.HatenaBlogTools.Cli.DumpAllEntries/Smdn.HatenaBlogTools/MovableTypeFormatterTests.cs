@@ -24,7 +24,7 @@ public class MovableTypeFormatterTests {
 
   [TestCaseSource(nameof(YieldTestCases_TestToDateString_DateTime))]
   public void TestToDateString_DateTime(DateTime dateTime, string expected)
-    => Assert.AreEqual(expected, MovableTypeFormatter.ToDateString(dateTime));
+    => Assert.That(MovableTypeFormatter.ToDateString(dateTime), Is.EqualTo(expected));
 
   private static System.Collections.IEnumerable YieldTestCases_TestToDateString_DateTimeOffset()
   {
@@ -43,7 +43,7 @@ public class MovableTypeFormatterTests {
 
   [TestCaseSource(nameof(YieldTestCases_TestToDateString_DateTimeOffset))]
   public void TestToDateString_DateTimeOffset(DateTimeOffset dateTimeOffset, string expected)
-    => Assert.AreEqual(expected, MovableTypeFormatter.ToDateString(dateTimeOffset));
+    => Assert.That(MovableTypeFormatter.ToDateString(dateTimeOffset), Is.EqualTo(expected));
 
   private static void Format(
     IEnumerable<PostedEntry> entries,
@@ -135,9 +135,9 @@ public class MovableTypeFormatterTests {
 
     Format(new[] { entry }, TimeZoneInfo.FindSystemTimeZoneById(timeZoneId), out var formattedText, out var _);
 
-    StringAssert.Contains(
-      "DATE: " + expectedDateString,
-      formattedText
+    Assert.That(
+      formattedText,
+      Does.Contain("DATE: " + expectedDateString)
     );
   }
 
@@ -184,9 +184,9 @@ entry0-formatted-content
 
     Format(new[] { entry }, null, out var formattedText, out var _);
 
-    Assert.AreEqual(
-      expectedResult.Replace("\r", string.Empty),
-      formattedText
+    Assert.That(
+      formattedText,
+      Is.EqualTo(expectedResult.Replace("\r", string.Empty))
     );
   }
 
@@ -233,9 +233,9 @@ entry1-formatted-content
 
     Format(entries, null, out var formattedText, out var _);
 
-    Assert.AreEqual(
-      expectedResult.Replace("\r", string.Empty),
-      formattedText.Replace(" \n", "\n") // trim line endings
+    Assert.That(
+      formattedText.Replace(" \n", "\n"),
+      Is.EqualTo(expectedResult.Replace("\r", string.Empty)) // trim line endings
     );
   }
 }

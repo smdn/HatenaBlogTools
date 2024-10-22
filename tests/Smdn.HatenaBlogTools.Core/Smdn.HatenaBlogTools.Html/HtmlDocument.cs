@@ -13,8 +13,8 @@ public class HtmlDocumentTests {
   {
     var doc = new HtmlDocument(input);
 
-    Assert.IsEmpty(doc.Elements, "element count");
-    Assert.AreEqual(input, doc.ToString(), "reconstructed document");
+    Assert.That(doc.Elements, Is.Empty, "element count");
+    Assert.That(doc.ToString(), Is.EqualTo(input), "reconstructed document");
   }
 
   [TestCase("<p>")]
@@ -25,10 +25,10 @@ public class HtmlDocumentTests {
   {
     var doc = new HtmlDocument(input);
 
-    Assert.AreEqual(1, doc.Elements.Count, "element count");
-    Assert.AreEqual("p", doc.Elements[0].LocalName, "element local name #0");
+    Assert.That(doc.Elements.Count, Is.EqualTo(1), "element count");
+    Assert.That(doc.Elements[0].LocalName, Is.EqualTo("p"), "element local name #0");
 
-    Assert.AreEqual(input, doc.ToString(), "reconstructed document");
+    Assert.That(doc.ToString(), Is.EqualTo(input), "reconstructed document");
   }
 
   [TestCase("</p>")]
@@ -39,9 +39,9 @@ public class HtmlDocumentTests {
   {
     var doc = new HtmlDocument(input);
 
-    Assert.AreEqual(0, doc.Elements.Count, "element count");
+    Assert.That(doc.Elements.Count, Is.EqualTo(0), "element count");
 
-    Assert.AreEqual(input, doc.ToString(), "reconstructed document");
+    Assert.That(doc.ToString(), Is.EqualTo(input), "reconstructed document");
   }
 
   [TestCase("<p>text<p>")]
@@ -53,7 +53,7 @@ public class HtmlDocumentTests {
   {
     var doc = new HtmlDocument(input);
 
-    Assert.AreEqual(input, doc.ToString(), "reconstructed document");
+    Assert.That(doc.ToString(), Is.EqualTo(input), "reconstructed document");
   }
 
   [TestCase("<p class='parag' id='p1'>")]
@@ -72,18 +72,18 @@ public class HtmlDocumentTests {
   {
     var doc = new HtmlDocument(input);
 
-    Assert.AreEqual(1, doc.Elements.Count, "element count");
-    Assert.AreEqual("p", doc.Elements[0].LocalName, "element local name #0");
+    Assert.That(doc.Elements.Count, Is.EqualTo(1), "element count");
+    Assert.That(doc.Elements[0].LocalName, Is.EqualTo("p"), "element local name #0");
 
-    Assert.AreEqual(2, doc.Elements[0].Attributes.Count, "element #0 attribute count");
+    Assert.That(doc.Elements[0].Attributes.Count, Is.EqualTo(2), "element #0 attribute count");
 
-    Assert.AreEqual("class", doc.Elements[0].Attributes[0].Name, "element #0 attribute #0 name");
-    Assert.AreEqual("parag", doc.Elements[0].Attributes[0].Value, "element #0 attribute #0 value");
+    Assert.That(doc.Elements[0].Attributes[0].Name, Is.EqualTo("class"), "element #0 attribute #0 name");
+    Assert.That(doc.Elements[0].Attributes[0].Value, Is.EqualTo("parag"), "element #0 attribute #0 value");
 
-    Assert.AreEqual("id", doc.Elements[0].Attributes[1].Name, "element #0 attribute #1 name");
-    Assert.AreEqual("p1", doc.Elements[0].Attributes[1].Value, "element #0 attribute #1 value");
+    Assert.That(doc.Elements[0].Attributes[1].Name, Is.EqualTo("id"), "element #0 attribute #1 name");
+    Assert.That(doc.Elements[0].Attributes[1].Value, Is.EqualTo("p1"), "element #0 attribute #1 value");
 
-    Assert.AreEqual(input, doc.ToString(), "reconstructed document");
+    Assert.That(doc.ToString(), Is.EqualTo(input), "reconstructed document");
   }
 
   [TestCase("<e attr1='val1' attr2>")]
@@ -102,18 +102,18 @@ public class HtmlDocumentTests {
   {
     var doc = new HtmlDocument(input);
 
-    Assert.AreEqual(1, doc.Elements.Count, "element count");
-    Assert.AreEqual("e", doc.Elements[0].LocalName, "element local name #0");
+    Assert.That(doc.Elements.Count, Is.EqualTo(1), "element count");
+    Assert.That(doc.Elements[0].LocalName, Is.EqualTo("e"), "element local name #0");
 
-    Assert.AreEqual(2, doc.Elements[0].Attributes.Count, "element #0 attribute count");
+    Assert.That(doc.Elements[0].Attributes.Count, Is.EqualTo(2), "element #0 attribute count");
 
-    Assert.AreEqual("attr1", doc.Elements[0].Attributes[0].Name, "element #0 attribute #0 name");
-    Assert.AreEqual("val1", doc.Elements[0].Attributes[0].Value, "element #0 attribute #0 value");
+    Assert.That(doc.Elements[0].Attributes[0].Name, Is.EqualTo("attr1"), "element #0 attribute #0 name");
+    Assert.That(doc.Elements[0].Attributes[0].Value, Is.EqualTo("val1"), "element #0 attribute #0 value");
 
-    Assert.AreEqual("attr2", doc.Elements[0].Attributes[1].Name, "element #0 attribute #1 name");
-    Assert.AreEqual(null, doc.Elements[0].Attributes[1].Value, "element #0 attribute #1 value");
+    Assert.That(doc.Elements[0].Attributes[1].Name, Is.EqualTo("attr2"), "element #0 attribute #1 name");
+    Assert.That(doc.Elements[0].Attributes[1].Value, Is.EqualTo(null), "element #0 attribute #1 value");
 
-    Assert.AreEqual(input, doc.ToString(), "reconstructed document");
+    Assert.That(doc.ToString(), Is.EqualTo(input), "reconstructed document");
   }
 
   [TestCase("<e attr1 attr2='val2'>")]
@@ -132,18 +132,18 @@ public class HtmlDocumentTests {
   {
     var doc = new HtmlDocument(input);
 
-    Assert.AreEqual(1, doc.Elements.Count, "element count");
-    Assert.AreEqual("e", doc.Elements[0].LocalName, "element local name #0");
+    Assert.That(doc.Elements.Count, Is.EqualTo(1), "element count");
+    Assert.That(doc.Elements[0].LocalName, Is.EqualTo("e"), "element local name #0");
 
-    Assert.AreEqual(2, doc.Elements[0].Attributes.Count, "element #0 attribute count");
+    Assert.That(doc.Elements[0].Attributes.Count, Is.EqualTo(2), "element #0 attribute count");
 
-    Assert.AreEqual("attr1", doc.Elements[0].Attributes[0].Name, "element #0 attribute #0 name");
-    Assert.AreEqual(null, doc.Elements[0].Attributes[0].Value, "element #0 attribute #0 value");
+    Assert.That(doc.Elements[0].Attributes[0].Name, Is.EqualTo("attr1"), "element #0 attribute #0 name");
+    Assert.That(doc.Elements[0].Attributes[0].Value, Is.EqualTo(null), "element #0 attribute #0 value");
 
-    Assert.AreEqual("attr2", doc.Elements[0].Attributes[1].Name, "element #0 attribute #1 name");
-    Assert.AreEqual("val2", doc.Elements[0].Attributes[1].Value, "element #0 attribute #1 value");
+    Assert.That(doc.Elements[0].Attributes[1].Name, Is.EqualTo("attr2"), "element #0 attribute #1 name");
+    Assert.That(doc.Elements[0].Attributes[1].Value, Is.EqualTo("val2"), "element #0 attribute #1 value");
 
-    Assert.AreEqual(input, doc.ToString(), "reconstructed document");
+    Assert.That(doc.ToString(), Is.EqualTo(input), "reconstructed document");
   }
 
   [TestCase("<e attr='val'>", "<e attr='al'>")]
@@ -164,7 +164,7 @@ public class HtmlDocumentTests {
       }
     }
 
-    Assert.AreEqual(expectedResult, doc.ToString(), "reconstructed document");
+    Assert.That(doc.ToString(), Is.EqualTo(expectedResult), "reconstructed document");
   }
 
   [TestCase("<e attr='val'>", "<e attr=' val'>")]
@@ -185,6 +185,6 @@ public class HtmlDocumentTests {
       }
     }
 
-    Assert.AreEqual(expectedResult, doc.ToString(), "reconstructed document");
+    Assert.That(doc.ToString(), Is.EqualTo(expectedResult), "reconstructed document");
   }
 }
