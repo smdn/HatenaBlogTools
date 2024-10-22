@@ -31,7 +31,10 @@ dotnet publish --configuration Release --framework $PublishTargetFramework --no-
 # create ZIP archive
 $PathToArchive = $([System.IO.Path]::Combine(${PSScriptRoot}, $PackageName + ".zip"))
 
-Remove-Item -Path $PathToArchive # remove existing file before creating archive
+if (Test-Path $PathToArchive) {
+  # remove existing file before creating archive
+  Remove-Item -Path $PathToArchive
+}
 Compress-Archive -CompressionLevel Optimal -Path ${PathToPublishOutputDirectory} -DestinationPath $PathToArchive
 
 # delete the temporary output directory
