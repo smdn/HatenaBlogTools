@@ -37,21 +37,21 @@ public class BloggerFormatterTests {
     // /feed
     var elementFeed = doc.Root!;
 
-    Assert.AreEqual(
-      AtomPub.Namespaces.Atom + "feed",
-      elementFeed.Name
+    Assert.That(
+      elementFeed.Name,
+      Is.EqualTo(AtomPub.Namespaces.Atom + "feed")
     );
 
     // /feed/title
-    Assert.AreEqual(
-      blogTitle,
-      elementFeed.Element(AtomPub.Namespaces.Atom + "title")?.Value
+    Assert.That(
+      elementFeed.Element(AtomPub.Namespaces.Atom + "title")?.Value,
+      Is.EqualTo(blogTitle)
     );
 
     // /feed/generator
-    Assert.AreEqual(
-      "Blogger",
-      elementFeed.Element(AtomPub.Namespaces.Atom + "generator")?.Value
+    Assert.That(
+      elementFeed.Element(AtomPub.Namespaces.Atom + "generator")?.Value,
+      Is.EqualTo("Blogger")
     );
 
     // /feed/entry
@@ -61,56 +61,56 @@ public class BloggerFormatterTests {
         e.Element(AtomPub.Namespaces.Atom + "category")?.HasAttributeWithValue("term", "http://schemas.google.com/blogger/2008/kind#post") ?? false
       ).ToList();
 
-    Assert.AreEqual(
-      1,
-      elementsEntryOfPost.Count
+    Assert.That(
+      elementsEntryOfPost.Count,
+      Is.EqualTo(1)
     );
 
     var elementEntry = elementsEntryOfPost.First();
 
     // /feed/entry/id
-    Assert.AreEqual(
-      entry.Id!.AbsoluteUri,
-      elementEntry.Element(AtomPub.Namespaces.Atom + "id")?.Value
+    Assert.That(
+      elementEntry.Element(AtomPub.Namespaces.Atom + "id")?.Value,
+      Is.EqualTo(entry.Id!.AbsoluteUri)
     );
 
     // /feed/entry/author
-    CollectionAssert.AreEquivalent(
-      entry.Authors,
-      elementEntry.Elements(AtomPub.Namespaces.Atom + "author").Elements(AtomPub.Namespaces.Atom + "name").Select(e => e.Value)
+    Assert.That(
+      elementEntry.Elements(AtomPub.Namespaces.Atom + "author").Elements(AtomPub.Namespaces.Atom + "name").Select(e => e.Value),
+      Is.EquivalentTo(entry.Authors)
     );
 
     // /feed/entry/published
-    Assert.IsNotNull(elementEntry.Element(AtomPub.Namespaces.Atom + "published"));
-    Assert.AreEqual(
-      entry.DatePublished,
-      DateTimeOffset.Parse(elementEntry.Element(AtomPub.Namespaces.Atom + "published")!.Value)
+    Assert.That(elementEntry.Element(AtomPub.Namespaces.Atom + "published"), Is.Not.Null);
+    Assert.That(
+      DateTimeOffset.Parse(elementEntry.Element(AtomPub.Namespaces.Atom + "published")!.Value, formatProvider: null),
+      Is.EqualTo(entry.DatePublished)
     );
 
     // /feed/entry/updated
-    Assert.IsNotNull(elementEntry.Element(AtomPub.Namespaces.Atom + "published"));
-    Assert.AreEqual(
-      entry.DateUpdated,
-      DateTimeOffset.Parse(elementEntry.Element(AtomPub.Namespaces.Atom + "updated")!.Value)
+    Assert.That(elementEntry.Element(AtomPub.Namespaces.Atom + "published"), Is.Not.Null);
+    Assert.That(
+      DateTimeOffset.Parse(elementEntry.Element(AtomPub.Namespaces.Atom + "updated")!.Value, formatProvider: null),
+      Is.EqualTo(entry.DateUpdated)
     );
 
     // /feed/entry/title
-    Assert.IsNotNull(elementEntry.Element(AtomPub.Namespaces.Atom + "title"));
-    Assert.AreEqual(
-      entry.Title,
-      elementEntry.Element(AtomPub.Namespaces.Atom + "title")!.Value
+    Assert.That(elementEntry.Element(AtomPub.Namespaces.Atom + "title"), Is.Not.Null);
+    Assert.That(
+      elementEntry.Element(AtomPub.Namespaces.Atom + "title")!.Value,
+      Is.EqualTo(entry.Title)
     );
 
     // /feed/entry/app:control/app:draft
-    Assert.IsNull(elementEntry.Element(AtomPub.Namespaces.App + "control"));
+    Assert.That(elementEntry.Element(AtomPub.Namespaces.App + "control"), Is.Null);
 
     // /feed/entry/category
-    Assert.AreEqual(
-      "http://schemas.google.com/blogger/2008/kind#post",
+    Assert.That(
       elementEntry
         .Elements(AtomPub.Namespaces.Atom + "category")
         .FirstOrDefault(e => e.HasAttributeWithValue("scheme", "http://schemas.google.com/g/2005#kind"))
-        ?.GetAttributeValue("term")
+        ?.GetAttributeValue("term"),
+      Is.EqualTo("http://schemas.google.com/blogger/2008/kind#post")
     );
 
     var categories = elementEntry
@@ -118,20 +118,20 @@ public class BloggerFormatterTests {
       .Where(e => e.HasAttributeWithValue("scheme", "http://www.blogger.com/atom/ns#"))
       .Select(e => e.GetAttributeValue("term"));
 
-    CollectionAssert.AreEquivalent(
-      entry.Categories,
-      categories
+    Assert.That(
+      categories,
+      Is.EquivalentTo(entry.Categories)
     );
 
     // /feed/entry/content
-    Assert.AreEqual(
-      "html",
-      elementEntry.Element(AtomPub.Namespaces.Atom + "content")?.GetAttributeValue("type")
+    Assert.That(
+      elementEntry.Element(AtomPub.Namespaces.Atom + "content")?.GetAttributeValue("type"),
+      Is.EqualTo("html")
     );
 
-    Assert.AreEqual(
-      entry.FormattedContent,
-      elementEntry.Element(AtomPub.Namespaces.Atom + "content")?.Value
+    Assert.That(
+      elementEntry.Element(AtomPub.Namespaces.Atom + "content")?.Value,
+      Is.EqualTo(entry.FormattedContent)
     );
   }
 
@@ -158,11 +158,11 @@ public class BloggerFormatterTests {
       );
 
     // /feed/entry/app:control/app:draft
-    Assert.IsNotNull(elementEntry.Element(AtomPub.Namespaces.App + "control"));
-    Assert.IsNotNull(elementEntry.Element(AtomPub.Namespaces.App + "control")!.Element(AtomPub.Namespaces.App + "draft"));
-    Assert.AreEqual(
-      "yes",
-      elementEntry.Element(AtomPub.Namespaces.App + "control")!.Element(AtomPub.Namespaces.App + "draft")!.Value
+    Assert.That(elementEntry.Element(AtomPub.Namespaces.App + "control"), Is.Not.Null);
+    Assert.That(elementEntry.Element(AtomPub.Namespaces.App + "control")!.Element(AtomPub.Namespaces.App + "draft"), Is.Not.Null);
+    Assert.That(
+      elementEntry.Element(AtomPub.Namespaces.App + "control")!.Element(AtomPub.Namespaces.App + "draft")!.Value,
+      Is.EqualTo("yes")
     );
   }
 
@@ -197,25 +197,25 @@ public class BloggerFormatterTests {
       )
       .ToList();
 
-    Assert.AreEqual(2, elementListEntries.Count);
+    Assert.That(elementListEntries.Count, Is.EqualTo(2));
 
     for (var index = 0; index < entries.Length; index++) {
       // /feed/entry[index]/id
-      Assert.AreEqual(
-        entries[index].Id!.AbsoluteUri,
-        elementListEntries[index].Element(AtomPub.Namespaces.Atom + "id")?.Value
+      Assert.That(
+        elementListEntries[index].Element(AtomPub.Namespaces.Atom + "id")?.Value,
+        Is.EqualTo(entries[index].Id!.AbsoluteUri)
       );
 
       // /feed/entry[index]/title
-      Assert.AreEqual(
-        entries[index].Title,
-        elementListEntries[index].Element(AtomPub.Namespaces.Atom + "title")?.Value
+      Assert.That(
+        elementListEntries[index].Element(AtomPub.Namespaces.Atom + "title")?.Value,
+        Is.EqualTo(entries[index].Title)
       );
 
       // /feed/entry[index]/title
-      Assert.AreEqual(
-        entries[index].FormattedContent,
-        elementListEntries[index].Element(AtomPub.Namespaces.Atom + "content")?.Value
+      Assert.That(
+        elementListEntries[index].Element(AtomPub.Namespaces.Atom + "content")?.Value,
+        Is.EqualTo(entries[index].FormattedContent)
       );
     }
   }

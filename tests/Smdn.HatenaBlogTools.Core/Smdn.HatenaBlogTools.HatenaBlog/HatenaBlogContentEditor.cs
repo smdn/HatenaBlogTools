@@ -75,7 +75,7 @@ public class HatenaBlogContentEditorTests {
 
     editor.FixMixedContentReferences();
 
-    Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
+    Assert.That(editor.ToString(), Is.EqualTo(expectedResult), "modified content");
   }
 
   [TestCase("<img src=\"https://example.com/test.dat\">",
@@ -92,7 +92,7 @@ public class HatenaBlogContentEditorTests {
 
     editor.FixMixedContentReferences();
 
-    Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
+    Assert.That(editor.ToString(), Is.EqualTo(expectedResult), "modified content");
   }
 
   [TestCase("<img src=\"//example.com/test.dat\">")]
@@ -102,7 +102,7 @@ public class HatenaBlogContentEditorTests {
 
     editor.FixMixedContentReferences();
 
-    Assert.AreEqual(input, editor.ToString(), "modified content");
+    Assert.That(editor.ToString(), Is.EqualTo(input), "modified content");
   }
 
   [TestCase("<img src=\"/test.dat\">")]
@@ -114,7 +114,7 @@ public class HatenaBlogContentEditorTests {
 
     editor.FixMixedContentReferences();
 
-    Assert.AreEqual(input, editor.ToString(), "modified content");
+    Assert.That(editor.ToString(), Is.EqualTo(input), "modified content");
   }
 
   [TestCase("<img src=\"ftps://example.com/test.dat\">")]
@@ -124,7 +124,7 @@ public class HatenaBlogContentEditorTests {
 
     editor.FixMixedContentReferences();
 
-    Assert.AreEqual(input, editor.ToString(), "modified content");
+    Assert.That(editor.ToString(), Is.EqualTo(input), "modified content");
   }
 
   [TestCase("<link rel=\"canonical\" href=\"http://example.com/test.dat\">")]
@@ -134,7 +134,7 @@ public class HatenaBlogContentEditorTests {
 
     editor.FixMixedContentReferences();
 
-    Assert.AreEqual(input, editor.ToString(), "modified content");
+    Assert.That(editor.ToString(), Is.EqualTo(input), "modified content");
   }
 
   [TestCase("<a href=\"http://example.com/test.dat\">")]
@@ -146,7 +146,7 @@ public class HatenaBlogContentEditorTests {
 
     editor.FixMixedContentReferences();
 
-    Assert.AreEqual(input, editor.ToString(), "modified content");
+    Assert.That(editor.ToString(), Is.EqualTo(input), "modified content");
   }
 
   [TestCase("http://example.com/test.dat")]
@@ -158,7 +158,7 @@ public class HatenaBlogContentEditorTests {
 
     editor.FixMixedContentReferences();
 
-    Assert.AreEqual(input, editor.ToString(), "modified content");
+    Assert.That(editor.ToString(), Is.EqualTo(input), "modified content");
   }
 
   [TestCase("<img src=\"http://example.com/test.dat\">", "<img src=\"https://example.com/test.dat\">")]
@@ -169,7 +169,7 @@ public class HatenaBlogContentEditorTests {
 
     editor.FixMixedContentReferences(attribute => attribute.Value!.Contains("//example.com/"));
 
-    Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
+    Assert.That(editor.ToString(), Is.EqualTo(expectedResult), "modified content");
   }
 
 
@@ -193,7 +193,7 @@ public class HatenaBlogContentEditorTests {
 
     editor.ReplaceBlogUrlToHttps(new[] { "example.com", "example.net" });
 
-    Assert.AreEqual(expectedResult, editor.ToString(), "modified content");
+    Assert.That(editor.ToString(), Is.EqualTo(expectedResult), "modified content");
   }
 
   [TestCase("http://example.net/")]
@@ -204,6 +204,6 @@ public class HatenaBlogContentEditorTests {
 
     editor.ReplaceBlogUrlToHttps(new[] { "example.com" });
 
-    Assert.AreEqual(input, editor.ToString(), "modified content");
+    Assert.That(editor.ToString(), Is.EqualTo(input), "modified content");
   }
 }

@@ -44,9 +44,9 @@ public class ReplaceContentTextTests {
       out var modifiedEntries
     );
 
-    Assert.AreEqual(1, modifiedEntries.Count);
-    Assert.AreEqual("barbar", modifiedEntries[0].Content);
-    Assert.AreEqual("foobar", modifiedEntries[0].Title);
+    Assert.That(modifiedEntries.Count, Is.EqualTo(1));
+    Assert.That(modifiedEntries[0].Content, Is.EqualTo("barbar"));
+    Assert.That(modifiedEntries[0].Title, Is.EqualTo("foobar"));
   }
 
   [Test]
@@ -64,10 +64,10 @@ public class ReplaceContentTextTests {
       out var modifiedEntries
     );
 
-    Assert.AreEqual(0, modifiedEntries.Count);
+    Assert.That(modifiedEntries.Count, Is.EqualTo(0));
 
-    Assert.AreEqual("foobar", entries[0].Content);
-    Assert.AreEqual("foobar", entries[0].Title);
+    Assert.That(entries[0].Content, Is.EqualTo("foobar"));
+    Assert.That(entries[0].Title, Is.EqualTo("foobar"));
   }
 
   [Test]
@@ -85,9 +85,9 @@ public class ReplaceContentTextTests {
       out var modifiedEntries
     );
 
-    Assert.AreEqual(1, modifiedEntries.Count);
-    Assert.AreEqual("barbar", modifiedEntries[0].Content);
-    Assert.AreEqual("foobar", modifiedEntries[0].Title);
+    Assert.That(modifiedEntries.Count, Is.EqualTo(1));
+    Assert.That(modifiedEntries[0].Content, Is.EqualTo("barbar"));
+    Assert.That(modifiedEntries[0].Title, Is.EqualTo("foobar"));
   }
 
   [Test]
@@ -105,10 +105,10 @@ public class ReplaceContentTextTests {
       out var modifiedEntries
     );
 
-    Assert.AreEqual(0, modifiedEntries.Count);
+    Assert.That(modifiedEntries.Count, Is.EqualTo(0));
 
-    Assert.AreEqual("foobar", entries[0].Content);
-    Assert.AreEqual("foobar", entries[0].Title);
+    Assert.That(entries[0].Content, Is.EqualTo("foobar"));
+    Assert.That(entries[0].Title, Is.EqualTo("foobar"));
   }
 
   [Test]
@@ -126,9 +126,9 @@ public class ReplaceContentTextTests {
       out var modifiedEntries
     );
 
-    Assert.AreEqual(1, modifiedEntries.Count);
-    Assert.AreEqual("f<oo>bar", modifiedEntries[0].Content);
-    Assert.AreEqual("foobar", modifiedEntries[0].Title);
+    Assert.That(modifiedEntries.Count, Is.EqualTo(1));
+    Assert.That(modifiedEntries[0].Content, Is.EqualTo("f<oo>bar"));
+    Assert.That(modifiedEntries[0].Title, Is.EqualTo("foobar"));
   }
 
 
@@ -149,9 +149,9 @@ public class ReplaceContentTextTests {
       out var modifiedEntries
     );
 
-    Assert.AreEqual(1, modifiedEntries.Count);
-    Assert.AreEqual("foobar", modifiedEntries[0].Content);
-    Assert.AreEqual("barbar", modifiedEntries[0].Title);
+    Assert.That(modifiedEntries.Count, Is.EqualTo(1));
+    Assert.That(modifiedEntries[0].Content, Is.EqualTo("foobar"));
+    Assert.That(modifiedEntries[0].Title, Is.EqualTo("barbar"));
   }
 
   [Test]
@@ -169,10 +169,10 @@ public class ReplaceContentTextTests {
       out var modifiedEntries
     );
 
-    Assert.AreEqual(0, modifiedEntries.Count);
+    Assert.That(modifiedEntries.Count, Is.EqualTo(0));
 
-    Assert.AreEqual("foobar", entries[0].Content);
-    Assert.AreEqual("foobar", entries[0].Title);
+    Assert.That(entries[0].Content, Is.EqualTo("foobar"));
+    Assert.That(entries[0].Title, Is.EqualTo("foobar"));
   }
 
   [Test]
@@ -190,9 +190,9 @@ public class ReplaceContentTextTests {
       out var modifiedEntries
     );
 
-    Assert.AreEqual(1, modifiedEntries.Count);
-    Assert.AreEqual("foobar", modifiedEntries[0].Content);
-    Assert.AreEqual("barbar", modifiedEntries[0].Title);
+    Assert.That(modifiedEntries.Count, Is.EqualTo(1));
+    Assert.That(modifiedEntries[0].Content, Is.EqualTo("foobar"));
+    Assert.That(modifiedEntries[0].Title, Is.EqualTo("barbar"));
   }
 
   [Test]
@@ -210,9 +210,9 @@ public class ReplaceContentTextTests {
       out var modifiedEntries
     );
 
-    Assert.AreEqual(0, modifiedEntries.Count);
+    Assert.That(modifiedEntries.Count, Is.EqualTo(0));
 
-    Assert.AreEqual("foobar", entries[0].Content);
-    Assert.AreEqual("foobar", entries[0].Title);
+    Assert.That(entries[0].Content, Is.EqualTo("foobar"));
+    Assert.That(entries[0].Title, Is.EqualTo("foobar"));
   }
 }

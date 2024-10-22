@@ -73,7 +73,7 @@ http://example.com/
 
     var output = EditLocalContent(input, null);
 
-    Assert.AreEqual(expectedOutput, output);
+    Assert.That(output, Is.EqualTo(expectedOutput));
   }
 
   [Test]
@@ -106,7 +106,7 @@ http://example.net/
 
     var output = EditLocalContent(input, new[] { "--fix-blog-url", "--custom-domain", "example.com" });
 
-    Assert.AreEqual(expectedOutput, output);
+    Assert.That(output, Is.EqualTo(expectedOutput));
   }
 
   [Test]
@@ -135,7 +135,7 @@ http://example.net/
 
     var output = EditLocalContent(input, new[] { "--fix-mixed-content" });
 
-    Assert.AreEqual(expectedOutput, output);
+    Assert.That(output, Is.EqualTo(expectedOutput));
   }
 
   [Test]
@@ -154,7 +154,7 @@ http://example.net/
 
     var output = EditLocalContent(input, new[] { "--fix-mixed-content", "--include-domain", "example.com", "--include-domain", "example.net" });
 
-    Assert.AreEqual(expectedOutput, output);
+    Assert.That(output, Is.EqualTo(expectedOutput));
   }
 
   [Test]
@@ -173,7 +173,7 @@ http://example.net/
 
     var output = EditLocalContent(input, new[] { "--fix-mixed-content", "--exclude-domain", "example.com", "--exclude-domain", "example.net" });
 
-    Assert.AreEqual(expectedOutput, output);
+    Assert.That(output, Is.EqualTo(expectedOutput));
   }
 
   [Test]
@@ -202,7 +202,7 @@ http://example.net/
 
     var output = EditLocalContent(input, new[] { "--fix-mixed-content", "--fix-blog-url", "--custom-domain", "example.com" });
 
-    Assert.AreEqual(expectedOutput, output);
+    Assert.That(output, Is.EqualTo(expectedOutput));
   }
 
   [Test]
@@ -227,7 +227,7 @@ http://example.net/
 
     var output = EditLocalContent(input, new[] { "--fix-mixed-content" });
 
-    Assert.AreEqual(expectedOutput, output);
+    Assert.That(output, Is.EqualTo(expectedOutput));
   }
 
   [Test]
@@ -252,6 +252,6 @@ http://example.net/
 
     var output = EditLocalContent(input, new[] { "--fix-blog-url", "--custom-domain", "smdn.hatenablog.jp" });
 
-    Assert.AreEqual(expectedOutput, output);
+    Assert.That(output, Is.EqualTo(expectedOutput));
   }
 }

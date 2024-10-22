@@ -2,13 +2,14 @@
 # SPDX-FileCopyrightText: 2022 smdn <smdn@smdn.jp>
 # SPDX-License-Identifier: MIT
 
-$PublishTargetFramework = 'netcoreapp3.1'
+$PublishTargetFramework = 'net8.0'
 $PathToProjectToGetVersion = $([System.IO.Path]::Combine(${PSScriptRoot}, '../src/Smdn.HatenaBlogTools.Cli.Login/Smdn.HatenaBlogTools.Cli.Login.csproj'))
 
 # get CLI version
-dotnet build --framework net6.0 $PathToProjectToGetVersion
-$InformationalVersion = dotnet run --no-build --framework net6.0 --project $PathToProjectToGetVersion -- --version
+dotnet build --framework net8.0 $PathToProjectToGetVersion
+$InformationalVersion = dotnet run --no-build --framework net8.0 --project $PathToProjectToGetVersion -- --version
 $InformationalVersion = $InformationalVersion -replace '\(.+\)', ''
+$InformationalVersion = $InformationalVersion -replace '\+[0-9a-z]+', ''
 $Version = New-Object -TypeName System.Version -ArgumentList $InformationalVersion
 
 # generate a temporary solution file for build CLI assemblies
@@ -20,7 +21,7 @@ dotnet new sln --name $CliSolutionName --output $PathToCliSolutionDirectory
 dotnet sln $PathToCliSolutionFile add $([System.IO.Path]::Combine(${PSScriptRoot}, '../src/Smdn.HatenaBlogTools.Cli.*/Smdn.HatenaBlogTools.Cli.*.csproj'))
 
 # determine package name and output directory
-$PackageName = "HatenaBlogTools-${Version}"
+$PackageName = "HatenaBlogTools-$($Version.Major).$($Version.Minor)"
 $PathToPublishOutputDirectory = $([System.IO.Path]::Combine(${PSScriptRoot}, $PackageName))
 
 # build and publish CLI executables
@@ -30,7 +31,10 @@ dotnet publish --configuration Release --framework $PublishTargetFramework --no-
 # create ZIP archive
 $PathToArchive = $([System.IO.Path]::Combine(${PSScriptRoot}, $PackageName + ".zip"))
 
-Remove-Item -Path $PathToArchive # remove existing file before creating archive
+if (Test-Path $PathToArchive) {
+  # remove existing file before creating archive
+  Remove-Item -Path $PathToArchive
+}
 Compress-Archive -CompressionLevel Optimal -Path ${PathToPublishOutputDirectory} -DestinationPath $PathToArchive
 
 # delete the temporary output directory

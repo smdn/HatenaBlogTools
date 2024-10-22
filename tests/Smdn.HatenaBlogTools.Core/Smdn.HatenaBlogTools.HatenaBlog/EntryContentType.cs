@@ -19,5 +19,5 @@ public class EntryContentTypeTests {
   [TestCase("TEXT/HTML", ".html")]
   [TestCase("text/x-unknown", null)]
   public void GetFileExtension(string contentType, string? expectedFileExtension)
-    => Assert.AreEqual(expectedFileExtension, EntryContentType.GetFileExtension(contentType));
+    => Assert.That(EntryContentType.GetFileExtension(contentType), Is.EqualTo(expectedFileExtension));
 }

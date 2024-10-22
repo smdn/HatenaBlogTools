@@ -5,10 +5,15 @@ SPDX-License-Identifier: MIT
 <Project>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0;net47;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net8.0;net47</TargetFrameworks>
     <VersionPrefix>3.1</VersionPrefix>
     <VersionSuffix></VersionSuffix>
-    <Nullable Condition=" '$(TargetFramework)' == 'net6.0' ">warnings</Nullable>
+    <RootNamespace/> <!-- empty the root namespace so that the namespace is determined only by the directory name, for code style rule IDE0030 -->
+    <Nullable Condition=" '$(TargetFramework)' == 'net8.0' ">warnings</Nullable>
+    <NoWarn>IDE0130;$(NoWarn)</NoWarn> <!-- IDE0130: Namespace "XXX" はフォルダー構造と一致しません。 -->
+    <NoWarn>CA1502;$(NoWarn)</NoWarn> <!-- CA1502: 'XXX' のサイクロマティック複雑度は 'n' です。コードを書き換えるか、リファクタリングし、複雑度を '26' 未満に緩和します。 -->
+    <NoWarn>SA1402;$(NoWarn)</NoWarn> <!-- SA1402: File may only contain a single type -->
+    <NoWarn>SA1649;$(NoWarn)</NoWarn> <!-- SA1649: File name should match first type name -->
   </PropertyGroup>
 
   <PropertyGroup Label="assembly attributes">

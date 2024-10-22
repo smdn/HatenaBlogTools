@@ -17,8 +17,10 @@ internal class PseudoAtomPubServer : IDisposable {
 
   private void ThrowIfDisposed()
   {
+#pragma warning disable CA1513
     if (listener is null)
       throw new ObjectDisposedException(GetType().FullName);
+#pragma warning restore CA1513
   }
 
   public void Dispose()

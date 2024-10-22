@@ -78,25 +78,25 @@ public class AtomPubClientTests {
 
     Assert.DoesNotThrow(() => status = client.Get(server.Url, out responseDocument));
 
-    Assert.AreEqual(HttpStatusCode.OK, status);
-    Assert.IsNotNull(responseDocument, nameof(responseDocument));
-    Assert.AreEqual("service", responseDocument!.Root!.Name.LocalName);
-    Assert.AreEqual(AtomPub.Namespaces.App.NamespaceName, responseDocument.Root!.Name.NamespaceName);
+    Assert.That(status, Is.EqualTo(HttpStatusCode.OK));
+    Assert.That(responseDocument, Is.Not.Null, nameof(responseDocument));
+    Assert.That(responseDocument!.Root!.Name.LocalName, Is.EqualTo("service"));
+    Assert.That(responseDocument.Root!.Name.NamespaceName, Is.EqualTo(AtomPub.Namespaces.App.NamespaceName));
 
     var (request, _) = await task;
 
-    Assert.AreEqual(WebRequestMethods.Http.Get, request.HttpMethod, nameof(request.HttpMethod));
-    Assert.AreEqual(userAgent ?? string.Empty, request.UserAgent ?? string.Empty, nameof(request.UserAgent));
-    Assert.IsNotNull(request.Headers["X-WSSE"], "has X-WSSE header");
-    StringAssert.Contains($"UsernameToken Username=\"{userName}\"", request.Headers["X-WSSE"], "X-WSSE header value");
+    Assert.That(request.HttpMethod, Is.EqualTo(WebRequestMethods.Http.Get), nameof(request.HttpMethod));
+    Assert.That(request.UserAgent ?? string.Empty, Is.EqualTo(userAgent ?? string.Empty), nameof(request.UserAgent));
+    Assert.That(request.Headers["X-WSSE"], Is.Not.Null, "has X-WSSE header");
+    Assert.That(request.Headers["X-WSSE"], Does.Contain($"UsernameToken Username=\"{userName}\""), "X-WSSE header value");
 
     var trimmedAcceptTypes = request.AcceptTypes?.Select(static t => t?.Trim())?.ToList();
 
-    CollectionAssert.Contains(trimmedAcceptTypes, "application/x.atom+xml");
-    CollectionAssert.Contains(trimmedAcceptTypes, "application/atom+xml");
-    CollectionAssert.Contains(trimmedAcceptTypes, "application/atomsvc+xml");
-    CollectionAssert.Contains(trimmedAcceptTypes, "application/xml");
-    CollectionAssert.Contains(trimmedAcceptTypes, "text/xml");
+    Assert.That(trimmedAcceptTypes, Has.Member("application/x.atom+xml"));
+    Assert.That(trimmedAcceptTypes, Has.Member("application/atom+xml"));
+    Assert.That(trimmedAcceptTypes, Has.Member("application/atomsvc+xml"));
+    Assert.That(trimmedAcceptTypes, Has.Member("application/xml"));
+    Assert.That(trimmedAcceptTypes, Has.Member("text/xml"));
   }
 
   [Test]
@@ -120,14 +120,14 @@ public class AtomPubClientTests {
 
     Assert.DoesNotThrow(() => status = client.Get(server.Url, out responseDocument));
 
-    Assert.AreEqual(HttpStatusCode.BadRequest, status);
-    Assert.IsNull(responseDocument, nameof(responseDocument));
+    Assert.That(status, Is.EqualTo(HttpStatusCode.BadRequest));
+    Assert.That(responseDocument, Is.Null, nameof(responseDocument));
 
     var (request, _) = await task;
 
-    Assert.AreEqual(WebRequestMethods.Http.Get, request.HttpMethod, nameof(request.HttpMethod));
-    Assert.IsNotNull(request.Headers["X-WSSE"], "has X-WSSE header");
-    StringAssert.Contains($"UsernameToken Username=\"{userName}\"", request.Headers["X-WSSE"], "X-WSSE header value");
+    Assert.That(request.HttpMethod, Is.EqualTo(WebRequestMethods.Http.Get), nameof(request.HttpMethod));
+    Assert.That(request.Headers["X-WSSE"], Is.Not.Null, "has X-WSSE header");
+    Assert.That(request.Headers["X-WSSE"], Does.Contain($"UsernameToken Username=\"{userName}\""), "X-WSSE header value");
   }
 
   [Test]
@@ -159,15 +159,15 @@ public class AtomPubClientTests {
       );
     });
 
-    Assert.AreEqual(HttpStatusCode.Created, status);
-    Assert.IsNotNull(responseDocument, nameof(responseDocument));
-    Assert.AreEqual("entry", responseDocument!.Root!.Name.LocalName);
-    Assert.AreEqual(AtomPub.Namespaces.Atom.NamespaceName, responseDocument.Root!.Name.NamespaceName);
+    Assert.That(status, Is.EqualTo(HttpStatusCode.Created));
+    Assert.That(responseDocument, Is.Not.Null, nameof(responseDocument));
+    Assert.That(responseDocument!.Root!.Name.LocalName, Is.EqualTo("entry"));
+    Assert.That(responseDocument.Root!.Name.NamespaceName, Is.EqualTo(AtomPub.Namespaces.Atom.NamespaceName));
 
     var (request, _) = await task;
 
-    Assert.AreEqual(WebRequestMethods.Http.Post, request.HttpMethod, nameof(request.HttpMethod));
-    Assert.IsNotNull(request.Headers["X-WSSE"], "has X-WSSE header");
+    Assert.That(request.HttpMethod, Is.EqualTo(WebRequestMethods.Http.Post), nameof(request.HttpMethod));
+    Assert.That(request.Headers["X-WSSE"], Is.Not.Null, "has X-WSSE header");
   }
 
   [Test]
@@ -198,12 +198,12 @@ public class AtomPubClientTests {
       );
     });
 
-    Assert.AreEqual(HttpStatusCode.Unauthorized, status);
-    Assert.IsNull(responseDocument, nameof(responseDocument));
+    Assert.That(status, Is.EqualTo(HttpStatusCode.Unauthorized));
+    Assert.That(responseDocument, Is.Null, nameof(responseDocument));
 
     var (request, _) = await task;
 
-    Assert.AreEqual(WebRequestMethods.Http.Post, request.HttpMethod, nameof(request.HttpMethod));
+    Assert.That(request.HttpMethod, Is.EqualTo(WebRequestMethods.Http.Post), nameof(request.HttpMethod));
   }
 
   [Test]
@@ -235,15 +235,15 @@ public class AtomPubClientTests {
       );
     });
 
-    Assert.AreEqual(HttpStatusCode.OK, status);
-    Assert.IsNotNull(responseDocument, nameof(responseDocument));
-    Assert.AreEqual("entry", responseDocument!.Root!.Name.LocalName);
-    Assert.AreEqual(AtomPub.Namespaces.Atom.NamespaceName, responseDocument.Root!.Name.NamespaceName);
+    Assert.That(status, Is.EqualTo(HttpStatusCode.OK));
+    Assert.That(responseDocument, Is.Not.Null, nameof(responseDocument));
+    Assert.That(responseDocument!.Root!.Name.LocalName, Is.EqualTo("entry"));
+    Assert.That(responseDocument.Root!.Name.NamespaceName, Is.EqualTo(AtomPub.Namespaces.Atom.NamespaceName));
 
     var (request, _) = await task;
 
-    Assert.AreEqual(WebRequestMethods.Http.Put, request.HttpMethod, nameof(request.HttpMethod));
-    Assert.IsNotNull(request.Headers["X-WSSE"], "has X-WSSE header");
+    Assert.That(request.HttpMethod, Is.EqualTo(WebRequestMethods.Http.Put), nameof(request.HttpMethod));
+    Assert.That(request.Headers["X-WSSE"], Is.Not.Null, "has X-WSSE header");
   }
 
   [Test]
@@ -274,12 +274,12 @@ public class AtomPubClientTests {
       );
     });
 
-    Assert.AreEqual(HttpStatusCode.MethodNotAllowed, status);
-    Assert.IsNull(responseDocument, nameof(responseDocument));
+    Assert.That(status, Is.EqualTo(HttpStatusCode.MethodNotAllowed));
+    Assert.That(responseDocument, Is.Null, nameof(responseDocument));
 
     var (request, _) = await task;
 
-    Assert.AreEqual(WebRequestMethods.Http.Put, request.HttpMethod, nameof(request.HttpMethod));
+    Assert.That(request.HttpMethod, Is.EqualTo(WebRequestMethods.Http.Put), nameof(request.HttpMethod));
   }
 
   [TestCase(true)]
@@ -313,11 +313,11 @@ public class AtomPubClientTests {
 
     var (request, requestStream) = await task;
 
-    Assert.AreEqual(
-      postIfTrueOtherwisePut
-        ? WebRequestMethods.Http.Post
-        : WebRequestMethods.Http.Put,
+    Assert.That(
       request.HttpMethod,
+      Is.EqualTo(postIfTrueOtherwisePut
+        ? WebRequestMethods.Http.Post
+        : WebRequestMethods.Http.Put),
       nameof(request.HttpMethod)
     );
 
@@ -325,9 +325,9 @@ public class AtomPubClientTests {
 
     requestStream.Read(requestBodyFirst5Bytes, 0, requestBodyFirst5Bytes.Length);
 
-    CollectionAssert.AreEqual(
-      new byte[] { (byte)'<', (byte)'?', (byte)'x', (byte)'m', (byte)'l'},
+    Assert.That(
       requestBodyFirst5Bytes,
+      Is.EqualTo(new byte[] { (byte)'<', (byte)'?', (byte)'x', (byte)'m', (byte)'l' }).AsCollection,
       "request body must be sent in UTF-8 without BOM"
     );
   }
