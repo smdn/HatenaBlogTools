@@ -6,27 +6,44 @@ SPDX-License-Identifier: MIT
   <PropertyGroup>
     <!-- enable target framework net* (.NET >= 5.0) by default -->
     <EnableTargetFrameworkDotNet>true</EnableTargetFrameworkDotNet>
-    <!-- enable target framework netcoreapp* by default -->
-    <EnableTargetFrameworkNetCoreApp>true</EnableTargetFrameworkNetCoreApp>
+    <EnableTargetFrameworkDotNet60>true</EnableTargetFrameworkDotNet60>
+    <EnableTargetFrameworkDotNet80>true</EnableTargetFrameworkDotNet80>
     <!-- enable target framework net* (.NET Framework/Mono) by default -->
     <EnableTargetFrameworkNetFx>true</EnableTargetFrameworkNetFx>
   </PropertyGroup>
 
+  <!--
+    Note: RuntimeInformation.RuntimeIdentifier on >= .NET 8 has been changed to return 'linux-x64' instead of 'ubuntu.20.04-x64'.
+    RuntimeInformation.OSDescription still returns 'Ubuntu 22.04' on >= .NET 8.
+  -->
+
   <!-- On Ubuntu 22.04 -->
   <PropertyGroup
-    Condition=" $([System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier.StartsWith('ubuntu.22.04')) "
+    Condition="
+      $([System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier.StartsWith('ubuntu.22.04')) or
+      $([System.Runtime.InteropServices.RuntimeInformation]::OSDescription.StartsWith('Ubuntu 22.04'))
+    "
   >
-    <!-- disable .NET Core (cannot run .NET Core on Ubuntu 22.04) -->
-    <EnableTargetFrameworkNetCoreApp>false</EnableTargetFrameworkNetCoreApp>
     <!-- disable Mono (test runner not working on local environment?) -->
-    <EnableTargetFrameworkNetFx>false</EnableTargetFrameworkNetFx>
+    <EnableTargetFrameworkNetFx Condition=" '$(GITHUB_ACTIONS)' != 'true' ">false</EnableTargetFrameworkNetFx>
   </PropertyGroup>
 
-  <!-- On Ubuntu 20.04 -->
+  <!-- On Ubuntu 24.04 -->
   <PropertyGroup
-    Condition=" $([System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier.StartsWith('ubuntu.20.04')) "
+    Condition="
+      $([System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier.StartsWith('ubuntu.24.04')) or
+      $([System.Runtime.InteropServices.RuntimeInformation]::OSDescription.StartsWith('Ubuntu 24.04'))
+    "
   >
-    <!-- enable Mono on GitHub Actions -->
-    <EnableTargetFrameworkNetFx Condition=" '$(GITHUB_ACTIONS)' == 'true' ">true</EnableTargetFrameworkNetFx>
+    <!-- disable net6.0 on GitHub Actions Ubuntu 24.04 runner images -->
+    <EnableTargetFrameworkDotNet60 Condition=" '$(GITHUB_ACTIONS)' == 'true' ">false</EnableTargetFrameworkDotNet60>
+    <!-- disable Mono on GitHub Actions Ubuntu 24.04 runner images -->
+    <EnableTargetFrameworkNetFx Condition=" '$(GITHUB_ACTIONS)' == 'true' ">false</EnableTargetFrameworkNetFx>
+  </PropertyGroup>
+
+  <!-- On MacOS -->
+  <PropertyGroup Condition="$([System.OperatingSystem]::IsMacOS())">
+    <!-- disable net6.0 on GitHub Actions MacOS runner images -->
+    <EnableTargetFrameworkDotNet60 Condition=" '$(GITHUB_ACTIONS)' == 'true' ">false</EnableTargetFrameworkDotNet60>
   </PropertyGroup>
 </Project>
