@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 $PublishTargetFramework = 'net8.0'
-$PathToProjectToGetVersion = $([System.IO.Path]::Combine(${PSScriptRoot}, '../src/Smdn.HatenaBlogTools.Cli.Login/Smdn.HatenaBlogTools.Cli.Login.csproj'))
+$PathToProjectToGetVersion = $([System.IO.Path]::Combine(${PSScriptRoot}, '..\src\Smdn.HatenaBlogTools.Cli.Login\Smdn.HatenaBlogTools.Cli.Login.csproj'))
 
 # get CLI version
 dotnet build --framework net8.0 $PathToProjectToGetVersion
@@ -18,7 +18,7 @@ $PathToCliSolutionDirectory = $PSScriptRoot
 $PathToCliSolutionFile = $([System.IO.Path]::Combine($PathToCliSolutionDirectory, $CliSolutionName + '.sln'))
 
 dotnet new sln --name $CliSolutionName --output $PathToCliSolutionDirectory
-dotnet sln $PathToCliSolutionFile add $([System.IO.Path]::Combine(${PSScriptRoot}, '../src/Smdn.HatenaBlogTools.Cli.*/Smdn.HatenaBlogTools.Cli.*.csproj'))
+dotnet sln $PathToCliSolutionFile add $([System.IO.Path]::Combine(${PSScriptRoot}, '..\src\Smdn.HatenaBlogTools.Cli.*\Smdn.HatenaBlogTools.Cli.*.csproj'))
 
 # determine package name and output directory
 $PackageName = "HatenaBlogTools-$($Version.Major).$($Version.Minor)"
