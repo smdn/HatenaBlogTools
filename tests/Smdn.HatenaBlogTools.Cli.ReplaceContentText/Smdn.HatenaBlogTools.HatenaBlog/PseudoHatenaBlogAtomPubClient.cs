@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2013 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+#nullable enable
 
 using System;
 using System.Collections.Generic;

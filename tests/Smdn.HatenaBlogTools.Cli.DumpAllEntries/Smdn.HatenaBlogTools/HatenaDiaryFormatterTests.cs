@@ -119,7 +119,7 @@ public class HatenaDiaryFormatterTests {
 
     var day = doc.Root!.Element("day")!;
 
-    Assert.That(day.Attribute("date")?.Value, Is.EqualTo(dateUpdated.LocalDateTime.ToString("yyyy-MM-dd")));
+    Assert.That(day.Attribute("date")?.Value, Is.EqualTo(dateUpdated.LocalDateTime.ToString("yyyy-MM-dd", provider: null)));
     Assert.That(day.Attribute("title")?.Value, Is.Empty);
 
     // /diary/day/body
@@ -172,7 +172,7 @@ public class HatenaDiaryFormatterTests {
     var doc = XDocument.Load(new HatenaDiaryFormatter().ToStream(entries));
 
     var day = doc.Root!.Elements("day").First(
-      e => string.Equals(dateUpdatedEntry0.LocalDateTime.ToString("yyyy-MM-dd"), e.Attribute("date")?.Value, StringComparison.Ordinal)
+      e => string.Equals(dateUpdatedEntry0.LocalDateTime.ToString("yyyy-MM-dd", provider: null), e.Attribute("date")?.Value, StringComparison.Ordinal)
     );
     var bodyText = day.Value;
 
@@ -211,13 +211,13 @@ public class HatenaDiaryFormatterTests {
     var doc = XDocument.Load(new HatenaDiaryFormatter().ToStream(entries));
 
     var firstDay = doc.Root!.Elements("day").First(
-      e => string.Equals(dateUpdatedEntry0.LocalDateTime.ToString("yyyy-MM-dd"), e.Attribute("date")?.Value, StringComparison.Ordinal)
+      e => string.Equals(dateUpdatedEntry0.LocalDateTime.ToString("yyyy-MM-dd", provider: null), e.Attribute("date")?.Value, StringComparison.Ordinal)
     );
 
     Assert.That(firstDay.Element("body")!.Value.Replace("\r", string.Empty), Does.Contain($"*{dateUpdatedEntry0.ToUnixTimeSeconds():D}*entry0\nentry0-content\n"));
 
     var secondDay = doc.Root!.Elements("day").First(
-      e => string.Equals(dateUpdatedEntry1.LocalDateTime.ToString("yyyy-MM-dd"), e.Attribute("date")?.Value, StringComparison.Ordinal)
+      e => string.Equals(dateUpdatedEntry1.LocalDateTime.ToString("yyyy-MM-dd", provider: null), e.Attribute("date")?.Value, StringComparison.Ordinal)
     );
 
     Assert.That(secondDay.Element("body")!.Value.Replace("\r", string.Empty), Does.Contain($"*{dateUpdatedEntry1.ToUnixTimeSeconds():D}*entry1\nentry1-content\n"));

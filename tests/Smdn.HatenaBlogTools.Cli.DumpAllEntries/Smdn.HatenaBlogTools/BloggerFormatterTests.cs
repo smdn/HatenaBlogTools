@@ -83,14 +83,14 @@ public class BloggerFormatterTests {
     // /feed/entry/published
     Assert.That(elementEntry.Element(AtomPub.Namespaces.Atom + "published"), Is.Not.Null);
     Assert.That(
-      DateTimeOffset.Parse(elementEntry.Element(AtomPub.Namespaces.Atom + "published")!.Value),
+      DateTimeOffset.Parse(elementEntry.Element(AtomPub.Namespaces.Atom + "published")!.Value, formatProvider: null),
       Is.EqualTo(entry.DatePublished)
     );
 
     // /feed/entry/updated
     Assert.That(elementEntry.Element(AtomPub.Namespaces.Atom + "published"), Is.Not.Null);
     Assert.That(
-      DateTimeOffset.Parse(elementEntry.Element(AtomPub.Namespaces.Atom + "updated")!.Value),
+      DateTimeOffset.Parse(elementEntry.Element(AtomPub.Namespaces.Atom + "updated")!.Value, formatProvider: null),
       Is.EqualTo(entry.DateUpdated)
     );
 
