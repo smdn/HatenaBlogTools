@@ -98,6 +98,6 @@ jobs:
       dotnet_test_options_verbosity_level:    ${{ github.event.inputs.dotnet_test_options_verbosity_level }}
       dotnet_test_options_framework:          ${{ github.event.inputs.dotnet_test_options_framework }}
       dotnet_test_options_filter_expression:  ${{ github.event.inputs.dotnet_test_options_filter_expression }}
-      dotnet_build_options_enable_concurrent_build: 'true'
+      dotnet_build_options_enable_concurrent_build: ${{ fromJSON('true') }}
     secrets:
       token_repo: ${{ secrets.GITHUB_TOKEN }}
