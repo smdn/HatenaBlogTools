@@ -42,9 +42,6 @@ on:
         description: "The common extra options to be set on running the `dotnet restore/build/test` command."
         required: false
         type: string
-        # set '/maxcpucount:1' to avoid 'error MSB4018: The "GenerateDepsFile" task failed unexpectedly'
-        # ref: https://github.com/dotnet/sdk/issues/2902
-        default: "/maxcpucount:1"
 
       dotnet_test_options_verbosity_level:
         description: "The argument to be set to the `--verbosity <LEVEL>` option of the `dotnet test` command. <LEVEL> := q[uiet], m[inimal], n[ormal], d[etailed], diag[nostic]"
@@ -86,7 +83,7 @@ jobs:
         fi
 
   run-test:
-    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test-v1.3.2
+    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test-v1.3.3
     needs: prerequisites
     with:
       project:            ${{ github.event.inputs.project }}
@@ -101,5 +98,6 @@ jobs:
       dotnet_test_options_verbosity_level:    ${{ github.event.inputs.dotnet_test_options_verbosity_level }}
       dotnet_test_options_framework:          ${{ github.event.inputs.dotnet_test_options_framework }}
       dotnet_test_options_filter_expression:  ${{ github.event.inputs.dotnet_test_options_filter_expression }}
+      dotnet_build_options_enable_concurrent_build: 'true'
     secrets:
       token_repo: ${{ secrets.GITHUB_TOKEN }}
